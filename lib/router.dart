@@ -1,8 +1,8 @@
 import 'package:calm_notes/navigation_bar.dart';
-import 'package:calm_notes/screen_entry.dart';
-import 'package:calm_notes/screen_home.dart';
-import 'package:calm_notes/screen_settings.dart';
-import 'package:calm_notes/screen_statistics.dart';
+import 'package:calm_notes/pages/screen_entry.dart';
+import 'package:calm_notes/pages/screen_home.dart';
+import 'package:calm_notes/pages/screen_settings.dart';
+import 'package:calm_notes/pages/screen_statistics.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 

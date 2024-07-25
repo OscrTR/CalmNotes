@@ -1,10 +1,18 @@
 import 'package:calm_notes/colors.dart';
+import 'package:calm_notes/services/database_service.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 
-class ScreenHome extends StatelessWidget {
+class ScreenHome extends StatefulWidget {
   const ScreenHome({super.key});
+
+  @override
+  State<ScreenHome> createState() => _ScreenHomeState();
+}
+
+class _ScreenHomeState extends State<ScreenHome> {
+  final DatabaseService _databaseService = DatabaseService.instance;
 
   @override
   Widget build(BuildContext context) {
