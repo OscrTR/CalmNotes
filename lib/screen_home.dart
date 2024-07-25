@@ -1,5 +1,7 @@
+import 'package:calm_notes/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:material_symbols_icons/material_symbols_icons.dart';
 
 class ScreenHome extends StatelessWidget {
   const ScreenHome({super.key});
@@ -11,6 +13,27 @@ class ScreenHome extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Hello!',
+                  style: Theme.of(context).textTheme.headlineMedium,
+                ),
+                IconButton(
+                    iconSize: 30,
+                    color: AppColors.primaryColor,
+                    onPressed: () => GoRouter.of(context).push('/settings'),
+                    icon: const Icon(
+                      Symbols.settings,
+                      weight: 300,
+                    )),
+              ],
+            ),
+            Text(
+              "Don't make a bad day make you feel like you have a bad life.",
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
             Text(
               'Regular Inter text.',
               style: Theme.of(context).textTheme.bodyMedium,
@@ -22,18 +45,6 @@ class ScreenHome extends StatelessWidget {
             Text(
               'Bold PlayfairDisplay text.',
               style: Theme.of(context).textTheme.headlineMedium,
-            ),
-            ElevatedButton(
-              onPressed: () => context.push('/statistics'),
-              child: const Text('Go to the stats screen'),
-            ),
-            ElevatedButton(
-              onPressed: () => context.push('/settings'),
-              child: const Text('Go to the settings screen'),
-            ),
-            ElevatedButton(
-              onPressed: () => context.push('/entry'),
-              child: const Text('Go to the entry screen'),
             ),
           ],
         ),
