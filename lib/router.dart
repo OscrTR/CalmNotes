@@ -13,24 +13,59 @@ final router = GoRouter(
         routes: [
           GoRoute(
             path: '/',
-            builder: (context, state) => const ScreenHome(),
+            pageBuilder: (context, state) => CustomTransitionPage(
+              child: const ScreenHome(),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                // No transition
+                return child;
+              },
+            ),
           ),
           GoRoute(
             path: '/statistics',
-            builder: (context, state) => const ScreenStatistics(),
+            pageBuilder: (context, state) => CustomTransitionPage(
+              child: const ScreenStatistics(),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                // No transition
+                return child;
+              },
+            ),
           ),
           GoRoute(
             path: '/settings',
-            builder: (context, state) => const ScreenSettings(),
+            pageBuilder: (context, state) => CustomTransitionPage(
+              child: const ScreenSettings(),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                // No transition
+                return child;
+              },
+            ),
           ),
           GoRoute(
             path: '/entry',
-            builder: (context, state) => const ScreenEntry(),
+            pageBuilder: (context, state) => CustomTransitionPage(
+              child: const ScreenEntry(),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                // No transition
+                return child;
+              },
+            ),
           ),
         ],
         builder: (context, state, child) {
           return Scaffold(
-              body: child, bottomNavigationBar: const CustomNavigationBar());
+              body: SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.only(
+                      left: 20.0, top: 20.0, right: 20.0, bottom: 0.0),
+                  child: child,
+                ),
+              ),
+              bottomNavigationBar: const CustomNavigationBar());
         })
   ],
 );
