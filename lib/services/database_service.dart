@@ -1,3 +1,4 @@
+import 'package:calm_notes/models/entry.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -57,5 +58,23 @@ class DatabaseService {
       _entriesDescriptionColumnName: description,
       _entriesTagsColumnName: tags
     });
+  }
+
+  Future<List<Entry>> getEntries() async {
+    final db = await database;
+    final data = await db.query(_entriesTableName);
+    List<Entry> entries = data
+        .map(
+          (e) => Entry(
+            id: e['id'] as int,
+            mood: e['mood'] as int,
+            date: e['date'] as String,
+            emotions: e['emotions'] as String,
+            description: e['description'] as String,
+            tags: e['tags'] as String,
+          ),
+        )
+        .toList();
+    return entries;
   }
 }
