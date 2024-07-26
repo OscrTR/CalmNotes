@@ -65,11 +65,20 @@ class _ScreenHomeState extends State<ScreenHome> {
                         Text(entry.mood.toString()),
                         const Text(' - '),
                         OutlinedButton(
-                            onPressed: () {
-                              _databaseService.updateEntry(entry.id, 10);
-                              setState(() {});
-                            },
-                            child: Text('Edit'))
+                          onPressed: () {
+                            _databaseService.updateEntry(entry.id, 10);
+                            setState(() {});
+                          },
+                          child: const Text('Edit'),
+                        ),
+                        const Text(' - '),
+                        OutlinedButton(
+                          onPressed: () {
+                            _databaseService.deleteEntry(entry.id);
+                            setState(() {});
+                          },
+                          child: const Text('Delete'),
+                        ),
                       ],
                     ),
                   ),

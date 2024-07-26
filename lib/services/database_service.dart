@@ -89,4 +89,13 @@ class DatabaseService {
       whereArgs: [id],
     );
   }
+
+  void deleteEntry(int id) async {
+    final db = await database;
+    await db.delete(
+      _entriesTableName,
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
 }
