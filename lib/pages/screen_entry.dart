@@ -13,15 +13,44 @@ class ScreenEntry extends StatefulWidget {
 
 class _ScreenEntryState extends State<ScreenEntry> {
   final DatabaseService _databaseService = DatabaseService.instance;
+  DateTime selectedDate = DateTime.now();
+  TimeOfDay selectedTime =
+      TimeOfDay(hour: DateTime.now().hour, minute: DateTime.now().minute);
+  DateFormat dateFormatter = DateFormat('d MMMM yyyy');
+
+  Future<void> selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+        context: context,
+        initialDate: selectedDate,
+        firstDate: DateTime(2023),
+        lastDate: DateTime(2043));
+    if (picked != null && picked != selectedDate) {
+      setState(() {
+        selectedDate = picked;
+      });
+    }
+  }
+
+  Future<void> selectTime(BuildContext context) async {
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: selectedTime,
+      builder: (BuildContext context, Widget? child) {
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+          child: child!,
+        );
+      },
+    );
+    if (picked != null && picked != selectedTime) {
+      setState(() {
+        selectedTime = picked;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    DateTime now = DateTime.now();
-    DateFormat dateFormatter = DateFormat('d MMMM yyyy');
-    String formattedDate = dateFormatter.format(now);
-    DateFormat timeFormatter = DateFormat('HH:mm');
-    String formattedTime = timeFormatter.format(now);
-
     return Scaffold(
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -38,19 +67,35 @@ class _ScreenEntryState extends State<ScreenEntry> {
               ),
               child: Row(
                 children: [
-                  Text(
-                    formattedDate,
-                    style: Theme.of(context).textTheme.titleMedium,
+                  TextButton(
+                    onPressed: () => selectDate(context),
+                    child: Text(
+                      dateFormatter.format(selectedDate),
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
                   ),
-                  Text(' - $formattedTime')
+                  const Text(' - '),
+                  TextButton(
+                    onPressed: () => selectTime(context),
+                    child: Text(
+                      MaterialLocalizations.of(context).formatTimeOfDay(
+                          selectedTime,
+                          alwaysUse24HourFormat: true),
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                  ),
                 ],
               )),
           const CustomSlider(),
-          OutlinedButton(onPressed: () {}, child: Text('anxiety')),
+          OutlinedButton(onPressed: () {}, child: const Text('anxiety')),
           FilledButton(
             onPressed: () {
-              _databaseService.addEntry(formattedDate + formattedTime, 5,
-                  'emotions', 'description', 'tags');
+              _databaseService.addEntry(
+                  '${dateFormatter.format(selectedDate)}|${MaterialLocalizations.of(context).formatTimeOfDay(selectedTime, alwaysUse24HourFormat: true)}',
+                  5,
+                  'emotions',
+                  'description',
+                  'tags');
             },
             style: ButtonStyle(
               backgroundColor:
