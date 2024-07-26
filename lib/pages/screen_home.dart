@@ -56,9 +56,15 @@ class _ScreenHomeState extends State<ScreenHome> {
                 index -= 1;
 
                 Entry entry = snapshot.data![index];
-                return ListTile(
-                  title: Text(
-                    entry.id.toString(),
+                return Card(
+                  child: ListTile(
+                    title: Row(
+                      children: [
+                        Text(entry.id.toString()),
+                        const Text(' - '),
+                        Text(entry.mood.toString()),
+                      ],
+                    ),
                   ),
                 );
               });
