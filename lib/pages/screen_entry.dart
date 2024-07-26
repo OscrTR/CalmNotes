@@ -91,7 +91,7 @@ class _ScreenEntryState extends State<ScreenEntry> {
           FilledButton(
             onPressed: () {
               _databaseService.addEntry(
-                  '${dateFormatter.format(selectedDate)}|${MaterialLocalizations.of(context).formatTimeOfDay(selectedTime, alwaysUse24HourFormat: true)}',
+                  '${selectedDate.toString().split(' ')[0]}|${MaterialLocalizations.of(context).formatTimeOfDay(selectedTime, alwaysUse24HourFormat: true)}',
                   5,
                   'emotions',
                   'description',

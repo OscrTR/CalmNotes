@@ -58,12 +58,11 @@ class _ScreenHomeState extends State<ScreenHome> {
                 Entry entry = snapshot.data![index];
                 return Card(
                   child: ListTile(
-                    title: Row(
+                    title: Column(
                       children: [
                         Text(entry.id.toString()),
-                        const Text(' - '),
+                        Text(entry.date),
                         Text(entry.mood.toString()),
-                        const Text(' - '),
                         OutlinedButton(
                           onPressed: () {
                             _databaseService.updateEntry(entry.id, 10);
@@ -71,7 +70,6 @@ class _ScreenHomeState extends State<ScreenHome> {
                           },
                           child: const Text('Edit'),
                         ),
-                        const Text(' - '),
                         OutlinedButton(
                           onPressed: () {
                             _databaseService.deleteEntry(entry.id);
