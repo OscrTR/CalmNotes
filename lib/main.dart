@@ -1,5 +1,5 @@
+import 'package:calm_notes/theme.dart';
 import 'package:flutter/material.dart';
-import 'colors.dart';
 import 'router.dart';
 
 void main() {
@@ -12,29 +12,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      routerConfig: router,
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        scaffoldBackgroundColor: AppColors.backgroundColor,
-        fontFamily: 'Inter',
-        textTheme: const TextTheme(
-          bodyMedium: TextStyle(
-            fontSize: 14,
-            color: AppColors.primaryColor,
-          ),
-          titleMedium: TextStyle(
-            fontSize: 14,
-            color: AppColors.primaryColor,
-            fontWeight: FontWeight.bold,
-          ),
-          headlineMedium: TextStyle(
-            color: AppColors.primaryColor,
-            fontFamily: 'PlayfairDisplay',
-            fontSize: 28,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-    );
+        routerConfig: router,
+        debugShowCheckedModeBanner: false,
+        theme: appTheme);
   }
 }

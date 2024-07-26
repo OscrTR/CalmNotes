@@ -98,15 +98,8 @@ class _ScreenEntryState extends State<ScreenEntry> {
                   'tags');
             },
             style: ButtonStyle(
-              backgroundColor:
-                  WidgetStateProperty.all<Color>(AppColors.primaryColor),
               padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
                 const EdgeInsets.symmetric(horizontal: 60, vertical: 12),
-              ),
-              shape: WidgetStateProperty.all<RoundedRectangleBorder>(
-                RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(5.0),
-                ),
               ),
             ),
             child: const Text('Save'),
