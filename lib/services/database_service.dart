@@ -24,8 +24,9 @@ class DatabaseService {
   Future<Database> getDatabase() async {
     final databaseDirPath = await getDatabasesPath();
     final databasePath = join(databaseDirPath, "calmNotes_db.db");
-    final database = openDatabase(
+    return openDatabase(
       databasePath,
+      version: 1,
       onCreate: (db, version) {
         db.execute('''
         CREATE TABLE $_entriesTableName (
@@ -39,6 +40,22 @@ class DatabaseService {
         ''');
       },
     );
-    return database;
+  }
+
+  void addEntry(
+    String date,
+    int mood,
+    String emotions,
+    String description,
+    String tags,
+  ) async {
+    final db = await database;
+    await db.insert(_entriesTableName, {
+      _entriesDateColumnName: date,
+      _entriesMoodColumnName: mood,
+      _entriesEmotionsColumnName: emotions,
+      _entriesDescriptionColumnName: description,
+      _entriesTagsColumnName: tags
+    });
   }
 }

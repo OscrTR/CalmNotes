@@ -7,7 +7,6 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  /// Constructs a [MyApp]
   const MyApp({super.key});
 
   @override
