@@ -77,4 +77,16 @@ class DatabaseService {
         .toList();
     return entries;
   }
+
+  void updateEntry(int id, int mood) async {
+    final db = await database;
+    db.update(
+      _entriesTableName,
+      {
+        _entriesMoodColumnName: mood,
+      },
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
 }
