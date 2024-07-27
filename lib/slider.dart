@@ -71,6 +71,8 @@ class _CustomSliderState extends State<CustomSlider> {
             ),
             thumbShape: const CustomSliderThumbShape(enabledThumbRadius: 12.0),
             thumbColor: thumbColor,
+            inactiveTickMarkColor: Colors.transparent,
+            activeTickMarkColor: Colors.transparent,
           ),
           child: Slider(
             value: _currentSliderValue,
