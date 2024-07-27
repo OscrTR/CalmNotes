@@ -73,6 +73,7 @@ class _CustomSliderState extends State<CustomSlider> {
             thumbColor: thumbColor,
             inactiveTickMarkColor: Colors.transparent,
             activeTickMarkColor: Colors.transparent,
+            showValueIndicator: ShowValueIndicator.never,
           ),
           child: Slider(
             value: _currentSliderValue,
@@ -86,11 +87,6 @@ class _CustomSliderState extends State<CustomSlider> {
               });
             },
           ),
-        ),
-        const SizedBox(height: 16),
-        Text(
-          'Value: ${_currentSliderValue.toStringAsFixed(1)}',
-          style: const TextStyle(fontSize: 24),
         ),
       ],
     );
@@ -165,6 +161,62 @@ class CustomSliderThumbShape extends RoundSliderThumbShape {
       canvas.drawShadow(path, Colors.black, evaluatedElevation, true);
       canvas.drawCircle(center, radius, paint);
       canvas.drawCircle(center, radius, borderPaint);
+
+      // TextPainter to draw the value above the thumb
+      final TextSpan span = TextSpan(
+        text: '${(value * 10).round()}', // Format the value
+        style: const TextStyle(
+          fontSize: 12.0,
+          color: AppColors.backgroundColor,
+        ),
+      );
+
+      final TextPainter textPainter = TextPainter(
+        text: span,
+        textAlign: TextAlign.center,
+        textDirection: textDirection,
+      );
+
+      textPainter.layout();
+
+      const double backgroundWidth = 40;
+      const double backgroundHeight = 24;
+
+      // Background rectangle position
+      final Offset backgroundOffset = center -
+          Offset(
+            backgroundWidth / 2,
+            radius +
+                backgroundHeight +
+                9, // Offset to place background above thumb
+          );
+
+      // Draw the background rectangle
+      final Paint backgroundPaint = Paint()
+        ..color = AppColors.primaryColor // Background color
+        ..style = PaintingStyle.fill;
+
+      final Rect backgroundRect = Rect.fromLTWH(
+        backgroundOffset.dx,
+        backgroundOffset.dy,
+        backgroundWidth,
+        backgroundHeight,
+      );
+
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(backgroundRect, const Radius.circular(5)),
+        backgroundPaint,
+      );
+
+      // Calculate the position to place the text within the background rectangle
+      final Offset textOffset = center -
+          Offset(
+            textPainter.width / 2,
+            21 + textPainter.height + 4, // Offset to place text above the thumb
+          );
+
+      // Paint the text on the canvas
+      textPainter.paint(canvas, textOffset);
     }
   }
 }
