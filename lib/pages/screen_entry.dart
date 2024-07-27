@@ -60,33 +60,29 @@ class _ScreenEntryState extends State<ScreenEntry> {
             'How do you feel?',
             style: Theme.of(context).textTheme.headlineMedium,
           ),
-          TextButton(
-              onPressed: () {},
-              style: ButtonStyle(
-                padding: WidgetStateProperty.all<EdgeInsets>(EdgeInsets.zero),
+          Row(
+            children: [
+              TextButton(
+                onPressed: () => selectDate(context),
+                child: Text(
+                  dateFormatter.format(selectedDate),
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
               ),
-              child: Row(
-                children: [
-                  TextButton(
-                    onPressed: () => selectDate(context),
-                    child: Text(
-                      dateFormatter.format(selectedDate),
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                  ),
-                  const Text(' - '),
-                  TextButton(
-                    onPressed: () => selectTime(context),
-                    child: Text(
-                      MaterialLocalizations.of(context).formatTimeOfDay(
-                          selectedTime,
-                          alwaysUse24HourFormat: true),
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
-                  ),
-                ],
-              )),
+              TextButton(
+                onPressed: () => selectTime(context),
+                child: Text(
+                  MaterialLocalizations.of(context).formatTimeOfDay(
+                      selectedTime,
+                      alwaysUse24HourFormat: true),
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
           const CustomSlider(),
+          const SizedBox(height: 14),
           OutlinedButton(onPressed: () {}, child: const Text('anxiety')),
           FilledButton(
             onPressed: () {

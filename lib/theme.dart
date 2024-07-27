@@ -39,12 +39,12 @@ final ThemeData appTheme = ThemeData(
       ),
     ),
     textButtonTheme: TextButtonThemeData(
-      style: OutlinedButton.styleFrom(
-        foregroundColor: AppColors.primaryColor,
-      ),
-    ),
+        style: TextButton.styleFrom(
+      foregroundColor: AppColors.primaryColor,
+      padding: EdgeInsets.zero,
+    )),
     filledButtonTheme: FilledButtonThemeData(
-      style: OutlinedButton.styleFrom(
+      style: FilledButton.styleFrom(
         foregroundColor: AppColors.backgroundColor,
         backgroundColor: AppColors.primaryColor,
         shape: RoundedRectangleBorder(
