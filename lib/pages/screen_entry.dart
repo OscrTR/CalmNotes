@@ -56,62 +56,72 @@ class _ScreenEntryState extends State<ScreenEntry> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.start,
+      body: Stack(
         children: [
-          Text(
-            'How do you feel?',
-            style: Theme.of(context).textTheme.headlineMedium,
-          ),
-          Row(
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              TextButton(
-                onPressed: () => selectDate(context),
-                child: Text(
-                  dateFormatter.format(selectedDate),
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
+              Text(
+                'How do you feel?',
+                style: Theme.of(context).textTheme.headlineMedium,
               ),
-              const Text(' - '),
-              TextButton(
-                onPressed: () => selectTime(context),
-                child: Text(
-                  MaterialLocalizations.of(context).formatTimeOfDay(
-                      selectedTime,
-                      alwaysUse24HourFormat: true),
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
+              Row(
+                children: [
+                  TextButton(
+                    onPressed: () => selectDate(context),
+                    child: Text(
+                      dateFormatter.format(selectedDate),
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ),
+                  const Text(' - '),
+                  TextButton(
+                    onPressed: () => selectTime(context),
+                    child: Text(
+                      MaterialLocalizations.of(context).formatTimeOfDay(
+                          selectedTime,
+                          alwaysUse24HourFormat: true),
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                  ),
+                ],
               ),
+              const SizedBox(height: 24),
+              CustomSlider(
+                onChanged: (double newValue) {
+                  selectedMood = newValue.toInt();
+                },
+              ),
+              const SizedBox(height: 14),
+              Emotions(),
             ],
           ),
-          const SizedBox(height: 24),
-          CustomSlider(
-            onChanged: (double newValue) {
-              selectedMood = newValue.toInt();
-            },
-          ),
-          const SizedBox(height: 14),
-          Emotions(),
-          FilledButton(
-            onPressed: () {
-              final emotionProvider =
-                  Provider.of<EmotionProvider>(context, listen: false);
-              final emotionCounts = emotionProvider.selectedEmotionCounts;
-              _databaseService.addEntry(
-                  '${selectedDate.toString().split(' ')[0]}|${MaterialLocalizations.of(context).formatTimeOfDay(selectedTime, alwaysUse24HourFormat: true)}',
-                  selectedMood,
-                  '$emotionCounts',
-                  'description',
-                  'tags');
-            },
-            style: ButtonStyle(
-              padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
-                const EdgeInsets.symmetric(horizontal: 60, vertical: 12),
+          Positioned(
+            bottom: 16.0, // Distance from bottom
+            left: 0,
+            right: 0,
+            child: Center(
+                child: FilledButton(
+              onPressed: () {
+                final emotionProvider =
+                    Provider.of<EmotionProvider>(context, listen: false);
+                final emotionCounts = emotionProvider.selectedEmotionCounts;
+                _databaseService.addEntry(
+                    '${selectedDate.toString().split(' ')[0]}|${MaterialLocalizations.of(context).formatTimeOfDay(selectedTime, alwaysUse24HourFormat: true)}',
+                    selectedMood,
+                    '$emotionCounts',
+                    'description',
+                    'tags');
+              },
+              style: ButtonStyle(
+                padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
+                  const EdgeInsets.symmetric(horizontal: 60, vertical: 12),
+                ),
               ),
-            ),
-            child: const Text('Save'),
-          )
+              child: const Text('Save'),
+            )),
+          ),
         ],
       ),
     );
