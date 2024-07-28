@@ -1,9 +1,9 @@
 import 'package:calm_notes/colors.dart';
 import 'package:flutter/material.dart';
-import 'dart:math' as math;
 
 class CustomSlider extends StatefulWidget {
-  const CustomSlider({super.key});
+  final ValueChanged<double>? onChanged;
+  const CustomSlider({super.key, this.onChanged});
 
   @override
   State<CustomSlider> createState() => _CustomSliderState();
@@ -85,6 +85,9 @@ class _CustomSliderState extends State<CustomSlider> {
               setState(() {
                 _currentSliderValue = value;
               });
+              if (widget.onChanged != null) {
+                widget.onChanged!(value);
+              }
             },
           ),
         ),

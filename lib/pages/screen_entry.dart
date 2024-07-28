@@ -49,6 +49,8 @@ class _ScreenEntryState extends State<ScreenEntry> {
     }
   }
 
+  int selectedMood = 5;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -82,14 +84,18 @@ class _ScreenEntryState extends State<ScreenEntry> {
             ],
           ),
           const SizedBox(height: 24),
-          const CustomSlider(),
+          CustomSlider(
+            onChanged: (double newValue) {
+              selectedMood = newValue.toInt();
+            },
+          ),
           const SizedBox(height: 14),
           OutlinedButton(onPressed: () {}, child: const Text('anxiety')),
           FilledButton(
             onPressed: () {
               _databaseService.addEntry(
                   '${selectedDate.toString().split(' ')[0]}|${MaterialLocalizations.of(context).formatTimeOfDay(selectedTime, alwaysUse24HourFormat: true)}',
-                  5,
+                  selectedMood,
                   'emotions',
                   'description',
                   'tags');
