@@ -1,4 +1,5 @@
 import 'package:calm_notes/colors.dart';
+import 'package:calm_notes/emotions.dart';
 import 'package:calm_notes/slider.dart';
 import 'package:flutter/material.dart';
 import 'package:calm_notes/services/database_service.dart';
@@ -90,7 +91,7 @@ class _ScreenEntryState extends State<ScreenEntry> {
             },
           ),
           const SizedBox(height: 14),
-          OutlinedButton(onPressed: () {}, child: const Text('anxiety')),
+          const Emotions(),
           FilledButton(
             onPressed: () {
               _databaseService.addEntry(
