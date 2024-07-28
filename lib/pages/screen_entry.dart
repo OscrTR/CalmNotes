@@ -69,6 +69,7 @@ class _ScreenEntryState extends State<ScreenEntry> {
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
               ),
+              const Text(' - '),
               TextButton(
                 onPressed: () => selectTime(context),
                 child: Text(

@@ -42,6 +42,8 @@ final ThemeData appTheme = ThemeData(
         style: TextButton.styleFrom(
       foregroundColor: AppColors.primaryColor,
       padding: EdgeInsets.zero,
+      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      minimumSize: const Size(0, 40),
     )),
     filledButtonTheme: FilledButtonThemeData(
       style: FilledButton.styleFrom(
