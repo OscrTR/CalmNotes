@@ -1,7 +1,9 @@
 import 'package:calm_notes/colors.dart';
+import 'package:calm_notes/providers/emotion_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
+import 'package:provider/provider.dart';
 
 class CustomNavigationBar extends StatefulWidget {
   const CustomNavigationBar({super.key});
@@ -29,7 +31,10 @@ class _CustomNavigationBarState extends State<CustomNavigationBar> {
           IconButton(
               iconSize: 44,
               color: AppColors.primaryColor,
-              onPressed: () => GoRouter.of(context).push('/entry'),
+              onPressed: () {
+                context.read<EmotionProvider>().resetEmotions();
+                GoRouter.of(context).push('/entry');
+              },
               icon: const Icon(Icons.add_circle)),
           IconButton(
               iconSize: 30,

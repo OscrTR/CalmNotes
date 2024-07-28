@@ -24,4 +24,9 @@ class EmotionProvider extends ChangeNotifier {
     }
     notifyListeners();
   }
+
+  void resetEmotions() {
+    _selectedEmotionCounts.clear();
+    notifyListeners();
+  }
 }
