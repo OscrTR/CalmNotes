@@ -63,6 +63,7 @@ class _ScreenHomeState extends State<ScreenHome> {
                         Text(entry.id.toString()),
                         Text(entry.date),
                         Text(entry.mood.toString()),
+                        Text(entry.emotions!),
                         OutlinedButton(
                           onPressed: () {
                             _databaseService.updateEntry(entry.id, 10);

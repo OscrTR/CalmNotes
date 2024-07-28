@@ -1,9 +1,10 @@
-import 'package:calm_notes/colors.dart';
 import 'package:calm_notes/emotions.dart';
+import 'package:calm_notes/providers/emotion_provider.dart';
 import 'package:calm_notes/slider.dart';
 import 'package:flutter/material.dart';
 import 'package:calm_notes/services/database_service.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class ScreenEntry extends StatefulWidget {
   const ScreenEntry({super.key});
@@ -91,13 +92,16 @@ class _ScreenEntryState extends State<ScreenEntry> {
             },
           ),
           const SizedBox(height: 14),
-          const Emotions(),
+          Emotions(),
           FilledButton(
             onPressed: () {
+              final emotionProvider =
+                  Provider.of<EmotionProvider>(context, listen: false);
+              final emotionCounts = emotionProvider.selectedEmotionCounts;
               _databaseService.addEntry(
                   '${selectedDate.toString().split(' ')[0]}|${MaterialLocalizations.of(context).formatTimeOfDay(selectedTime, alwaysUse24HourFormat: true)}',
                   selectedMood,
-                  'emotions',
+                  '$emotionCounts',
                   'description',
                   'tags');
             },
