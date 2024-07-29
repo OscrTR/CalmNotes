@@ -53,6 +53,16 @@ class _ScreenEntryState extends State<ScreenEntry> {
 
   int selectedMood = 5;
 
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _descriptionController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -95,6 +105,36 @@ class _ScreenEntryState extends State<ScreenEntry> {
               ),
               const SizedBox(height: 14),
               Emotions(),
+              const SizedBox(height: 24),
+              TextField(
+                controller: _titleController,
+                decoration: InputDecoration(
+                  border: const OutlineInputBorder(
+                    borderSide: BorderSide.none,
+                  ),
+                  hintText: 'Titre',
+                  hintStyle: Theme.of(context).textTheme.titleMedium,
+                  contentPadding: EdgeInsets.zero,
+                  isDense: true,
+                ),
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const SizedBox(height: 10),
+              TextField(
+                controller: _descriptionController,
+                decoration: InputDecoration(
+                  border: const OutlineInputBorder(
+                    borderSide: BorderSide.none,
+                  ),
+                  hintText: 'Description',
+                  hintStyle: Theme.of(context).textTheme.bodyMedium,
+                  contentPadding: EdgeInsets.zero,
+                  isDense: true,
+                ),
+                style: Theme.of(context).textTheme.bodyMedium,
+                maxLines: null,
+                keyboardType: TextInputType.multiline,
+              ),
             ],
           ),
           Positioned(
@@ -111,7 +151,8 @@ class _ScreenEntryState extends State<ScreenEntry> {
                     '${selectedDate.toString().split(' ')[0]}|${MaterialLocalizations.of(context).formatTimeOfDay(selectedTime, alwaysUse24HourFormat: true)}',
                     selectedMood,
                     '$emotionCounts',
-                    'description',
+                    _titleController.text,
+                    _descriptionController.text,
                     'tags');
               },
               style: ButtonStyle(

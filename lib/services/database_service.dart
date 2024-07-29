@@ -8,6 +8,7 @@ class DatabaseService {
 
   final String _entriesTableName = 'entries';
   final String _entriesIdColumnName = 'id';
+  final String _entriesTitleColumnName = 'title';
   final String _entriesDescriptionColumnName = 'description';
   final String _entriesDateColumnName = 'date';
   final String _entriesMoodColumnName = 'mood';
@@ -35,6 +36,7 @@ class DatabaseService {
           $_entriesDateColumnName TEXT NOT NULL,
           $_entriesMoodColumnName INTEGER NOT NULL,
           $_entriesEmotionsColumnName TEXT,
+          $_entriesTitleColumnName TEXT,
           $_entriesDescriptionColumnName TEXT,
           $_entriesTagsColumnName TEXT
         )
@@ -47,6 +49,7 @@ class DatabaseService {
     String date,
     int mood,
     String emotions,
+    String title,
     String description,
     String tags,
   ) async {
@@ -55,6 +58,7 @@ class DatabaseService {
       _entriesDateColumnName: date,
       _entriesMoodColumnName: mood,
       _entriesEmotionsColumnName: emotions,
+      _entriesTitleColumnName: title,
       _entriesDescriptionColumnName: description,
       _entriesTagsColumnName: tags
     });
@@ -70,6 +74,7 @@ class DatabaseService {
             mood: e['mood'] as int,
             date: e['date'] as String,
             emotions: e['emotions'] as String,
+            title: e['title'] as String,
             description: e['description'] as String,
             tags: e['tags'] as String,
           ),

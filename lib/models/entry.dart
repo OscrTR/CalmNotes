@@ -3,6 +3,7 @@ class Entry {
   final int mood;
   final String date;
   final String? emotions;
+  final String? title;
   final String? description;
   final String? tags;
 
@@ -11,6 +12,7 @@ class Entry {
     required this.date,
     required this.mood,
     this.emotions,
+    this.title,
     this.description,
     this.tags,
   });
