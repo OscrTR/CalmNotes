@@ -29,6 +29,8 @@ flutter:
         - asset: assets/fonts/Inter-Regular.ttf
         - asset: assets/fonts/Inter-Bold.ttf
           weight: 600
+        - asset: assets/fonts/Inter-Black.ttf
+          weight: 800
     - family: PlayfairDisplay
       fonts:
         - asset: assets/fonts/PlayfairDisplay-Bold.ttf

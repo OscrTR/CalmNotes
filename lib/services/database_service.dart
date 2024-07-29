@@ -66,7 +66,10 @@ class DatabaseService {
 
   Future<List<Entry>> getEntries() async {
     final db = await database;
-    final data = await db.query(_entriesTableName);
+    final data = await db.query(
+      _entriesTableName,
+      orderBy: 'date DESC',
+    );
     List<Entry> entries = data
         .map(
           (e) => Entry(

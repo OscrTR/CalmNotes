@@ -4,6 +4,7 @@ import 'package:calm_notes/slider.dart';
 import 'package:calm_notes/tags.dart';
 import 'package:flutter/material.dart';
 import 'package:calm_notes/services/database_service.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -162,6 +163,7 @@ class _ScreenEntryState extends State<ScreenEntry> {
                       _titleController.text,
                       _descriptionController.text,
                       selectedTags.toString());
+                  GoRouter.of(context).push('/');
                 },
                 style: ButtonStyle(
                   padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
