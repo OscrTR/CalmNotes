@@ -1,6 +1,7 @@
 import 'package:calm_notes/emotions.dart';
 import 'package:calm_notes/providers/emotion_provider.dart';
 import 'package:calm_notes/slider.dart';
+import 'package:calm_notes/tags.dart';
 import 'package:flutter/material.dart';
 import 'package:calm_notes/services/database_service.dart';
 import 'package:intl/intl.dart';
@@ -52,6 +53,11 @@ class _ScreenEntryState extends State<ScreenEntry> {
   }
 
   int selectedMood = 5;
+
+  List<String> selectedTags = [];
+  void updateSelectedTags(List<String> newSelectedTags) {
+    selectedTags = newSelectedTags;
+  }
 
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
@@ -112,7 +118,7 @@ class _ScreenEntryState extends State<ScreenEntry> {
                   border: const OutlineInputBorder(
                     borderSide: BorderSide.none,
                   ),
-                  hintText: 'Titre',
+                  hintText: 'Title',
                   hintStyle: Theme.of(context).textTheme.titleMedium,
                   contentPadding: EdgeInsets.zero,
                   isDense: true,
@@ -135,6 +141,13 @@ class _ScreenEntryState extends State<ScreenEntry> {
                 maxLines: null,
                 keyboardType: TextInputType.multiline,
               ),
+              const SizedBox(height: 24),
+              Text(
+                'What was it about?',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const SizedBox(height: 10),
+              Tags(onSelectedTagsChanged: updateSelectedTags),
             ],
           ),
           Positioned(
@@ -153,7 +166,7 @@ class _ScreenEntryState extends State<ScreenEntry> {
                     '$emotionCounts',
                     _titleController.text,
                     _descriptionController.text,
-                    'tags');
+                    selectedTags.toString());
               },
               style: ButtonStyle(
                 padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
