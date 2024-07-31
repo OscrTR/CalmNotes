@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class ScreenHome extends StatefulWidget {
   const ScreenHome({super.key});
@@ -63,7 +64,6 @@ class _ScreenHomeState extends State<ScreenHome> {
       );
       return dateTime;
     } catch (e) {
-      print('Error parsing date or time: $e');
       return null;
     }
   }
@@ -114,10 +114,13 @@ class _ScreenHomeState extends State<ScreenHome> {
                 return Card(
                   color: getCardColor(entry.mood),
                   child: ListTile(
+                    contentPadding: EdgeInsets.zero,
                     title: Container(
                       height: 70,
-                      padding: const EdgeInsets.all(10),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 10, horizontal: 15),
                       child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -141,33 +144,50 @@ class _ScreenHomeState extends State<ScreenHome> {
                               ),
                             ],
                           ),
-                          const SizedBox(width: 10),
                           const VerticalDivider(color: AppColors.ternaryColor),
-                          const SizedBox(width: 10),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                entry.title!,
-                                style: const TextStyle(
-                                  color: AppColors.primaryColor,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
+                          SizedBox(
+                            width: 250,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  mainAxisSize: MainAxisSize.max,
+                                  children: [
+                                    SizedBox(
+                                      width: 230,
+                                      child: Text(
+                                        entry.title!,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                          color: AppColors.primaryColor,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                    SvgPicture.asset(
+                                      'assets/images/mood${entry.mood}.svg',
+                                      height: 18,
+                                      width: 18,
+                                    ),
+                                  ],
                                 ),
-                              ),
-                              const Spacer(),
-                              SizedBox(
-                                width: 220,
-                                child: Text(
-                                  entry.description!,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    color: AppColors.ternaryColor,
+                                SizedBox(
+                                  width: 250,
+                                  child: Text(
+                                    entry.description!,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: AppColors.ternaryColor,
+                                    ),
                                   ),
-                                ),
-                              )
-                            ],
+                                )
+                              ],
+                            ),
                           ),
                         ],
                       ),
