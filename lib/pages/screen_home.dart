@@ -67,16 +67,82 @@ class _ScreenHomeState extends State<ScreenHome> {
             return const Center(child: Text('No entries found.'));
           }
 
-          return ListView.builder(
-            itemCount: entries.length + 1,
-            itemBuilder: (context, index) {
-              if (index == 0) {
-                return _buildHeader(context);
+          Map<String, List<Entry>> groupEntriesByMonthYear(
+              List<Entry> entries) {
+            final Map<String, List<Entry>> groupedEntries = {};
+
+            for (var entry in entries) {
+              final DateTime date = getDateTime(entry.date)!;
+              final String monthYear = DateFormat('MMMM yyyy').format(date);
+
+              if (groupedEntries[monthYear] == null) {
+                groupedEntries[monthYear] = [];
               }
 
-              final entry = entries[index - 1];
-              return _buildEntryCard(entry);
-            },
+              groupedEntries[monthYear]!.add(entry);
+            }
+
+            return groupedEntries;
+          }
+
+          final groupedEntries = groupEntriesByMonthYear(entries);
+
+          return ListView(
+            children: [
+              _buildHeader(context),
+              ...groupedEntries.keys.map(
+                (monthYear) {
+                  final entriesForMonth = groupedEntries[monthYear]!;
+
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 24),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 0),
+                        child: Text(
+                          monthYear,
+                          style:
+                              Theme.of(context).textTheme.titleMedium?.copyWith(
+                                    color: AppColors.ternaryColor,
+                                  ),
+                        ),
+                      ),
+                      ...entriesForMonth.map(
+                        (entry) {
+                          return Card(
+                            color: getCardColor(entry.mood),
+                            margin: const EdgeInsets.symmetric(
+                                vertical: 5, horizontal: 0),
+                            child: ListTile(
+                              contentPadding: EdgeInsets.zero,
+                              title: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 10, horizontal: 15),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    _buildEntryDate(entry.date),
+                                    Container(
+                                      height: 48,
+                                      width: 1,
+                                      color: AppColors.ternaryColor,
+                                    ),
+                                    _buildEntryDetails(entry),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ],
           );
         },
       ),
@@ -84,66 +150,37 @@ class _ScreenHomeState extends State<ScreenHome> {
   }
 
   Widget _buildHeader(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Hello!',
-                style: Theme.of(context).textTheme.headlineMedium,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Hello!',
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
+            IconButton(
+              iconSize: 30,
+              color: AppColors.primaryColor,
+              onPressed: () => GoRouter.of(context).push('/settings'),
+              icon: const Icon(
+                Symbols.settings,
+                weight: 300,
               ),
-              IconButton(
-                iconSize: 30,
-                color: AppColors.primaryColor,
-                onPressed: () => GoRouter.of(context).push('/settings'),
-                icon: const Icon(
-                  Symbols.settings,
-                  weight: 300,
-                ),
-              ),
-            ],
-          ),
-          Text(
-            "Don't make a bad day make you feel like you have a bad life.",
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
-          const SizedBox(height: 24),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildEntryCard(Entry entry) {
-    final dateTime = getDateTime(entry.date)!;
-
-    return Card(
-      color: getCardColor(entry.mood),
-      child: ListTile(
-        contentPadding: EdgeInsets.zero,
-        title: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              _buildDateSection(dateTime),
-              Container(
-                height: 48,
-                width: 1,
-                color: AppColors.ternaryColor,
-              ),
-              _buildEntryDetails(entry),
-            ],
-          ),
+            ),
+          ],
         ),
-      ),
+        Text(
+          "Don't make a bad day make you feel like you have a bad life.",
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
+      ],
     );
   }
 
-  Widget _buildDateSection(DateTime dateTime) {
+  Widget _buildEntryDate(String date) {
+    final dateTime = getDateTime(date)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -152,7 +189,7 @@ class _ScreenHomeState extends State<ScreenHome> {
           style: const TextStyle(
             fontWeight: FontWeight.w800,
             fontSize: 20,
-            color: AppColors.primaryColor,
+            color: Colors.black,
           ),
         ),
         Text(
@@ -160,7 +197,7 @@ class _ScreenHomeState extends State<ScreenHome> {
           style: const TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 12,
-            color: AppColors.ternaryColor,
+            color: Colors.grey,
           ),
         ),
       ],
