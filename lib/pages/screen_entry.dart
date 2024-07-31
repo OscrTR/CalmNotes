@@ -17,48 +17,11 @@ class ScreenEntry extends StatefulWidget {
 
 class _ScreenEntryState extends State<ScreenEntry> {
   final DatabaseService _databaseService = DatabaseService.instance;
-  DateTime selectedDate = DateTime.now();
-  TimeOfDay selectedTime =
-      TimeOfDay(hour: DateTime.now().hour, minute: DateTime.now().minute);
-  DateFormat dateFormatter = DateFormat('d MMMM yyyy');
-
-  Future<void> selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-        context: context,
-        initialDate: selectedDate,
-        firstDate: DateTime(2023),
-        lastDate: DateTime(2043));
-    if (picked != null && picked != selectedDate) {
-      setState(() {
-        selectedDate = picked;
-      });
-    }
-  }
-
-  Future<void> selectTime(BuildContext context) async {
-    final TimeOfDay? picked = await showTimePicker(
-      context: context,
-      initialTime: selectedTime,
-      builder: (BuildContext context, Widget? child) {
-        return MediaQuery(
-          data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
-          child: child!,
-        );
-      },
-    );
-    if (picked != null && picked != selectedTime) {
-      setState(() {
-        selectedTime = picked;
-      });
-    }
-  }
-
-  int selectedMood = 5;
-
-  List<String> selectedTags = [];
-  void updateSelectedTags(List<String> newSelectedTags) {
-    selectedTags = newSelectedTags;
-  }
+  final DateFormat _dateFormatter = DateFormat('d MMMM yyyy');
+  DateTime _selectedDate = DateTime.now();
+  TimeOfDay _selectedTime = TimeOfDay.now();
+  int _selectedMood = 5;
+  List<String> _selectedTags = [];
 
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
@@ -70,111 +33,172 @@ class _ScreenEntryState extends State<ScreenEntry> {
     super.dispose();
   }
 
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate,
+      firstDate: DateTime(2023),
+      lastDate: DateTime(2043),
+    );
+    if (picked != null && picked != _selectedDate) {
+      setState(() {
+        _selectedDate = picked;
+      });
+    }
+  }
+
+  Future<void> _selectTime(BuildContext context) async {
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: _selectedTime,
+      builder: (BuildContext context, Widget? child) {
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+          child: child!,
+        );
+      },
+    );
+    if (picked != null && picked != _selectedTime) {
+      setState(() {
+        _selectedTime = picked;
+      });
+    }
+  }
+
+  void _updateSelectedTags(List<String> newSelectedTags) {
+    setState(() {
+      _selectedTags = newSelectedTags;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Text(
-              'How do you feel?',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-            Row(
-              children: [
-                TextButton(
-                  onPressed: () => selectDate(context),
-                  child: Text(
-                    dateFormatter.format(selectedDate),
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                ),
-                const Text(' - '),
-                TextButton(
-                  onPressed: () => selectTime(context),
-                  child: Text(
-                    MaterialLocalizations.of(context).formatTimeOfDay(
-                        selectedTime,
-                        alwaysUse24HourFormat: true),
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
-                ),
-              ],
-            ),
+            _buildHeader(context),
             const SizedBox(height: 24),
-            CustomSlider(
-              onChanged: (double newValue) {
-                selectedMood = newValue.toInt();
-              },
-            ),
+            CustomSlider(onChanged: (double newValue) {
+              setState(() {
+                _selectedMood = newValue.toInt();
+              });
+            }),
             const SizedBox(height: 14),
             Emotions(),
             const SizedBox(height: 24),
-            TextField(
-              controller: _titleController,
-              decoration: InputDecoration(
-                border: const OutlineInputBorder(
-                  borderSide: BorderSide.none,
-                ),
-                hintText: 'Title',
-                hintStyle: Theme.of(context).textTheme.titleMedium,
-                contentPadding: EdgeInsets.zero,
-                isDense: true,
-              ),
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
+            _buildTitleField(context),
             const SizedBox(height: 10),
-            TextField(
-              controller: _descriptionController,
-              decoration: InputDecoration(
-                border: const OutlineInputBorder(
-                  borderSide: BorderSide.none,
-                ),
-                hintText: 'Description',
-                hintStyle: Theme.of(context).textTheme.bodyMedium,
-                contentPadding: EdgeInsets.zero,
-                isDense: true,
+            _buildDescriptionField(context),
+            const SizedBox(height: 24),
+            _buildTagsSection(context),
+            const SizedBox(height: 24),
+            _buildSaveButton(context),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeader(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('How do you feel?',
+            style: Theme.of(context).textTheme.headlineMedium),
+        Row(
+          children: [
+            TextButton(
+              onPressed: () => _selectDate(context),
+              child: Text(
+                _dateFormatter.format(_selectedDate),
+                style: Theme.of(context).textTheme.titleMedium,
               ),
-              style: Theme.of(context).textTheme.bodyMedium,
-              maxLines: null,
-              keyboardType: TextInputType.multiline,
             ),
-            const SizedBox(height: 24),
-            Text(
-              'What was it about?',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            const SizedBox(height: 10),
-            Tags(onSelectedTagsChanged: updateSelectedTags),
-            const SizedBox(height: 24),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: FilledButton(
-                onPressed: () {
-                  final emotionProvider =
-                      Provider.of<EmotionProvider>(context, listen: false);
-                  final emotionCounts = emotionProvider.selectedEmotionCounts;
-                  _databaseService.addEntry(
-                      '${selectedDate.toString().split(' ')[0]}|${MaterialLocalizations.of(context).formatTimeOfDay(selectedTime, alwaysUse24HourFormat: true)}',
-                      selectedMood,
-                      '$emotionCounts',
-                      _titleController.text,
-                      _descriptionController.text,
-                      selectedTags.toString());
-                  GoRouter.of(context).push('/');
-                },
-                style: ButtonStyle(
-                  padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
-                    const EdgeInsets.symmetric(horizontal: 60, vertical: 12),
-                  ),
-                ),
-                child: const Text('Save'),
+            const Text(' - '),
+            TextButton(
+              onPressed: () => _selectTime(context),
+              child: Text(
+                MaterialLocalizations.of(context).formatTimeOfDay(_selectedTime,
+                    alwaysUse24HourFormat: true),
+                style: Theme.of(context).textTheme.bodyMedium,
               ),
             ),
           ],
         ),
+      ],
+    );
+  }
+
+  Widget _buildTitleField(BuildContext context) {
+    return TextField(
+      controller: _titleController,
+      decoration: InputDecoration(
+        border: const OutlineInputBorder(borderSide: BorderSide.none),
+        hintText: 'Title',
+        hintStyle: Theme.of(context).textTheme.titleMedium,
+        contentPadding: EdgeInsets.zero,
+        isDense: true,
+      ),
+      style: Theme.of(context).textTheme.titleMedium,
+    );
+  }
+
+  Widget _buildDescriptionField(BuildContext context) {
+    return TextField(
+      controller: _descriptionController,
+      decoration: InputDecoration(
+        border: const OutlineInputBorder(borderSide: BorderSide.none),
+        hintText: 'Description',
+        hintStyle: Theme.of(context).textTheme.bodyMedium,
+        contentPadding: EdgeInsets.zero,
+        isDense: true,
+      ),
+      style: Theme.of(context).textTheme.bodyMedium,
+      maxLines: null,
+      keyboardType: TextInputType.multiline,
+    );
+  }
+
+  Widget _buildTagsSection(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('What was it about?',
+            style: Theme.of(context).textTheme.titleMedium),
+        const SizedBox(height: 10),
+        Tags(onSelectedTagsChanged: _updateSelectedTags),
+      ],
+    );
+  }
+
+  Widget _buildSaveButton(BuildContext context) {
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: FilledButton(
+        onPressed: () {
+          final emotionProvider =
+              Provider.of<EmotionProvider>(context, listen: false);
+          final emotionCounts = emotionProvider.selectedEmotionCounts;
+
+          _databaseService.addEntry(
+            '${_selectedDate.toString().split(' ')[0]}|${MaterialLocalizations.of(context).formatTimeOfDay(_selectedTime, alwaysUse24HourFormat: true)}',
+            _selectedMood,
+            '$emotionCounts',
+            _titleController.text,
+            _descriptionController.text,
+            _selectedTags.toString(),
+          );
+          GoRouter.of(context).push('/');
+        },
+        style: ButtonStyle(
+          padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
+            const EdgeInsets.symmetric(horizontal: 60, vertical: 12),
+          ),
+        ),
+        child: const Text('Save'),
       ),
     );
   }

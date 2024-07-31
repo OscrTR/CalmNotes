@@ -54,7 +54,7 @@ class _ScreenHomeState extends State<ScreenHome> {
         future: _databaseService.getEntries(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           }
 
           if (snapshot.hasError) {
@@ -64,7 +64,7 @@ class _ScreenHomeState extends State<ScreenHome> {
           final entries = snapshot.data;
 
           if (entries == null || entries.isEmpty) {
-            return Center(child: Text('No entries found.'));
+            return const Center(child: Text('No entries found.'));
           }
 
           return ListView.builder(
