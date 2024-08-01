@@ -1,3 +1,4 @@
+import 'package:calm_notes/colors.dart';
 import 'package:calm_notes/emotions.dart';
 import 'package:calm_notes/providers/emotion_provider.dart';
 import 'package:calm_notes/slider.dart';
@@ -75,7 +76,6 @@ class _ScreenEntryState extends State<ScreenEntry> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -106,8 +106,21 @@ class _ScreenEntryState extends State<ScreenEntry> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('How do you feel?',
-            style: Theme.of(context).textTheme.headlineMedium),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text('How do you feel?',
+                style: Theme.of(context).textTheme.headlineMedium),
+            IconButton(
+              color: AppColors.primaryColor,
+              onPressed: () => GoRouter.of(context).push('/'),
+              icon: const Icon(
+                Icons.close,
+              ),
+            ),
+          ],
+        ),
         Row(
           children: [
             TextButton(

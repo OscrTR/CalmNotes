@@ -65,7 +65,10 @@ final router = GoRouter(
                   child: child,
                 ),
               ),
-              bottomNavigationBar: const CustomNavigationBar());
+              bottomNavigationBar:
+                  GoRouterState.of(context).uri.toString() != '/entry'
+                      ? const CustomNavigationBar()
+                      : null);
         })
   ],
 );
