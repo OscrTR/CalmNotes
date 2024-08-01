@@ -110,15 +110,6 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
     return TimeOfDay(hour: hour, minute: minute);
   }
 
-// List of all possible emotions
-  final List<String> _emotions = [
-    'fear',
-    'anger',
-    'disgust',
-    'sad',
-    'happy',
-    'surprise',
-  ];
   // Parse the input string into a Map<String, int>
   Map<String, int> _parseEmotionString(String emotionString) {
     // Remove curly braces and split the string by comma to get each emotion entry
@@ -137,6 +128,13 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
     }
 
     return emotionMap;
+  }
+
+  List<String> _parseTagsString(String tagsString) {
+    String withoutBrackets = tagsString.substring(1, tagsString.length - 1);
+    List<String> items = withoutBrackets.split(',');
+    List<String> result = items.map((item) => item.trim()).toList();
+    return result;
   }
 
   @override
@@ -168,8 +166,7 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
             _selectedMood = entry.mood;
             _titleController.text = entry.title!;
             _descriptionController.text = entry.description!;
-
-            print(entry.tags!);
+            _selectedTags = _parseTagsString(entry.tags!);
             context
                 .read<EmotionProvider>()
                 .setEmotions(_parseEmotionString(entry.emotions!));
@@ -286,7 +283,10 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
         Text('What was it about?',
             style: Theme.of(context).textTheme.titleMedium),
         const SizedBox(height: 10),
-        Tags(onSelectedTagsChanged: _updateSelectedTags),
+        Tags(
+          onSelectedTagsChanged: _updateSelectedTags,
+          defaultSelectedTags: _selectedTags,
+        ),
       ],
     );
   }

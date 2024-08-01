@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 
 class Tags extends StatefulWidget {
+  final List<String>? defaultSelectedTags;
   final Function(List<String>) onSelectedTagsChanged;
-  const Tags({super.key, required this.onSelectedTagsChanged});
+  const Tags(
+      {super.key,
+      this.defaultSelectedTags = const [],
+      required this.onSelectedTagsChanged});
 
   @override
   State<Tags> createState() => _TagsState();
@@ -14,7 +18,14 @@ class _TagsState extends State<Tags> {
     'school',
     'work',
   ];
-  final List<String> selectedTags = [];
+  late List<String> selectedTags;
+
+  @override
+  void initState() {
+    super.initState();
+    selectedTags = List.from(widget.defaultSelectedTags as Iterable);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Wrap(
