@@ -108,7 +108,12 @@ class _ScreenEntryState extends State<ScreenEntry> {
                 style: Theme.of(context).textTheme.headlineMedium),
             IconButton(
               color: AppColors.primaryColor,
-              onPressed: () => GoRouter.of(context).push('/'),
+              onPressed: () {
+                GoRouter.of(context).push('/');
+                Provider.of<EmotionProvider>(context, listen: false)
+                    .resetEmotions();
+                Provider.of<TagProvider>(context, listen: false).resettags();
+              },
               icon: const Icon(
                 Icons.close,
               ),
@@ -202,6 +207,8 @@ class _ScreenEntryState extends State<ScreenEntry> {
             '$tagCounts',
           );
           GoRouter.of(context).push('/');
+          emotionProvider.resetEmotions();
+          tagProvider.resettags();
         },
         style: ButtonStyle(
           padding: WidgetStateProperty.all<EdgeInsetsGeometry>(

@@ -1,6 +1,6 @@
 import 'package:calm_notes/navigation_bar.dart';
 import 'package:calm_notes/pages/entry_detail_page.dart';
-import 'package:calm_notes/pages/screen_entry.dart';
+import 'package:calm_notes/pages/entry_create.page.dart';
 import 'package:calm_notes/pages/home_page.dart';
 import 'package:calm_notes/pages/screen_settings.dart';
 import 'package:calm_notes/pages/screen_statistics.dart';

@@ -194,7 +194,12 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
                 style: Theme.of(context).textTheme.headlineMedium),
             IconButton(
               color: AppColors.primaryColor,
-              onPressed: () => GoRouter.of(context).push('/'),
+              onPressed: () {
+                GoRouter.of(context).push('/');
+                Provider.of<EmotionProvider>(context, listen: false)
+                    .resetEmotions();
+                Provider.of<TagProvider>(context, listen: false).resettags();
+              },
               icon: const Icon(
                 Icons.close,
               ),
@@ -276,15 +281,20 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
               Provider.of<EmotionProvider>(context, listen: false);
           final emotionCounts = emotionProvider.selectedEmotionCounts;
 
+          final tagProvider = Provider.of<TagProvider>(context, listen: false);
+          final tagCounts = tagProvider.selectedtagCounts;
+
           _databaseService.addEntry(
             '${_selectedDate.toString().split(' ')[0]}|${MaterialLocalizations.of(context).formatTimeOfDay(_selectedTime, alwaysUse24HourFormat: true)}',
             _selectedMood,
             '$emotionCounts',
             _titleController.text,
             _descriptionController.text,
-            _selectedTags.toString(),
+            '$tagCounts',
           );
           GoRouter.of(context).push('/');
+          emotionProvider.resetEmotions();
+          tagProvider.resettags();
         },
         style: ButtonStyle(
           padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
