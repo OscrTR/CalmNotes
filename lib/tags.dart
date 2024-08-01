@@ -1,56 +1,55 @@
+import 'package:calm_notes/providers/tag_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-class Tags extends StatefulWidget {
-  final List<String>? defaultSelectedTags;
-  final Function(List<String>) onSelectedTagsChanged;
-  const Tags(
-      {super.key,
-      this.defaultSelectedTags = const [],
-      required this.onSelectedTagsChanged});
+class Tags extends StatelessWidget {
+  Tags({super.key});
 
-  @override
-  State<Tags> createState() => _TagsState();
-}
-
-class _TagsState extends State<Tags> {
-  final List<String> tags = [
+  // List of all possible tags
+  final List<String> _tags = [
     'back pain',
     'school',
     'work',
   ];
-  late List<String> selectedTags;
-
-  @override
-  void initState() {
-    super.initState();
-    selectedTags = List.from(widget.defaultSelectedTags as Iterable);
-  }
 
   @override
   Widget build(BuildContext context) {
-    return Wrap(
-      spacing: 10,
-      children: tags.map((tag) {
-        final isSelected = selectedTags.contains(tag);
-        return isSelected
-            ? FilledButton(
-                onPressed: () {
-                  setState(() {
-                    selectedTags.remove(tag);
-                    widget.onSelectedTagsChanged(selectedTags);
-                  });
-                },
-                child: Text(tag),
-              )
-            : OutlinedButton(
-                onPressed: () {
-                  setState(() {
-                    selectedTags.add(tag);
-                    widget.onSelectedTagsChanged(selectedTags);
-                  });
-                },
-                child: Text(tag));
-      }).toList(),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Wrap(
+          spacing: 10,
+          children: _tags.map((tag) {
+            return OutlinedButton(
+              onPressed: () {
+                // Access the provider and increment the tag count
+                context.read<TagProvider>().incrementtag(tag);
+              },
+              child: Text(tag),
+            );
+          }).toList(),
+        ),
+        Consumer<TagProvider>(
+          builder: (context, tagProvider, child) {
+            return Wrap(
+              spacing: 10,
+              children: _tags
+                  .where(
+                      (tag) => tagProvider.selectedtagCounts.containsKey(tag))
+                  .map((tag) {
+                // If selected, show a filled button with count
+                return FilledButton(
+                  onPressed: () {
+                    // Access the provider and decrement the tag count
+                    tagProvider.decrementtag(tag);
+                  },
+                  child: Text('$tag (${tagProvider.selectedtagCounts[tag]})'),
+                );
+              }).toList(),
+            );
+          },
+        ),
+      ],
     );
   }
 }

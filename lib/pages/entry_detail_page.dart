@@ -2,6 +2,7 @@ import 'package:calm_notes/colors.dart';
 import 'package:calm_notes/emotions.dart';
 import 'package:calm_notes/models/entry.dart';
 import 'package:calm_notes/providers/emotion_provider.dart';
+import 'package:calm_notes/providers/tag_provider.dart';
 import 'package:calm_notes/slider.dart';
 import 'package:calm_notes/tags.dart';
 import 'package:flutter/material.dart';
@@ -55,19 +56,12 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
     _selectedTime = parseTimeOfDay(_savedEntry!.date);
     _titleController.text = _savedEntry!.title!;
     _descriptionController.text = _savedEntry!.description!;
-    // TODO : créer un provider pour les tags (reprendre le fonctionnement des emotions)
-    _selectedTags = _parseTagsString(_savedEntry!.tags!);
     Future.microtask(() {
       Provider.of<EmotionProvider>(context, listen: false)
           .setEmotions(_parseEmotionString(_savedEntry!.emotions!));
+      Provider.of<TagProvider>(context, listen: false)
+          .settags(_parseEmotionString(_savedEntry!.tags!));
     });
-  }
-
-  List<String> _parseTagsString(String tagsString) {
-    String withoutBrackets = tagsString.substring(1, tagsString.length - 1);
-    List<String> items = withoutBrackets.split(',');
-    List<String> result = items.map((item) => item.trim()).toList();
-    return result;
   }
 
   // Parse the input string into a Map<String, int>
@@ -156,12 +150,6 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
         _selectedTime = picked;
       });
     }
-  }
-
-  void _updateSelectedTags(List<String> newSelectedTags) {
-    setState(() {
-      _selectedTags = newSelectedTags;
-    });
   }
 
   @override
@@ -274,7 +262,7 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
         Text('What was it about?',
             style: Theme.of(context).textTheme.titleMedium),
         const SizedBox(height: 10),
-        Tags(onSelectedTagsChanged: _updateSelectedTags),
+        Tags(),
       ],
     );
   }

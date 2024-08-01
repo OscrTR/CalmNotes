@@ -1,6 +1,7 @@
 import 'package:calm_notes/colors.dart';
 import 'package:calm_notes/emotions.dart';
 import 'package:calm_notes/providers/emotion_provider.dart';
+import 'package:calm_notes/providers/tag_provider.dart';
 import 'package:calm_notes/slider.dart';
 import 'package:calm_notes/tags.dart';
 import 'package:flutter/material.dart';
@@ -22,7 +23,6 @@ class _ScreenEntryState extends State<ScreenEntry> {
   DateTime _selectedDate = DateTime.now();
   TimeOfDay _selectedTime = TimeOfDay.now();
   int _selectedMood = 5;
-  List<String> _selectedTags = [];
 
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
@@ -64,12 +64,6 @@ class _ScreenEntryState extends State<ScreenEntry> {
         _selectedTime = picked;
       });
     }
-  }
-
-  void _updateSelectedTags(List<String> newSelectedTags) {
-    setState(() {
-      _selectedTags = newSelectedTags;
-    });
   }
 
   @override
@@ -182,7 +176,7 @@ class _ScreenEntryState extends State<ScreenEntry> {
         Text('What was it about?',
             style: Theme.of(context).textTheme.titleMedium),
         const SizedBox(height: 10),
-        Tags(onSelectedTagsChanged: _updateSelectedTags),
+        Tags(),
       ],
     );
   }
@@ -196,13 +190,16 @@ class _ScreenEntryState extends State<ScreenEntry> {
               Provider.of<EmotionProvider>(context, listen: false);
           final emotionCounts = emotionProvider.selectedEmotionCounts;
 
+          final tagProvider = Provider.of<TagProvider>(context, listen: false);
+          final tagCounts = tagProvider.selectedtagCounts;
+
           _databaseService.addEntry(
             '${_selectedDate.toString().split(' ')[0]}|${MaterialLocalizations.of(context).formatTimeOfDay(_selectedTime, alwaysUse24HourFormat: true)}',
             _selectedMood,
             '$emotionCounts',
             _titleController.text,
             _descriptionController.text,
-            _selectedTags.toString(),
+            '$tagCounts',
           );
           GoRouter.of(context).push('/');
         },
