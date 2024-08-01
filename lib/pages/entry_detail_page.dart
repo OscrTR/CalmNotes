@@ -2,10 +2,10 @@ import 'package:calm_notes/colors.dart';
 import 'package:calm_notes/emotions.dart';
 import 'package:calm_notes/models/entry.dart';
 import 'package:calm_notes/providers/emotion_provider.dart';
-import 'package:calm_notes/services/database_service.dart';
 import 'package:calm_notes/slider.dart';
 import 'package:calm_notes/tags.dart';
 import 'package:flutter/material.dart';
+import 'package:calm_notes/services/database_service.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -19,8 +19,9 @@ class EntryDetailPage extends StatefulWidget {
 }
 
 class _EntryDetailPageState extends State<EntryDetailPage> {
-  bool _isDataInitialized = false;
   final DatabaseService _databaseService = DatabaseService.instance;
+  Entry? _savedEntry;
+
   final DateFormat _dateFormatter = DateFormat('d MMMM yyyy');
   DateTime _selectedDate = DateTime.now();
   TimeOfDay _selectedTime = TimeOfDay.now();
@@ -35,6 +36,94 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
     _titleController.dispose();
     _descriptionController.dispose();
     super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize controllers or other variables if needed
+    _fetchData();
+  }
+
+  Future<void> _fetchData() async {
+    final data = await _databaseService.getEntry(widget.entryId);
+    setState(() {
+      _savedEntry = data;
+    });
+    _selectedMood = _savedEntry!.mood;
+    _selectedDate = getDateTime(_savedEntry!.date)!;
+    _selectedTime = parseTimeOfDay(_savedEntry!.date);
+    _titleController.text = _savedEntry!.title!;
+    _descriptionController.text = _savedEntry!.description!;
+    // TODO : créer un provider pour les tags (reprendre le fonctionnement des emotions)
+    _selectedTags = _parseTagsString(_savedEntry!.tags!);
+    Future.microtask(() {
+      Provider.of<EmotionProvider>(context, listen: false)
+          .setEmotions(_parseEmotionString(_savedEntry!.emotions!));
+    });
+  }
+
+  List<String> _parseTagsString(String tagsString) {
+    String withoutBrackets = tagsString.substring(1, tagsString.length - 1);
+    List<String> items = withoutBrackets.split(',');
+    List<String> result = items.map((item) => item.trim()).toList();
+    return result;
+  }
+
+  // Parse the input string into a Map<String, int>
+  Map<String, int> _parseEmotionString(String emotionString) {
+    // Remove curly braces and split the string by comma to get each emotion entry
+    String cleanedString = emotionString.replaceAll(RegExp(r'[{} ]'), '');
+    List<String> entries = cleanedString.split(',');
+
+    // Convert the list of entries into a map
+    Map<String, int> emotionMap = {};
+    for (String entry in entries) {
+      List<String> parts = entry.split(':');
+      if (parts.length == 2) {
+        String emotion = parts[0];
+        int count = int.tryParse(parts[1]) ?? 0;
+        emotionMap[emotion] = count;
+      }
+    }
+
+    return emotionMap;
+  }
+
+  DateTime? getDateTime(String date) {
+    try {
+      final parts = date.split('|');
+      final dateTime = DateFormat('yyyy-MM-dd').parse(parts[0]);
+      final time = DateFormat('HH:mm').parse(parts[1]);
+      return DateTime(
+          dateTime.year, dateTime.month, dateTime.day, time.hour, time.minute);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  TimeOfDay parseTimeOfDay(String dateTimeString) {
+    // Split the string to separate date and time
+    List<String> parts = dateTimeString.split('|');
+
+    // Extract the time part (assuming the format is correct)
+    if (parts.length != 2) {
+      throw const FormatException('Invalid date-time format');
+    }
+
+    String timePart = parts[1];
+
+    // Split the time part into hours and minutes
+    List<String> timeParts = timePart.split(':');
+    if (timeParts.length != 2) {
+      throw const FormatException('Invalid time format');
+    }
+
+    int hour = int.parse(timeParts[0]);
+    int minute = int.parse(timeParts[1]);
+
+    // Create and return a TimeOfDay object
+    return TimeOfDay(hour: hour, minute: minute);
   }
 
   Future<void> _selectDate(BuildContext context) async {
@@ -75,146 +164,32 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
     });
   }
 
-  DateTime? getDateTime(String date) {
-    try {
-      final parts = date.split('|');
-      final dateTime = DateFormat('yyyy-MM-dd').parse(parts[0]);
-      final time = DateFormat('HH:mm').parse(parts[1]);
-      return DateTime(
-          dateTime.year, dateTime.month, dateTime.day, time.hour, time.minute);
-    } catch (e) {
-      return null;
-    }
-  }
-
-  TimeOfDay parseTimeOfDay(String dateTimeString) {
-    // Split the string to separate date and time
-    List<String> parts = dateTimeString.split('|');
-
-    // Extract the time part (assuming the format is correct)
-    if (parts.length != 2) {
-      throw const FormatException('Invalid date-time format');
-    }
-
-    String timePart = parts[1];
-
-    // Split the time part into hours and minutes
-    List<String> timeParts = timePart.split(':');
-    if (timeParts.length != 2) {
-      throw const FormatException('Invalid time format');
-    }
-
-    int hour = int.parse(timeParts[0]);
-    int minute = int.parse(timeParts[1]);
-
-    // Create and return a TimeOfDay object
-    return TimeOfDay(hour: hour, minute: minute);
-  }
-
-  // Parse the input string into a Map<String, int>
-  Map<String, int> _parseEmotionString(String emotionString) {
-    // Remove curly braces and split the string by comma to get each emotion entry
-    String cleanedString = emotionString.replaceAll(RegExp(r'[{} ]'), '');
-    List<String> entries = cleanedString.split(',');
-
-    // Convert the list of entries into a map
-    Map<String, int> emotionMap = {};
-    for (String entry in entries) {
-      List<String> parts = entry.split(':');
-      if (parts.length == 2) {
-        String emotion = parts[0];
-        int count = int.tryParse(parts[1]) ?? 0;
-        emotionMap[emotion] = count;
-      }
-    }
-
-    return emotionMap;
-  }
-
-  List<String> _parseTagsString(String tagsString) {
-    String withoutBrackets = tagsString.substring(1, tagsString.length - 1);
-    List<String> items = withoutBrackets.split(',');
-    List<String> result = items.map((item) => item.trim()).toList();
-    return result;
-  }
-
-  void _initializeData(Entry entry) {
-    // This method updates the state after fetching the data
-    if (!_isDataInitialized) {
-      setState(() {
-        _selectedDate = getDateTime(entry.date)!;
-        _selectedTime = parseTimeOfDay(entry.date);
-        _selectedMood = entry.mood;
-        _titleController.text = entry.title!;
-        _descriptionController.text = entry.description!;
-        _selectedTags = _parseTagsString(entry.tags!);
-        context
-            .read<EmotionProvider>()
-            .setEmotions(_parseEmotionString(entry.emotions!));
-        _isDataInitialized = true;
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: FutureBuilder<Entry>(
-        future: _databaseService.getEntry(widget.entryId),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            // While the future is resolving, show a loading indicator
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          } else if (snapshot.hasError) {
-            // Handle any errors that occur during the future execution
-            return Center(
-              child: Text('Error: ${snapshot.error}'),
-            );
-          } else if (!snapshot.hasData || snapshot.data == null) {
-            // Handle the case where there is no data returned
-            return const Center(
-              child: Text('Entry not found'),
-            );
-          } else {
-            // Once the future resolves, extract the data and display it
-
-            if (snapshot.hasData) {
-              // Call the initialization method after the build phase is complete
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                _initializeData(snapshot.data!);
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildHeader(context),
+            const SizedBox(height: 24),
+            CustomSlider(onChanged: (double newValue) {
+              setState(() {
+                _selectedMood = newValue.toInt();
               });
-            }
-
-            return Scaffold(
-              body: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildHeader(context),
-                    const SizedBox(height: 24),
-                    CustomSlider(onChanged: (double newValue) {
-                      setState(() {
-                        _selectedMood = newValue.toInt();
-                      });
-                    }),
-                    const SizedBox(height: 14),
-                    Emotions(),
-                    const SizedBox(height: 24),
-                    _buildTitleField(context),
-                    const SizedBox(height: 10),
-                    _buildDescriptionField(context),
-                    const SizedBox(height: 24),
-                    _buildTagsSection(context),
-                    const SizedBox(height: 24),
-                    _buildSaveButton(context),
-                  ],
-                ),
-              ),
-            );
-          }
-        },
+            }),
+            const SizedBox(height: 14),
+            Emotions(),
+            const SizedBox(height: 24),
+            _buildTitleField(context),
+            const SizedBox(height: 10),
+            _buildDescriptionField(context),
+            const SizedBox(height: 24),
+            _buildTagsSection(context),
+            const SizedBox(height: 24),
+            _buildSaveButton(context),
+          ],
+        ),
       ),
     );
   }
@@ -299,10 +274,7 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
         Text('What was it about?',
             style: Theme.of(context).textTheme.titleMedium),
         const SizedBox(height: 10),
-        Tags(
-          onSelectedTagsChanged: _updateSelectedTags,
-          defaultSelectedTags: _selectedTags,
-        ),
+        Tags(onSelectedTagsChanged: _updateSelectedTags),
       ],
     );
   }
@@ -325,7 +297,6 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
             _selectedTags.toString(),
           );
           GoRouter.of(context).push('/');
-          context.read<EmotionProvider>().resetEmotions();
         },
         style: ButtonStyle(
           padding: WidgetStateProperty.all<EdgeInsetsGeometry>(

@@ -196,7 +196,6 @@ class _ScreenEntryState extends State<ScreenEntry> {
               Provider.of<EmotionProvider>(context, listen: false);
           final emotionCounts = emotionProvider.selectedEmotionCounts;
 
-          print(_selectedTags.toString());
           _databaseService.addEntry(
             '${_selectedDate.toString().split(' ')[0]}|${MaterialLocalizations.of(context).formatTimeOfDay(_selectedTime, alwaysUse24HourFormat: true)}',
             _selectedMood,
