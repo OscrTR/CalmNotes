@@ -1,6 +1,7 @@
 import 'package:calm_notes/navigation_bar.dart';
+import 'package:calm_notes/pages/entry_detail_page.dart';
 import 'package:calm_notes/pages/screen_entry.dart';
-import 'package:calm_notes/pages/screen_home.dart';
+import 'package:calm_notes/pages/home_page.dart';
 import 'package:calm_notes/pages/screen_settings.dart';
 import 'package:calm_notes/pages/screen_statistics.dart';
 import 'package:flutter/material.dart';
@@ -14,7 +15,7 @@ final router = GoRouter(
           GoRoute(
             path: '/',
             pageBuilder: (context, state) => CustomTransitionPage(
-              child: const ScreenHome(),
+              child: const HomePage(),
               transitionsBuilder:
                   (context, animation, secondaryAnimation, child) {
                 // No transition
@@ -54,6 +55,11 @@ final router = GoRouter(
                 return child;
               },
             ),
+          ),
+          GoRoute(
+            path: '/entry/:entryId',
+            builder: (context, state) => EntryDetailPage(
+                entryId: int.parse(state.pathParameters['entryId']!)),
           ),
         ],
         builder: (context, state, child) {

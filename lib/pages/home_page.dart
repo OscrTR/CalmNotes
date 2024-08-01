@@ -7,14 +7,14 @@ import 'package:calm_notes/colors.dart';
 import 'package:calm_notes/models/entry.dart';
 import 'package:calm_notes/services/database_service.dart';
 
-class ScreenHome extends StatefulWidget {
-  const ScreenHome({super.key});
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
 
   @override
-  State<ScreenHome> createState() => _ScreenHomeState();
+  State<HomePage> createState() => _HomePageState();
 }
 
-class _ScreenHomeState extends State<ScreenHome> {
+class _HomePageState extends State<HomePage> {
   final DatabaseService _databaseService = DatabaseService.instance;
 
   Color getCardColor(int mood) {
@@ -117,6 +117,8 @@ class _ScreenHomeState extends State<ScreenHome> {
                                 vertical: 5, horizontal: 0),
                             child: ListTile(
                               contentPadding: EdgeInsets.zero,
+                              onTap: () => GoRouter.of(context)
+                                  .push('/entry/${entry.id}'),
                               title: Padding(
                                 padding: const EdgeInsets.symmetric(
                                     vertical: 10, horizontal: 15),
