@@ -19,6 +19,7 @@ class EntryDetailPage extends StatefulWidget {
 }
 
 class _EntryDetailPageState extends State<EntryDetailPage> {
+  bool _isDataInitialized = false;
   final DatabaseService _databaseService = DatabaseService.instance;
   final DateFormat _dateFormatter = DateFormat('d MMMM yyyy');
   DateTime _selectedDate = DateTime.now();
@@ -137,6 +138,24 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
     return result;
   }
 
+  void _initializeData(Entry entry) {
+    // This method updates the state after fetching the data
+    if (!_isDataInitialized) {
+      setState(() {
+        _selectedDate = getDateTime(entry.date)!;
+        _selectedTime = parseTimeOfDay(entry.date);
+        _selectedMood = entry.mood;
+        _titleController.text = entry.title!;
+        _descriptionController.text = entry.description!;
+        _selectedTags = _parseTagsString(entry.tags!);
+        context
+            .read<EmotionProvider>()
+            .setEmotions(_parseEmotionString(entry.emotions!));
+        _isDataInitialized = true;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -160,16 +179,13 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
             );
           } else {
             // Once the future resolves, extract the data and display it
-            final entry = snapshot.data!;
-            _selectedDate = getDateTime(entry.date)!;
-            _selectedTime = parseTimeOfDay(entry.date);
-            _selectedMood = entry.mood;
-            _titleController.text = entry.title!;
-            _descriptionController.text = entry.description!;
-            _selectedTags = _parseTagsString(entry.tags!);
-            context
-                .read<EmotionProvider>()
-                .setEmotions(_parseEmotionString(entry.emotions!));
+
+            if (snapshot.hasData) {
+              // Call the initialization method after the build phase is complete
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                _initializeData(snapshot.data!);
+              });
+            }
 
             return Scaffold(
               body: SingleChildScrollView(
