@@ -29,4 +29,9 @@ class EmotionProvider extends ChangeNotifier {
     _selectedEmotionCounts.clear();
     notifyListeners();
   }
+
+  void setEmotions(Map<String, int> newEmotions) {
+    _selectedEmotionCounts.clear();
+    _selectedEmotionCounts.addAll(newEmotions);
+  }
 }

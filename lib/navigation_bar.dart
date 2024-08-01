@@ -32,7 +32,6 @@ class _CustomNavigationBarState extends State<CustomNavigationBar> {
               iconSize: 44,
               color: AppColors.primaryColor,
               onPressed: () {
-                context.read<EmotionProvider>().resetEmotions();
                 GoRouter.of(context).push('/entry');
               },
               icon: const Icon(Icons.add_circle)),
