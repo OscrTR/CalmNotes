@@ -58,11 +58,19 @@ final router = GoRouter(
           ),
           GoRoute(
             path: '/entry/:entryId',
-            builder: (context, state) => EntryDetailPage(
-                entryId: int.parse(state.pathParameters['entryId']!)),
+            pageBuilder: (context, state) => CustomTransitionPage(
+              child: EntryDetailPage(
+                  entryId: int.parse(state.pathParameters['entryId']!)),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                // No transition
+                return child;
+              },
+            ),
           ),
         ],
         builder: (context, state, child) {
+          final RegExp entryPattern = RegExp(r'^/entry($|/.*)');
           return Scaffold(
               body: SafeArea(
                 child: Padding(
@@ -71,10 +79,10 @@ final router = GoRouter(
                   child: child,
                 ),
               ),
-              bottomNavigationBar:
-                  GoRouterState.of(context).uri.toString() != '/entry'
-                      ? const CustomNavigationBar()
-                      : null);
+              bottomNavigationBar: !entryPattern
+                      .hasMatch(GoRouterState.of(context).uri.toString())
+                  ? const CustomNavigationBar()
+                  : null);
         })
   ],
 );

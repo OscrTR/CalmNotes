@@ -169,7 +169,7 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
             _titleController.text = entry.title!;
             _descriptionController.text = entry.description!;
 
-            print(_parseEmotionString(entry.tags!));
+            print(entry.tags!);
             context
                 .read<EmotionProvider>()
                 .setEmotions(_parseEmotionString(entry.emotions!));
