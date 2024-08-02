@@ -26,7 +26,8 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
   final DateFormat _dateFormatter = DateFormat('d MMMM yyyy');
   DateTime _selectedDate = DateTime.now();
   TimeOfDay _selectedTime = TimeOfDay.now();
-  int _selectedMood = 5;
+  int? _selectedMood;
+  late Future<int?> _futureMood;
 
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
@@ -41,6 +42,7 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
   @override
   void initState() {
     super.initState();
+    _futureMood = _databaseService.getEntryMood(widget.entryId);
     // Initialize controllers or other variables if needed
     _fetchData();
   }
@@ -161,7 +163,7 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
             _buildHeader(context),
             const SizedBox(height: 24),
             FutureBuilder(
-                future: _databaseService.getEntryMood(widget.entryId),
+                future: _futureMood,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const CircularProgressIndicator();
@@ -170,9 +172,10 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
                   } else if (!snapshot.hasData) {
                     return const Text('No data found');
                   } else {
-                    double initialValue = snapshot.data!.toDouble();
+                    final initialValue =
+                        _selectedMood ?? snapshot.data!.toDouble();
                     return CustomSlider(
-                        initialValue: initialValue,
+                        initialValue: initialValue.toDouble(),
                         onChanged: (double newValue) {
                           setState(() {
                             _selectedMood = newValue.toInt();
@@ -298,9 +301,10 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
           final tagProvider = Provider.of<TagProvider>(context, listen: false);
           final tagCounts = tagProvider.selectedtagCounts;
 
-          _databaseService.addEntry(
+          _databaseService.updateEntry(
+            widget.entryId,
             '${_selectedDate.toString().split(' ')[0]}|${MaterialLocalizations.of(context).formatTimeOfDay(_selectedTime, alwaysUse24HourFormat: true)}',
-            _selectedMood,
+            _selectedMood!,
             '$emotionCounts',
             _titleController.text,
             _descriptionController.text,

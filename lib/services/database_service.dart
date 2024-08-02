@@ -125,12 +125,18 @@ class DatabaseService {
     }
   }
 
-  void updateEntry(int id, int mood) async {
+  void updateEntry(int id, String date, int mood, String emotions, String title,
+      String description, String tags) async {
     final db = await database;
     db.update(
       _entriesTableName,
       {
+        _entriesDateColumnName: date,
         _entriesMoodColumnName: mood,
+        _entriesEmotionsColumnName: emotions,
+        _entriesTitleColumnName: title,
+        _entriesDescriptionColumnName: description,
+        _entriesTagsColumnName: tags,
       },
       where: 'id = ?',
       whereArgs: [id],
