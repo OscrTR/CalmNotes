@@ -2,7 +2,7 @@ import 'package:calm_notes/components/navigation_bar.dart';
 import 'package:calm_notes/pages/entry_detail_page.dart';
 import 'package:calm_notes/pages/entry_create.page.dart';
 import 'package:calm_notes/pages/home_page.dart';
-import 'package:calm_notes/pages/screen_settings.dart';
+import 'package:calm_notes/pages/settings_page.dart';
 import 'package:calm_notes/pages/screen_statistics.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -37,7 +37,7 @@ final router = GoRouter(
           GoRoute(
             path: '/settings',
             pageBuilder: (context, state) => CustomTransitionPage(
-              child: const ScreenSettings(),
+              child: const SettingsPage(),
               transitionsBuilder:
                   (context, animation, secondaryAnimation, child) {
                 // No transition

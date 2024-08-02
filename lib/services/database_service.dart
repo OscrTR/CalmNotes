@@ -1,4 +1,5 @@
 import 'package:calm_notes/models/entry.dart';
+import 'package:calm_notes/models/reminder.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -14,6 +15,10 @@ class DatabaseService {
   final String _entriesMoodColumnName = 'mood';
   final String _entriesEmotionsColumnName = 'emotions';
   final String _entriesTagsColumnName = 'tags';
+
+  final String _remindersTableName = 'reminders';
+  final String _remindersIdColumnName = 'id';
+  final String _remindersTimeColumnName = 'time';
 
   DatabaseService._constructor();
 
@@ -41,6 +46,12 @@ class DatabaseService {
           $_entriesTagsColumnName TEXT
         )
         ''');
+        db.execute('''
+      CREATE TABLE $_remindersTableName (
+        $_remindersIdColumnName INTEGER PRIMARY KEY,
+        $_remindersTimeColumnName TEXT NOT NULL,
+      )
+      ''');
       },
     );
   }
@@ -150,5 +161,40 @@ class DatabaseService {
       where: 'id = ?',
       whereArgs: [id],
     );
+  }
+
+  void addReminder(String time) async {
+    final db = await database;
+    await db.insert(_remindersTableName, {
+      _entriesDateColumnName: time,
+    });
+  }
+
+  void deleteReminder(int id) async {
+    final db = await database;
+    await db.delete(
+      _remindersTableName,
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  Future<List<Reminder>> getReminders() async {
+    final db = await database;
+    final data = await db.query(
+      _remindersTableName,
+      orderBy: 'date DESC',
+    );
+
+    List<Reminder> reminders = data
+        .map(
+          (e) => Reminder(
+            id: e['id'] as int,
+            time: e['time'] as String,
+          ),
+        )
+        .toList();
+
+    return reminders;
   }
 }

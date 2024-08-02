@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class ScreenSettings extends StatelessWidget {
-  const ScreenSettings({super.key});
+class SettingsPage extends StatelessWidget {
+  const SettingsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -13,6 +13,9 @@ class ScreenSettings extends StatelessWidget {
           Text(
             'Settings',
             style: Theme.of(context).textTheme.headlineMedium,
+          ),
+          const SizedBox(
+            height: 24,
           ),
           Text(
             'Reminders',
