@@ -1,9 +1,9 @@
 import 'package:calm_notes/colors.dart';
-import 'package:calm_notes/emotions.dart';
+import 'package:calm_notes/components/emotions.dart';
 import 'package:calm_notes/providers/emotion_provider.dart';
 import 'package:calm_notes/providers/tag_provider.dart';
-import 'package:calm_notes/slider.dart';
-import 'package:calm_notes/tags.dart';
+import 'package:calm_notes/components/slider.dart';
+import 'package:calm_notes/components/tags.dart';
 import 'package:flutter/material.dart';
 import 'package:calm_notes/services/database_service.dart';
 import 'package:go_router/go_router.dart';
