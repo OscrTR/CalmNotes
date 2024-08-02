@@ -48,7 +48,7 @@ final router = GoRouter(
           GoRoute(
             path: '/entry',
             pageBuilder: (context, state) => CustomTransitionPage(
-              child: const ScreenEntry(),
+              child: const EntryCreationPage(),
               transitionsBuilder:
                   (context, animation, secondaryAnimation, child) {
                 // No transition

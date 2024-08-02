@@ -10,14 +10,14 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-class ScreenEntry extends StatefulWidget {
-  const ScreenEntry({super.key});
+class EntryCreationPage extends StatefulWidget {
+  const EntryCreationPage({super.key});
 
   @override
-  State<ScreenEntry> createState() => _ScreenEntryState();
+  State<EntryCreationPage> createState() => _EntryCreationPageState();
 }
 
-class _ScreenEntryState extends State<ScreenEntry> {
+class _EntryCreationPageState extends State<EntryCreationPage> {
   final DatabaseService _databaseService = DatabaseService.instance;
   final DateFormat _dateFormatter = DateFormat('d MMMM yyyy');
   DateTime _selectedDate = DateTime.now();
