@@ -64,15 +64,6 @@ class _HomePageState extends State<HomePage> {
           final entries = snapshot.data;
 
           if (entries == null || entries.isEmpty) {
-            return IconButton(
-              iconSize: 30,
-              color: AppColors.primaryColor,
-              onPressed: () => GoRouter.of(context).push('/settings'),
-              icon: const Icon(
-                Symbols.settings,
-                weight: 300,
-              ),
-            );
             return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

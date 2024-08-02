@@ -1,5 +1,6 @@
 import 'package:calm_notes/services/database_service.dart';
 import 'package:flutter/material.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -50,8 +51,20 @@ class _SettingsPageState extends State<SettingsPage> {
                   itemCount: reminders.length,
                   itemBuilder: (context, index) {
                     final reminder = reminders[index];
-                    return ListTile(
-                      title: Text(reminder.time),
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 14),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            reminder.time,
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          ),
+                          const Icon(
+                            Symbols.delete,
+                          ),
+                        ],
+                      ),
                     );
                   },
                 ));
@@ -60,8 +73,6 @@ class _SettingsPageState extends State<SettingsPage> {
               child: FilledButton(
                   onPressed: () {
                     _selectTime(context);
-                    print(
-                        '${MaterialLocalizations.of(context).formatTimeOfDay(_initialTime, alwaysUse24HourFormat: true)}');
                   },
                   child: const Text('Add a reminder'))),
         ],
