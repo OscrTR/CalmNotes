@@ -17,45 +17,25 @@ class _CustomSliderState extends State<CustomSlider> {
       colors: [AppColors.secondaryColor, AppColors.secondaryColor]);
   final trackBorder = 1.0;
   final trackBorderColor = AppColors.primaryColor;
-  Color thumbColor = AppColors.color5;
+
+  static Map<double, Color> thumbColors = {
+    0: AppColors.color0,
+    1: AppColors.color1,
+    2: AppColors.color2,
+    3: AppColors.color3,
+    4: AppColors.color4,
+    5: AppColors.color5,
+    6: AppColors.color6,
+    7: AppColors.color7,
+    8: AppColors.color8,
+    9: AppColors.color9,
+    10: AppColors.color10,
+  };
 
   @override
   Widget build(BuildContext context) {
-    switch (_currentSliderValue) {
-      case 0:
-        thumbColor = AppColors.color0;
-        break;
-      case 1:
-        thumbColor = AppColors.color1;
-        break;
-      case 2:
-        thumbColor = AppColors.color2;
-        break;
-      case 3:
-        thumbColor = AppColors.color3;
-        break;
-      case 4:
-        thumbColor = AppColors.color4;
-        break;
-      case 5:
-        thumbColor = AppColors.color5;
-        break;
-      case 6:
-        thumbColor = AppColors.color6;
-        break;
-      case 7:
-        thumbColor = AppColors.color7;
-        break;
-      case 8:
-        thumbColor = AppColors.color8;
-        break;
-      case 9:
-        thumbColor = AppColors.color9;
-        break;
-      case 10:
-        thumbColor = AppColors.color10;
-        break;
-    }
+    final Color thumbColor =
+        thumbColors[_currentSliderValue] ?? AppColors.color5;
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -128,23 +108,20 @@ class CustomSliderThumbShape extends RoundSliderThumbShape {
     required Size sizeWithOverflow,
   }) {
     final Canvas canvas = context.canvas;
-    final ColorTween colorTween = ColorTween(
+    final Color color = ColorTween(
       begin: sliderTheme.disabledThumbColor,
       end: sliderTheme.thumbColor,
-    );
-    final Tween<double> radiusTween = Tween<double>(
+    ).evaluate(enableAnimation)!;
+
+    final double radius = Tween<double>(
       begin: _disabledThumbRadius,
       end: enabledThumbRadius,
-    );
-    final Tween<double> elevationTween = Tween<double>(
+    ).evaluate(enableAnimation);
+
+    final double evaluatedElevation = Tween<double>(
       begin: elevation,
       end: pressedElevation,
-    );
-
-    final Color color = colorTween.evaluate(enableAnimation)!;
-    final double radius = radiusTween.evaluate(enableAnimation);
-    final double evaluatedElevation =
-        elevationTween.evaluate(activationAnimation);
+    ).evaluate(activationAnimation);
 
     final Paint paint = Paint()
       ..color = color
@@ -155,72 +132,69 @@ class CustomSliderThumbShape extends RoundSliderThumbShape {
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.0; // Border width
 
-    if (sliderTheme.disabledThumbColor != null &&
-        sliderTheme.thumbColor != null) {
-      final Path path = Path()
-        ..addOval(Rect.fromCenter(
-            center: center, width: 2 * radius, height: 2 * radius));
+    final Path path = Path()
+      ..addOval(Rect.fromCenter(
+          center: center, width: 2 * radius, height: 2 * radius));
 
-      canvas.drawShadow(path, Colors.black, evaluatedElevation, true);
-      canvas.drawCircle(center, radius, paint);
-      canvas.drawCircle(center, radius, borderPaint);
+    canvas.drawShadow(path, Colors.black, evaluatedElevation, true);
+    canvas.drawCircle(center, radius, paint);
+    canvas.drawCircle(center, radius, borderPaint);
 
-      // TextPainter to draw the value above the thumb
-      final TextSpan span = TextSpan(
-        text: '${(value * 10).round()}', // Format the value
-        style: const TextStyle(
-          fontSize: 12.0,
-          color: AppColors.backgroundColor,
-        ),
-      );
+    // TextPainter to draw the value above the thumb
+    final TextSpan span = TextSpan(
+      text: '${(value * 10).round()}', // Format the value
+      style: const TextStyle(
+        fontSize: 12.0,
+        color: AppColors.backgroundColor,
+      ),
+    );
 
-      final TextPainter textPainter = TextPainter(
-        text: span,
-        textAlign: TextAlign.center,
-        textDirection: textDirection,
-      );
+    final TextPainter textPainter = TextPainter(
+      text: span,
+      textAlign: TextAlign.center,
+      textDirection: textDirection,
+    );
 
-      textPainter.layout();
+    textPainter.layout();
 
-      const double backgroundWidth = 40;
-      const double backgroundHeight = 24;
+    const double backgroundWidth = 40;
+    const double backgroundHeight = 24;
 
-      // Background rectangle position
-      final Offset backgroundOffset = center -
-          Offset(
-            backgroundWidth / 2,
-            radius +
-                backgroundHeight +
-                9, // Offset to place background above thumb
-          );
+    // Background rectangle position
+    final Offset backgroundOffset = center -
+        Offset(
+          backgroundWidth / 2,
+          radius +
+              backgroundHeight +
+              9, // Offset to place background above thumb
+        );
 
-      // Draw the background rectangle
-      final Paint backgroundPaint = Paint()
-        ..color = AppColors.primaryColor // Background color
-        ..style = PaintingStyle.fill;
+    // Draw the background rectangle
+    final Paint backgroundPaint = Paint()
+      ..color = AppColors.primaryColor // Background color
+      ..style = PaintingStyle.fill;
 
-      final Rect backgroundRect = Rect.fromLTWH(
-        backgroundOffset.dx,
-        backgroundOffset.dy,
-        backgroundWidth,
-        backgroundHeight,
-      );
+    final Rect backgroundRect = Rect.fromLTWH(
+      backgroundOffset.dx,
+      backgroundOffset.dy,
+      backgroundWidth,
+      backgroundHeight,
+    );
 
-      canvas.drawRRect(
-        RRect.fromRectAndRadius(backgroundRect, const Radius.circular(5)),
-        backgroundPaint,
-      );
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(backgroundRect, const Radius.circular(5)),
+      backgroundPaint,
+    );
 
-      // Calculate the position to place the text within the background rectangle
-      final Offset textOffset = center -
-          Offset(
-            textPainter.width / 2,
-            21 + textPainter.height + 4, // Offset to place text above the thumb
-          );
+    // Calculate the position to place the text within the background rectangle
+    final Offset textOffset = center -
+        Offset(
+          textPainter.width / 2,
+          21 + textPainter.height + 4, // Offset to place text above the thumb
+        );
 
-      // Paint the text on the canvas
-      textPainter.paint(canvas, textOffset);
-    }
+    // Paint the text on the canvas
+    textPainter.paint(canvas, textOffset);
   }
 }
 
@@ -232,6 +206,7 @@ class CustomSliderTrackShape extends SliderTrackShape
     this.trackBorder,
     this.trackBorderColor,
   });
+
   final Gradient activeTrackGradient;
   final Gradient? inactiveTrackGradient;
   final double? trackBorder;
@@ -251,14 +226,10 @@ class CustomSliderTrackShape extends SliderTrackShape
     bool isDiscrete = false,
     double additionalActiveTrackHeight = 2,
   }) {
-    assert(sliderTheme.disabledActiveTrackColor != null);
-    assert(sliderTheme.disabledInactiveTrackColor != null);
-    assert(sliderTheme.activeTrackColor != null);
-    assert(sliderTheme.inactiveTrackColor != null);
-    assert(sliderTheme.thumbShape != null);
     if (sliderTheme.trackHeight == null || sliderTheme.trackHeight! <= 0) {
       return;
     }
+
     final Rect trackRect = getPreferredRect(
       parentBox: parentBox,
       offset: offset,
@@ -266,94 +237,144 @@ class CustomSliderTrackShape extends SliderTrackShape
       isEnabled: isEnabled,
       isDiscrete: isDiscrete,
     );
-    final ColorTween activeTrackColorTween = ColorTween(
-        begin: sliderTheme.disabledActiveTrackColor, end: Colors.white);
-    final ColorTween inactiveTrackColorTween = ColorTween(
-        begin: sliderTheme.disabledInactiveTrackColor,
-        end: inactiveTrackGradient != null
-            ? Colors.white
-            : sliderTheme.inactiveTrackColor);
-    final Paint activePaint = Paint()
-      ..shader = activeTrackGradient.createShader(trackRect)
-      ..color = activeTrackColorTween.evaluate(enableAnimation)!;
-    final Paint inactivePaint = Paint()
-      ..color = inactiveTrackColorTween.evaluate(enableAnimation)!;
-    if (inactiveTrackGradient != null) {
-      inactivePaint.shader = inactiveTrackGradient!.createShader(trackRect);
-    }
+
+    final Paint activePaint = _createPaint(
+        activeTrackGradient, trackRect, sliderTheme, enableAnimation, true);
+    final Paint inactivePaint = _createPaint(
+        inactiveTrackGradient, trackRect, sliderTheme, enableAnimation, false);
+
     final canvas = context.canvas;
-    final Paint leftTrackPaint;
-    final Paint rightTrackPaint;
-    switch (textDirection) {
-      case TextDirection.ltr:
-        leftTrackPaint = activePaint;
-        rightTrackPaint = inactivePaint;
-        break;
-      case TextDirection.rtl:
-        leftTrackPaint = inactivePaint;
-        rightTrackPaint = activePaint;
-        break;
-    }
+
     final Radius trackRadius = Radius.circular(trackRect.height / 2);
     final Radius activeTrackRadius =
         Radius.circular((trackRect.height + additionalActiveTrackHeight) / 2);
 
+    _drawTrack(
+      canvas: canvas,
+      trackRect: trackRect,
+      thumbCenter: thumbCenter,
+      leftTrackPaint: activePaint,
+      rightTrackPaint: inactivePaint,
+      textDirection: textDirection,
+      activeTrackRadius: activeTrackRadius,
+      trackRadius: trackRadius,
+    );
+
+    if (trackBorder != null || trackBorderColor != null) {
+      _drawTrackBorder(canvas, trackRect, trackRadius);
+    }
+  }
+
+  Paint _createPaint(
+      Gradient? gradient,
+      Rect trackRect,
+      SliderThemeData sliderTheme,
+      Animation<double> enableAnimation,
+      bool isActive) {
+    final ColorTween colorTween = ColorTween(
+      begin: isActive
+          ? sliderTheme.disabledActiveTrackColor
+          : sliderTheme.disabledInactiveTrackColor,
+      end: isActive ? Colors.white : sliderTheme.inactiveTrackColor,
+    );
+
+    final Paint paint = Paint()..color = colorTween.evaluate(enableAnimation)!;
+
+    if (gradient != null) {
+      paint.shader = gradient.createShader(trackRect);
+    }
+
+    return paint;
+  }
+
+  void _drawTrack({
+    required Canvas canvas,
+    required Rect trackRect,
+    required Offset thumbCenter,
+    required Paint leftTrackPaint,
+    required Paint rightTrackPaint,
+    required TextDirection textDirection,
+    required Radius activeTrackRadius,
+    required Radius trackRadius,
+  }) {
+    switch (textDirection) {
+      case TextDirection.ltr:
+        canvas.drawRRect(
+          RRect.fromLTRBAndCorners(
+            trackRect.left,
+            trackRect.top - (activeTrackRadius.y - trackRadius.y),
+            thumbCenter.dx,
+            trackRect.bottom + (activeTrackRadius.y - trackRadius.y),
+            topLeft: activeTrackRadius,
+            bottomLeft: activeTrackRadius,
+          ),
+          leftTrackPaint,
+        );
+
+        canvas.drawRRect(
+          RRect.fromLTRBAndCorners(
+            thumbCenter.dx,
+            trackRect.top,
+            trackRect.right,
+            trackRect.bottom,
+            topRight: trackRadius,
+            bottomRight: trackRadius,
+          ),
+          rightTrackPaint,
+        );
+        break;
+
+      case TextDirection.rtl:
+        canvas.drawRRect(
+          RRect.fromLTRBAndCorners(
+            trackRect.left,
+            trackRect.top,
+            thumbCenter.dx,
+            trackRect.bottom,
+            topLeft: trackRadius,
+            bottomLeft: trackRadius,
+          ),
+          rightTrackPaint,
+        );
+
+        canvas.drawRRect(
+          RRect.fromLTRBAndCorners(
+            thumbCenter.dx,
+            trackRect.top - (activeTrackRadius.y - trackRadius.y),
+            trackRect.right,
+            trackRect.bottom + (activeTrackRadius.y - trackRadius.y),
+            topRight: activeTrackRadius,
+            bottomRight: activeTrackRadius,
+          ),
+          leftTrackPaint,
+        );
+        break;
+    }
+  }
+
+  void _drawTrackBorder(Canvas canvas, Rect trackRect, Radius trackRadius) {
+    final Paint strokePaint = Paint()
+      ..color = trackBorderColor ?? Colors.black
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = trackBorder != null
+          ? trackBorder! < trackRect.height / 2
+              ? trackBorder!
+              : trackRect.height / 2
+          : 1
+      ..strokeCap = StrokeCap.round;
+
     canvas.drawRRect(
       RRect.fromLTRBAndCorners(
         trackRect.left,
-        (textDirection == TextDirection.ltr)
-            ? trackRect.top - (additionalActiveTrackHeight / 2)
-            : trackRect.top,
-        thumbCenter.dx,
-        (textDirection == TextDirection.ltr)
-            ? trackRect.bottom + (additionalActiveTrackHeight / 2)
-            : trackRect.bottom,
-        topLeft: (textDirection == TextDirection.ltr)
-            ? activeTrackRadius
-            : trackRadius,
-        bottomLeft: (textDirection == TextDirection.ltr)
-            ? activeTrackRadius
-            : trackRadius,
-      ),
-      leftTrackPaint,
-    );
-    canvas.drawRRect(
-      RRect.fromLTRBAndCorners(
-        thumbCenter.dx,
-        (textDirection == TextDirection.rtl)
-            ? trackRect.top - (additionalActiveTrackHeight / 2)
-            : trackRect.top,
+        trackRect.top,
         trackRect.right,
-        (textDirection == TextDirection.rtl)
-            ? trackRect.bottom + (additionalActiveTrackHeight / 2)
-            : trackRect.bottom,
-        topRight: (textDirection == TextDirection.rtl)
-            ? activeTrackRadius
-            : trackRadius,
-        bottomRight: (textDirection == TextDirection.rtl)
-            ? activeTrackRadius
-            : trackRadius,
+        trackRect.bottom,
+        topLeft: trackRadius,
+        bottomLeft: trackRadius,
+        bottomRight: trackRadius,
+        topRight: trackRadius,
       ),
-      rightTrackPaint,
+      strokePaint,
     );
-    if (trackBorder != null || trackBorderColor != null) {
-      final strokePaint = Paint()
-        ..color = trackBorderColor ?? Colors.black
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = trackBorder != null
-            ? trackBorder! < trackRect.height / 2
-                ? trackBorder!
-                : trackRect.height / 2
-            : 1
-        ..strokeCap = StrokeCap.round;
-      canvas.drawRRect(
-          RRect.fromLTRBAndCorners(
-              trackRect.left, trackRect.top, trackRect.right, trackRect.bottom,
-              topLeft: trackRadius,
-              bottomLeft: trackRadius,
-              bottomRight: trackRadius,
-              topRight: trackRadius),
-          strokePaint);
-    }
   }
 }
