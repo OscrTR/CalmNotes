@@ -64,7 +64,22 @@ class _HomePageState extends State<HomePage> {
           final entries = snapshot.data;
 
           if (entries == null || entries.isEmpty) {
-            return const Center(child: Text('No entries found.'));
+            return IconButton(
+              iconSize: 30,
+              color: AppColors.primaryColor,
+              onPressed: () => GoRouter.of(context).push('/settings'),
+              icon: const Icon(
+                Symbols.settings,
+                weight: 300,
+              ),
+            );
+            return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildHeader(context),
+                  const SizedBox(height: 24),
+                  const Text('No entries found.')
+                ]);
           }
 
           Map<String, List<Entry>> groupEntriesByMonthYear(

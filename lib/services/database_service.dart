@@ -47,11 +47,11 @@ class DatabaseService {
         )
         ''');
         db.execute('''
-      CREATE TABLE $_remindersTableName (
-        $_remindersIdColumnName INTEGER PRIMARY KEY,
-        $_remindersTimeColumnName TEXT NOT NULL,
-      )
-      ''');
+        CREATE TABLE $_remindersTableName (
+          $_remindersIdColumnName INTEGER PRIMARY KEY,
+          $_remindersTimeColumnName TEXT NOT NULL
+        )
+        ''');
       },
     );
   }
@@ -166,7 +166,7 @@ class DatabaseService {
   void addReminder(String time) async {
     final db = await database;
     await db.insert(_remindersTableName, {
-      _entriesDateColumnName: time,
+      _remindersTimeColumnName: time,
     });
   }
 
@@ -183,7 +183,7 @@ class DatabaseService {
     final db = await database;
     final data = await db.query(
       _remindersTableName,
-      orderBy: 'date DESC',
+      orderBy: 'time ASC',
     );
 
     List<Reminder> reminders = data
