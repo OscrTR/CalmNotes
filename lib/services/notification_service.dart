@@ -82,40 +82,21 @@ class NotificationService {
   static Future<void> showNotification({
     required final String title,
     required final String body,
-    final String? summary,
-    final Map<String, String>? payload,
-    final ActionType actionType = ActionType.Default,
-    final NotificationLayout notificationLayout = NotificationLayout.Default,
-    final NotificationCategory? category,
-    final String? bigPicture,
-    final List<NotificationActionButton>? actionButtons,
-    final bool scheduled = false,
-    final int? interval,
   }) async {
-    assert(!scheduled || (scheduled && interval != null));
-
+    DateTime scheduleTime = DateTime.now().add(Duration(seconds: 3));
+    print(scheduleTime);
     await AwesomeNotifications().createNotification(
-      content: NotificationContent(
-        id: -1,
-        channelKey: 'high_importance_channel',
-        title: title,
-        body: body,
-        actionType: actionType,
-        notificationLayout: notificationLayout,
-        summary: summary,
-        category: category,
-        payload: payload,
-        bigPicture: bigPicture,
-      ),
-      actionButtons: actionButtons,
-      schedule: scheduled
-          ? NotificationInterval(
-              interval: interval,
-              timeZone:
-                  await AwesomeNotifications().getLocalTimeZoneIdentifier(),
-              preciseAlarm: true,
-            )
-          : null,
-    );
+        content: NotificationContent(
+          id: -1,
+          channelKey: 'high_importance_channel',
+          title: 'Just in time!',
+          body: 'This notification was scheduled to shows at $scheduleTime',
+          wakeUpScreen: true,
+          category: NotificationCategory.Reminder,
+          payload: {'uuid': 'uuid-test'},
+          autoDismissible: false,
+        ),
+        schedule: NotificationCalendar.fromDate(
+            date: scheduleTime, preciseAlarm: true));
   }
 }

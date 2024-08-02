@@ -186,14 +186,14 @@ class _HomePageState extends State<HomePage> {
           style: Theme.of(context).textTheme.bodyMedium,
         ),
         NotificationButton(
-          text: "Normal Notification",
+          text: "Scheduled Notification",
           onPressed: () async {
             await NotificationService.showNotification(
-              title: "Title of the notification",
-              body: "Body of the notification",
+              title: "Scheduled Notification",
+              body: "Notification was fired after 3 seconds",
             );
           },
-        ),
+        )
       ],
     );
   }
