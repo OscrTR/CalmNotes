@@ -2,15 +2,16 @@ import 'package:calm_notes/colors.dart';
 import 'package:flutter/material.dart';
 
 class CustomSlider extends StatefulWidget {
+  final double? initialValue;
   final ValueChanged<double>? onChanged;
-  const CustomSlider({super.key, this.onChanged});
+  const CustomSlider({super.key, this.onChanged, this.initialValue});
 
   @override
   State<CustomSlider> createState() => _CustomSliderState();
 }
 
 class _CustomSliderState extends State<CustomSlider> {
-  double _currentSliderValue = 5;
+  double _sliderValue = 5;
   final activeTrackGradient = const LinearGradient(
       colors: [AppColors.color0, AppColors.color5, AppColors.color10]);
   final inactiveTrackGradient = const LinearGradient(
@@ -33,9 +34,14 @@ class _CustomSliderState extends State<CustomSlider> {
   };
 
   @override
+  void initState() {
+    super.initState();
+    _sliderValue = widget.initialValue != null ? widget.initialValue! : 5.0;
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final Color thumbColor =
-        thumbColors[_currentSliderValue] ?? AppColors.color5;
+    final Color thumbColor = thumbColors[_sliderValue] ?? AppColors.color5;
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -56,14 +62,14 @@ class _CustomSliderState extends State<CustomSlider> {
             showValueIndicator: ShowValueIndicator.never,
           ),
           child: Slider(
-            value: _currentSliderValue,
+            value: _sliderValue,
             min: 0,
             max: 10,
             divisions: 10,
-            label: _currentSliderValue.toStringAsFixed(1),
+            label: _sliderValue.toStringAsFixed(1),
             onChanged: (double value) {
               setState(() {
-                _currentSliderValue = value;
+                _sliderValue = value;
               });
               if (widget.onChanged != null) {
                 widget.onChanged!(value);

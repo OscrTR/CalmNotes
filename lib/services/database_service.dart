@@ -110,6 +110,21 @@ class DatabaseService {
     }
   }
 
+  Future<int> getEntryMood(int id) async {
+    final db = await database;
+    final List<Map<String, dynamic>> result = await db.query(
+      _entriesTableName,
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+
+    if (result.isNotEmpty) {
+      return result.first['mood'] as int;
+    } else {
+      throw Exception('Entry with id $id not found');
+    }
+  }
+
   void updateEntry(int id, int mood) async {
     final db = await database;
     db.update(

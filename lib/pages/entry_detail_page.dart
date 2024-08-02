@@ -160,11 +160,26 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
           children: [
             _buildHeader(context),
             const SizedBox(height: 24),
-            CustomSlider(onChanged: (double newValue) {
-              setState(() {
-                _selectedMood = newValue.toInt();
-              });
-            }),
+            FutureBuilder(
+                future: _databaseService.getEntryMood(widget.entryId),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const CircularProgressIndicator();
+                  } else if (snapshot.hasError) {
+                    return Text('Error: ${snapshot.error}');
+                  } else if (!snapshot.hasData) {
+                    return const Text('No data found');
+                  } else {
+                    double initialValue = snapshot.data!.toDouble();
+                    return CustomSlider(
+                        initialValue: initialValue,
+                        onChanged: (double newValue) {
+                          setState(() {
+                            _selectedMood = newValue.toInt();
+                          });
+                        });
+                  }
+                }),
             const SizedBox(height: 14),
             Emotions(),
             const SizedBox(height: 24),
