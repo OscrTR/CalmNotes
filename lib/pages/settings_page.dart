@@ -50,14 +50,16 @@ class _SettingsPageState extends State<SettingsPage> {
             'Reminders',
             style: Theme.of(context).textTheme.titleMedium,
           ),
-          Flexible(
-            child: Consumer<ReminderProvider>(
-              builder: (context, provider, child) {
-                final reminders = provider.reminders;
-                if (reminders.isEmpty) {
-                  return const Center(child: Text('No reminders found.'));
-                }
-                return ListView.builder(
+          Consumer<ReminderProvider>(
+            builder: (context, provider, child) {
+              final reminders = provider.reminders;
+              if (reminders.isEmpty) {
+                return const Center(child: Text('No reminders found.'));
+              }
+              final double height = reminders.length * 40.0;
+              return SizedBox(
+                height: height,
+                child: ListView.builder(
                   itemCount: reminders.length,
                   itemBuilder: (context, index) {
                     final reminder = reminders[index];
@@ -82,9 +84,9 @@ class _SettingsPageState extends State<SettingsPage> {
                       ],
                     );
                   },
-                );
-              },
-            ),
+                ),
+              );
+            },
           ),
           Center(
             child: FilledButton(
