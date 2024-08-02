@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:calm_notes/services/database_service.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 
 class EntryDetailPage extends StatefulWidget {
@@ -207,8 +208,6 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text('Edit entry',
-                style: Theme.of(context).textTheme.headlineMedium),
             IconButton(
               color: AppColors.primaryColor,
               onPressed: () {
@@ -218,7 +217,45 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
                 Provider.of<TagProvider>(context, listen: false).resettags();
               },
               icon: const Icon(
-                Icons.close,
+                Icons.arrow_back,
+              ),
+            ),
+            Text('Edit entry',
+                style: Theme.of(context).textTheme.headlineMedium),
+            IconButton(
+              color: AppColors.primaryColor,
+              onPressed: () => showDialog<String>(
+                context: context,
+                builder: (BuildContext context) => AlertDialog(
+                  backgroundColor: AppColors.backgroundColor,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  title: const Text('Entry deletion'),
+                  content:
+                      const Text('Are you sure you want to delete this entry?'),
+                  actions: <Widget>[
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, 'Cancel'),
+                      child: const Text('Cancel'),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        _databaseService.deleteEntry(widget.entryId);
+                        Navigator.pop(context, 'Delete');
+                        GoRouter.of(context).push('/');
+                        Provider.of<EmotionProvider>(context, listen: false)
+                            .resetEmotions();
+                        Provider.of<TagProvider>(context, listen: false)
+                            .resettags();
+                      },
+                      child: const Text('Delete'),
+                    ),
+                  ],
+                ),
+              ),
+              icon: const Icon(
+                Symbols.delete,
               ),
             ),
           ],
