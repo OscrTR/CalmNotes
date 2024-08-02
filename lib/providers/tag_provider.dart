@@ -14,7 +14,6 @@ class TagProvider extends ChangeNotifier {
       _selectedtagCounts[tag] = 1;
     }
     notifyListeners();
-    print(_selectedtagCounts);
   }
 
   void decrementtag(String tag) {

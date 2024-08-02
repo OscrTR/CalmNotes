@@ -27,7 +27,6 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
   DateTime _selectedDate = DateTime.now();
   TimeOfDay _selectedTime = TimeOfDay.now();
   int _selectedMood = 5;
-  List<String> _selectedTags = [];
 
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
