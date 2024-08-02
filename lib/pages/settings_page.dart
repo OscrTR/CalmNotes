@@ -1,6 +1,7 @@
-import 'package:calm_notes/services/database_service.dart';
+import 'package:calm_notes/providers/reminder_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:provider/provider.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -10,8 +11,27 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  final DatabaseService _databaseService = DatabaseService.instance;
-  TimeOfDay _initialTime = TimeOfDay.now();
+  TimeOfDay selectedTime = TimeOfDay.now();
+
+  Future<void> selectTime(BuildContext context, VoidCallback onSuccess) async {
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: selectedTime, // Use the current selectedTime
+      builder: (BuildContext context, Widget? child) {
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+          child: child!,
+        );
+      },
+    );
+    if (picked != null) {
+      setState(() {
+        selectedTime = picked;
+        onSuccess.call();
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,72 +50,61 @@ class _SettingsPageState extends State<SettingsPage> {
             'Reminders',
             style: Theme.of(context).textTheme.titleMedium,
           ),
-          FutureBuilder(
-              future: _databaseService.getReminders(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
+          Flexible(
+            child: Consumer<ReminderProvider>(
+              builder: (context, provider, child) {
+                final reminders = provider.reminders;
+                if (reminders.isEmpty) {
+                  return const Center(child: Text('No reminders found.'));
                 }
-
-                if (snapshot.hasError) {
-                  return Center(child: Text('Error: ${snapshot.error}'));
-                }
-
-                final reminders = snapshot.data;
-                if (reminders == null || reminders.isEmpty) {
-                  return const Text('No reminders found.');
-                }
-
-                return Expanded(
-                    child: ListView.builder(
+                return ListView.builder(
                   itemCount: reminders.length,
                   itemBuilder: (context, index) {
                     final reminder = reminders[index];
-                    return Padding(
-                      padding: const EdgeInsets.only(top: 14),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            reminder.time,
-                            style: Theme.of(context).textTheme.bodyMedium,
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          reminder.time,
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                        IconButton(
+                          onPressed: () {
+                            provider.deleteReminder(reminder.id);
+                          },
+                          style: const ButtonStyle(
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                           ),
-                          const Icon(
+                          icon: const Icon(
                             Symbols.delete,
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     );
                   },
-                ));
-              }),
+                );
+              },
+            ),
+          ),
           Center(
-              child: FilledButton(
-                  onPressed: () {
-                    _selectTime(context);
-                  },
-                  child: const Text('Add a reminder'))),
+            child: FilledButton(
+              onPressed: () {
+                selectTime(context, () {
+                  if (!mounted) return;
+                  final reminderProvider =
+                      Provider.of<ReminderProvider>(context, listen: false);
+                  reminderProvider.addReminder(
+                    MaterialLocalizations.of(context).formatTimeOfDay(
+                        selectedTime,
+                        alwaysUse24HourFormat: true),
+                  );
+                });
+              },
+              child: const Text('Add a reminder'),
+            ),
+          ),
         ],
       ),
     );
-  }
-
-  Future<void> _selectTime(BuildContext context) async {
-    final TimeOfDay? picked = await showTimePicker(
-      context: context,
-      initialTime: _initialTime,
-      builder: (BuildContext context, Widget? child) {
-        return MediaQuery(
-          data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
-          child: child!,
-        );
-      },
-    );
-    if (picked != null) {
-      setState(() {
-        _databaseService.addReminder(MaterialLocalizations.of(context)
-            .formatTimeOfDay(picked, alwaysUse24HourFormat: true));
-      });
-    }
   }
 }

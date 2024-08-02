@@ -1,4 +1,5 @@
 import 'package:calm_notes/providers/emotion_provider.dart';
+import 'package:calm_notes/providers/reminder_provider.dart';
 import 'package:calm_notes/providers/tag_provider.dart';
 import 'package:calm_notes/theme.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +12,7 @@ void main() {
       providers: [
         ChangeNotifierProvider(create: (context) => EmotionProvider()),
         ChangeNotifierProvider(create: (context) => TagProvider()),
+        ChangeNotifierProvider(create: (context) => ReminderProvider()),
       ],
       child: const MyApp(),
     ),
