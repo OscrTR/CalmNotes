@@ -1,5 +1,6 @@
 import 'package:calm_notes/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 
 class CustomSlider extends StatefulWidget {
   final double? initialValue;
@@ -45,37 +46,54 @@ class _CustomSliderState extends State<CustomSlider> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        SliderTheme(
-          data: SliderTheme.of(context).copyWith(
-            trackHeight: 8.0,
-            inactiveTrackColor: AppColors.secondaryColor,
-            trackShape: CustomSliderTrackShape(
-              activeTrackGradient: activeTrackGradient,
-              inactiveTrackGradient: inactiveTrackGradient,
-              trackBorder: trackBorder,
-              trackBorderColor: trackBorderColor,
+        Row(
+          children: [
+            SvgPicture.asset(
+              'assets/images/mood0.svg',
+              height: 22,
+              width: 22,
             ),
-            thumbShape: const CustomSliderThumbShape(enabledThumbRadius: 12.0),
-            thumbColor: thumbColor,
-            inactiveTickMarkColor: Colors.transparent,
-            activeTickMarkColor: Colors.transparent,
-            showValueIndicator: ShowValueIndicator.never,
-          ),
-          child: Slider(
-            value: _sliderValue,
-            min: 0,
-            max: 10,
-            divisions: 10,
-            label: _sliderValue.toStringAsFixed(1),
-            onChanged: (double value) {
-              setState(() {
-                _sliderValue = value;
-              });
-              if (widget.onChanged != null) {
-                widget.onChanged!(value);
-              }
-            },
-          ),
+            Expanded(
+              child: SliderTheme(
+                data: SliderTheme.of(context).copyWith(
+                  trackHeight: 8.0,
+                  inactiveTrackColor: AppColors.secondaryColor,
+                  trackShape: CustomSliderTrackShape(
+                    activeTrackGradient: activeTrackGradient,
+                    inactiveTrackGradient: inactiveTrackGradient,
+                    trackBorder: trackBorder,
+                    trackBorderColor: trackBorderColor,
+                  ),
+                  thumbShape:
+                      const CustomSliderThumbShape(enabledThumbRadius: 12.0),
+                  thumbColor: thumbColor,
+                  inactiveTickMarkColor: Colors.transparent,
+                  activeTickMarkColor: Colors.transparent,
+                  showValueIndicator: ShowValueIndicator.never,
+                ),
+                child: Slider(
+                  value: _sliderValue,
+                  min: 0,
+                  max: 10,
+                  divisions: 10,
+                  label: _sliderValue.toStringAsFixed(1),
+                  onChanged: (double value) {
+                    setState(() {
+                      _sliderValue = value;
+                    });
+                    if (widget.onChanged != null) {
+                      widget.onChanged!(value);
+                    }
+                  },
+                ),
+              ),
+            ),
+            SvgPicture.asset(
+              'assets/images/mood10.svg',
+              height: 22,
+              width: 22,
+            ),
+          ],
         ),
       ],
     );
