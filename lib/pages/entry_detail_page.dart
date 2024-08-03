@@ -208,23 +208,33 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            IconButton(
-              color: AppColors.primaryColor,
-              onPressed: () {
+            GestureDetector(
+              onTap: () {
                 GoRouter.of(context).push('/');
                 Provider.of<EmotionProvider>(context, listen: false)
                     .resetEmotions();
                 Provider.of<TagProvider>(context, listen: false).resettags();
               },
-              icon: const Icon(
-                Icons.arrow_back,
+              child: Container(
+                height: 48,
+                width: 48,
+                alignment: Alignment.centerLeft,
+                child: const ClipRect(
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    widthFactor: 0.85,
+                    child: Icon(
+                      Icons.arrow_back,
+                      color: AppColors.primaryColor,
+                    ),
+                  ),
+                ),
               ),
             ),
             Text('Edit entry',
                 style: Theme.of(context).textTheme.headlineMedium),
-            IconButton(
-              color: AppColors.primaryColor,
-              onPressed: () => showDialog<String>(
+            GestureDetector(
+              onTap: () => showDialog<String>(
                 context: context,
                 builder: (BuildContext context) => AlertDialog(
                   backgroundColor: AppColors.backgroundColor,
@@ -254,8 +264,17 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
                   ],
                 ),
               ),
-              icon: const Icon(
-                Symbols.delete,
+              child: Container(
+                height: 48,
+                width: 48,
+                alignment: Alignment.centerRight,
+                child: const SizedBox(
+                  width: 20,
+                  child: Icon(
+                    Symbols.delete,
+                    color: AppColors.primaryColor,
+                  ),
+                ),
               ),
             ),
           ],
