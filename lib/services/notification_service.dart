@@ -9,8 +9,8 @@ class NotificationService {
       null,
       [
         NotificationChannel(
-          channelGroupKey: 'high_importance_channel',
-          channelKey: 'high_importance_channel',
+          channelGroupKey: 'reminders',
+          channelKey: 'reminders',
           channelName: 'Basic notifications',
           channelDescription: 'Notification channel for basic tests',
           defaultColor: const Color(0xFF9D50DD),
@@ -24,7 +24,7 @@ class NotificationService {
       ],
       channelGroups: [
         NotificationChannelGroup(
-          channelGroupKey: 'high_importance_channel_group',
+          channelGroupKey: 'reminders_group',
           channelGroupName: 'Group 1',
         )
       ],
@@ -79,24 +79,26 @@ class NotificationService {
     }
   }
 
-  static Future<void> showNotification({
-    required final String title,
-    required final String body,
-  }) async {
-    DateTime scheduleTime = DateTime.now().add(Duration(seconds: 3));
-    print(scheduleTime);
+  static Future<void> showNotification(TimeOfDay time) async {
+    DateTime date = DateTime.now();
+    DateTime scheduleTime = DateTime(
+      date.year,
+      date.month,
+      date.day,
+      time.hour,
+      time.minute,
+    );
     await AwesomeNotifications().createNotification(
         content: NotificationContent(
           id: -1,
-          channelKey: 'high_importance_channel',
-          title: 'Just in time!',
-          body: 'This notification was scheduled to shows at $scheduleTime',
+          channelKey: 'reminders',
+          title: 'How are you feeling?',
+          body: 'Add an entry to your journal.',
           wakeUpScreen: true,
           category: NotificationCategory.Reminder,
-          payload: {'uuid': 'uuid-test'},
           autoDismissible: false,
         ),
         schedule: NotificationCalendar.fromDate(
-            date: scheduleTime, preciseAlarm: true));
+            date: scheduleTime, preciseAlarm: true, repeats: true));
   }
 }

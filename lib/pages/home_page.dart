@@ -1,5 +1,3 @@
-import 'package:calm_notes/components/notification_button.dart';
-import 'package:calm_notes/services/notification_service.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -185,15 +183,6 @@ class _HomePageState extends State<HomePage> {
           "Don't make a bad day make you feel like you have a bad life.",
           style: Theme.of(context).textTheme.bodyMedium,
         ),
-        NotificationButton(
-          text: "Scheduled Notification",
-          onPressed: () async {
-            await NotificationService.showNotification(
-              title: "Scheduled Notification",
-              body: "Notification was fired after 3 seconds",
-            );
-          },
-        )
       ],
     );
   }

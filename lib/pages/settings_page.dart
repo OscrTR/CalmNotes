@@ -1,4 +1,6 @@
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:calm_notes/providers/reminder_provider.dart';
+import 'package:calm_notes/services/notification_service.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
@@ -16,7 +18,7 @@ class _SettingsPageState extends State<SettingsPage> {
   Future<void> selectTime(BuildContext context, VoidCallback onSuccess) async {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
-      initialTime: selectedTime, // Use the current selectedTime
+      initialTime: selectedTime,
       builder: (BuildContext context, Widget? child) {
         return MediaQuery(
           data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
@@ -32,6 +34,24 @@ class _SettingsPageState extends State<SettingsPage> {
     }
   }
 
+  // Future<void> printScheduledNotifications() async {
+  //   List<NotificationModel> scheduledNotifications =
+  //       await AwesomeNotifications().listScheduledNotifications();
+
+  //   for (NotificationModel notification in scheduledNotifications) {
+  //     print('Notification ID: ${notification.content?.id}');
+  //     print('Title: ${notification.content?.title}');
+  //     print('Body: ${notification.content?.body}');
+  //     print('Schedule: ${notification.schedule}');
+  //     print('Repeats: ${notification.schedule?.repeats}');
+  //     print('==================================');
+  //   }
+  // }
+
+  // void cancelNotification(int id) {
+  //   AwesomeNotifications().cancelSchedule(id);
+  // }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,6 +59,11 @@ class _SettingsPageState extends State<SettingsPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
+          // ElevatedButton(
+          //     onPressed: () {
+          //       printScheduledNotifications();
+          //     },
+          //     child: Text('list')),
           Text(
             'Settings',
             style: Theme.of(context).textTheme.headlineMedium,
@@ -100,6 +125,8 @@ class _SettingsPageState extends State<SettingsPage> {
                         selectedTime,
                         alwaysUse24HourFormat: true),
                   );
+                  //TODO add notification creation
+                  NotificationService.showNotification(selectedTime);
                 });
               },
               child: const Text('Add a reminder'),

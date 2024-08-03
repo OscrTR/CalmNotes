@@ -15,6 +15,12 @@ class Emotions extends StatelessWidget {
     'surprise',
   ];
 
+  //TODO
+  // 1) Retrieve list of emotions from DB ordered by last use
+  // 2) Display the first 3 elements
+  // 3) Add button for new emotion
+  // 4) Fetch again the emotions
+
   @override
   Widget build(BuildContext context) {
     return Column(

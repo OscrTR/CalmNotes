@@ -37,7 +37,6 @@ class _CustomSliderState extends State<CustomSlider> {
   void initState() {
     super.initState();
     _sliderValue = widget.initialValue ?? 5.0;
-    // print(_sliderValue);
   }
 
   @override
