@@ -1,3 +1,4 @@
+import 'package:calm_notes/colors.dart';
 import 'package:calm_notes/providers/tag_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -17,9 +18,8 @@ class Tags extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Wrap(
-          spacing: 10,
-          children: _tags.map((tag) {
+        Wrap(spacing: 10, children: [
+          ..._tags.map((tag) {
             return OutlinedButton(
               onPressed: () {
                 // Access the provider and increment the tag count
@@ -27,8 +27,15 @@ class Tags extends StatelessWidget {
               },
               child: Text(tag),
             );
-          }).toList(),
-        ),
+          }),
+          OutlinedButton(
+            onPressed: () {},
+            child: const Icon(
+              Icons.add,
+              color: AppColors.primaryColor,
+            ),
+          ),
+        ]),
         Consumer<TagProvider>(
           builder: (context, tagProvider, child) {
             return Wrap(

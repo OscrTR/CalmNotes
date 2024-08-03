@@ -1,3 +1,4 @@
+import 'package:calm_notes/colors.dart';
 import 'package:calm_notes/providers/emotion_provider.dart';
 import 'package:calm_notes/services/database_service.dart';
 import 'package:flutter/material.dart';
@@ -24,7 +25,6 @@ class Emotions extends StatelessWidget {
   }
 
   //TODO
-  // 1) Retrieve list of emotions from DB ordered by last use
   // 2) Display the first 3 elements
   // 3) Add button for new emotion
   // 4) Fetch again the emotions
@@ -35,9 +35,8 @@ class Emotions extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Wrap(
-          spacing: 10,
-          children: _emotions.map((emotion) {
+        Wrap(spacing: 10, children: [
+          ..._emotions.map((emotion) {
             return OutlinedButton(
               onPressed: () {
                 // Access the provider and increment the emotion count
@@ -45,13 +44,19 @@ class Emotions extends StatelessWidget {
               },
               child: Text(emotion),
             );
-          }).toList(),
-        ),
+          }),
+          OutlinedButton(
+            onPressed: () {},
+            child: const Icon(
+              Icons.add,
+              color: AppColors.primaryColor,
+            ),
+          ),
+        ]),
         Consumer<EmotionProvider>(
           builder: (context, emotionProvider, child) {
-            return Wrap(
-              spacing: 10,
-              children: _emotions
+            return Wrap(spacing: 10, children: [
+              ..._emotions
                   .where((emotion) => emotionProvider.selectedEmotionCounts
                       .containsKey(emotion))
                   .map((emotion) {
@@ -64,8 +69,8 @@ class Emotions extends StatelessWidget {
                   child: Text(
                       '$emotion (${emotionProvider.selectedEmotionCounts[emotion]})'),
                 );
-              }).toList(),
-            );
+              })
+            ]);
           },
         ),
       ],
