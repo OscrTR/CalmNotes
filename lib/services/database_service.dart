@@ -1,3 +1,4 @@
+import 'package:calm_notes/models/emotion.dart';
 import 'package:calm_notes/models/entry.dart';
 import 'package:calm_notes/models/reminder.dart';
 import 'package:path/path.dart';
@@ -19,6 +20,11 @@ class DatabaseService {
   final String _remindersTableName = 'reminders';
   final String _remindersIdColumnName = 'id';
   final String _remindersTimeColumnName = 'time';
+
+  final String _emotionsTableName = 'emotions';
+  final String _emotionsIdColumnName = 'id';
+  final String _emotionsNameColumnName = 'name';
+  final String _emotionsLastUseColumnName = 'lastUse';
 
   DatabaseService._constructor();
 
@@ -50,6 +56,14 @@ class DatabaseService {
         CREATE TABLE $_remindersTableName (
           $_remindersIdColumnName INTEGER PRIMARY KEY,
           $_remindersTimeColumnName TEXT NOT NULL
+        )
+        ''');
+
+        db.execute('''
+        CREATE TABLE $_emotionsTableName (
+          $_emotionsIdColumnName INTEGER PRIMARY KEY,
+          $_emotionsNameColumnName TEXT NOT NULL,
+          $_emotionsLastUseColumnName INTEGER NOT NULL,
         )
         ''');
       },
@@ -196,5 +210,42 @@ class DatabaseService {
         .toList();
 
     return reminders;
+  }
+
+  void addEmotion(String name) async {
+    final db = await database;
+    final lastUse = DateTime.now().toUtc().millisecondsSinceEpoch;
+    await db.insert(_emotionsTableName, {
+      _emotionsNameColumnName: name,
+      _emotionsLastUseColumnName: lastUse,
+    });
+  }
+
+  void deleteEmotion(int id) async {
+    final db = await database;
+    await db.delete(
+      _emotionsTableName,
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  Future<List<Emotion>> getEmotions() async {
+    final db = await database;
+    final data = await db.query(
+      _emotionsTableName,
+      orderBy: 'lastUse DESC',
+    );
+
+    List<Emotion> emotions = data
+        .map(
+          (e) => Emotion(
+              id: e['id'] as int,
+              name: e['name'] as String,
+              lastUse: e['lastUse'] as int),
+        )
+        .toList();
+
+    return emotions;
   }
 }
