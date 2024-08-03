@@ -106,16 +106,24 @@ class _EntryCreationPageState extends State<EntryCreationPage> {
           children: [
             Text('How do you feel?',
                 style: Theme.of(context).textTheme.headlineMedium),
-            IconButton(
-              color: AppColors.primaryColor,
-              onPressed: () {
+            GestureDetector(
+              onTap: () {
                 GoRouter.of(context).push('/');
                 Provider.of<EmotionProvider>(context, listen: false)
                     .resetEmotions();
                 Provider.of<TagProvider>(context, listen: false).resettags();
               },
-              icon: const Icon(
-                Icons.close,
+              child: Container(
+                height: 48,
+                width: 48,
+                alignment: Alignment.centerRight,
+                child: const SizedBox(
+                  width: 20,
+                  child: Icon(
+                    Icons.close,
+                    color: AppColors.primaryColor,
+                  ),
+                ),
               ),
             ),
           ],
