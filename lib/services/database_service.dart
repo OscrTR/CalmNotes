@@ -63,7 +63,7 @@ class DatabaseService {
         CREATE TABLE $_emotionsTableName (
           $_emotionsIdColumnName INTEGER PRIMARY KEY,
           $_emotionsNameColumnName TEXT NOT NULL,
-          $_emotionsLastUseColumnName INTEGER NOT NULL,
+          $_emotionsLastUseColumnName INTEGER NOT NULL
         )
         ''');
       },

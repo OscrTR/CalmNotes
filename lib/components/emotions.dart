@@ -1,4 +1,5 @@
 import 'package:calm_notes/providers/emotion_provider.dart';
+import 'package:calm_notes/services/database_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -15,6 +16,13 @@ class Emotions extends StatelessWidget {
     'surprise',
   ];
 
+  final DatabaseService _databaseService = DatabaseService.instance;
+
+  Future<void> _fetchEmotions() async {
+    final data = await _databaseService.getEmotions();
+    print(data);
+  }
+
   //TODO
   // 1) Retrieve list of emotions from DB ordered by last use
   // 2) Display the first 3 elements
@@ -23,6 +31,7 @@ class Emotions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    _fetchEmotions();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
