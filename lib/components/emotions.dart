@@ -33,22 +33,19 @@ class _EmotionsState extends State<Emotions> {
   }
 
   Widget _buildEmotionButtons(BuildContext context) {
-    return Consumer<EmotionProvider>(
-      builder: (context, provider, child) {
-        final emotions = provider.emotions;
-        return Wrap(
-          spacing: 10,
-          children: [
-            ..._buildEmotionButtonList(emotions, context),
-            _buildAddEmotionButton(context),
-          ],
-        );
-      },
+    final provider = context.watch<EmotionProvider>();
+    final emotions = provider.emotions;
+
+    return Wrap(
+      spacing: 10,
+      children: [
+        ..._buildEmotionButtonList(emotions),
+        _buildAddEmotionButton(context),
+      ],
     );
   }
 
-  List<Widget> _buildEmotionButtonList(
-      List<Emotion> emotions, BuildContext context) {
+  List<Widget> _buildEmotionButtonList(List<Emotion> emotions) {
     return emotions.map(
       (emotion) {
         return OutlinedButton(
@@ -92,27 +89,24 @@ class _EmotionsState extends State<Emotions> {
   }
 
   Widget _buildAddEmotionDialogContent(BuildContext context) {
-    return Consumer<EmotionProvider>(
-      builder: (context, provider, child) {
-        final emotions = provider.emotions;
-        if (emotions.isEmpty) {
-          return const Center(child: Text('No emotions found.'));
-        }
-        final double height =
-            emotions.length < 5 ? emotions.length * 48.0 : 200;
-        return SizedBox(
-          height: height,
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                ..._buildEmotionList(emotions, context),
-                const SizedBox(height: 10),
-                _buildEmotionCreation(context),
-              ],
-            ),
-          ),
-        );
-      },
+    final provider = context.watch<EmotionProvider>();
+    final emotions = provider.emotions;
+
+    if (emotions.isEmpty) {
+      return const Center(child: Text('No emotions found.'));
+    }
+    final double height = emotions.length < 5 ? emotions.length * 48.0 : 200;
+    return SizedBox(
+      height: height,
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            ..._buildEmotionList(emotions, context),
+            const SizedBox(height: 10),
+            _buildEmotionCreation(context),
+          ],
+        ),
+      ),
     );
   }
 
@@ -124,8 +118,7 @@ class _EmotionsState extends State<Emotions> {
           children: [
             OutlinedButton(
               onPressed: () {
-                Provider.of<EmotionProvider>(context, listen: false)
-                    .incrementEmotion(emotion.name);
+                context.read<EmotionProvider>().incrementEmotion(emotion.name);
                 Navigator.pop(context, 'Add emotion');
               },
               child: Text(emotion.name),
@@ -172,7 +165,8 @@ class _EmotionsState extends State<Emotions> {
           ),
           TextButton(
             onPressed: () {
-              Provider.of<EmotionProvider>(context, listen: false)
+              context
+                  .read<EmotionProvider>()
                   .deleteEmotion(emotion.id, emotion.name);
               Navigator.pop(context, 'Delete');
             },
@@ -184,16 +178,14 @@ class _EmotionsState extends State<Emotions> {
   }
 
   Widget _buildSelectedEmotions(BuildContext context) {
-    return Consumer<EmotionProvider>(
-      builder: (context, provider, child) {
-        final emotions = provider.emotions;
-        return Wrap(
-          spacing: 10,
-          children: [
-            ..._buildSelectedEmotionButtons(emotions, provider),
-          ],
-        );
-      },
+    final provider = context.watch<EmotionProvider>();
+    final emotions = provider.emotions;
+
+    return Wrap(
+      spacing: 10,
+      children: [
+        ..._buildSelectedEmotionButtons(emotions, provider),
+      ],
     );
   }
 
@@ -245,9 +237,11 @@ class _EmotionsState extends State<Emotions> {
           right: 0,
           child: IconButton(
             onPressed: () {
-              Provider.of<EmotionProvider>(context, listen: false)
+              context
+                  .read<EmotionProvider>()
                   .addEmotion(_emotionNameController.text);
-              Provider.of<EmotionProvider>(context, listen: false)
+              context
+                  .read<EmotionProvider>()
                   .incrementEmotion(_emotionNameController.text);
               FocusScope.of(context).unfocus();
               _emotionNameController.clear();
