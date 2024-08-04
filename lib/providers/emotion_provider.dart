@@ -16,7 +16,6 @@ class EmotionProvider extends ChangeNotifier {
 
   Future<void> _fetchEmotions() async {
     _emotions = await _databaseService.getEmotions();
-    print('Emotions : $_emotions');
     notifyListeners();
   }
 
