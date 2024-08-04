@@ -37,6 +37,8 @@ class EmotionProvider extends ChangeNotifier {
     } else {
       _selectedEmotionCounts[emotion] = 1;
     }
+
+    print(_selectedEmotionCounts);
     notifyListeners();
   }
 

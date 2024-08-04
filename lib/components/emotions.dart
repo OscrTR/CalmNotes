@@ -143,18 +143,8 @@ class _EmotionsState extends State<Emotions> {
                                           );
                                         },
                                       ),
-                                      _buildTitleField(context),
-                                      FilledButton(
-                                          onPressed: () {
-                                            Provider.of<EmotionProvider>(
-                                                    context,
-                                                    listen: false)
-                                                .addEmotion(
-                                                    _emotionNameController
-                                                        .text);
-                                          },
-                                          child:
-                                              const Text('Create new emotion'))
+                                      const SizedBox(height: 10),
+                                      _buildEmotionCreation(context),
                                     ],
                                   ),
                                 ),
@@ -203,17 +193,51 @@ class _EmotionsState extends State<Emotions> {
     );
   }
 
-  Widget _buildTitleField(BuildContext context) {
-    return TextField(
-      controller: _emotionNameController,
-      decoration: InputDecoration(
-        border: const OutlineInputBorder(borderSide: BorderSide.none),
-        hintText: 'Title',
-        hintStyle: Theme.of(context).textTheme.titleMedium,
-        contentPadding: EdgeInsets.zero,
-        isDense: true,
-      ),
-      style: Theme.of(context).textTheme.titleMedium,
+  Widget _buildEmotionCreation(BuildContext context) {
+    return Stack(
+      children: [
+        TextField(
+          controller: _emotionNameController,
+          decoration: InputDecoration(
+            labelText: 'Emotion name',
+            labelStyle: Theme.of(context)
+                .textTheme
+                .bodyMedium
+                ?.copyWith(color: AppColors.ternaryColor),
+            hintStyle: Theme.of(context).textTheme.bodyMedium,
+            enabledBorder: const OutlineInputBorder(
+              borderSide: BorderSide(
+                color: AppColors.secondaryColor,
+                width: 1.0,
+              ),
+            ),
+            focusedBorder: const OutlineInputBorder(
+              borderSide: BorderSide(
+                color: AppColors.secondaryColor,
+                width: 1.0,
+              ),
+            ),
+          ),
+        ),
+        Positioned(
+            top: 0,
+            bottom: 0,
+            right: 0,
+            child: IconButton(
+                onPressed: () {
+                  Provider.of<EmotionProvider>(context, listen: false)
+                      .addEmotion(_emotionNameController.text);
+                  Provider.of<EmotionProvider>(context, listen: false)
+                      .incrementEmotion(_emotionNameController.text);
+                  FocusScope.of(context).unfocus();
+                  _emotionNameController.clear();
+                  Navigator.pop(context, 'Create emotion');
+                },
+                icon: const Icon(
+                  Icons.add,
+                  color: AppColors.primaryColor,
+                ))),
+      ],
     );
   }
 }
