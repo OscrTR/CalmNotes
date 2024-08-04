@@ -80,7 +80,15 @@ class _EmotionsState extends State<Emotions> {
                                                 MainAxisAlignment.spaceBetween,
                                             children: [
                                               OutlinedButton(
-                                                onPressed: () {},
+                                                onPressed: () {
+                                                  Provider.of<EmotionProvider>(
+                                                          context,
+                                                          listen: false)
+                                                      .incrementEmotion(
+                                                          emotion.name);
+                                                  Navigator.pop(
+                                                      context, 'Add emotion');
+                                                },
                                                 child: Text(emotion.name),
                                               ),
                                               GestureDetector(
