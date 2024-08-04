@@ -12,21 +12,7 @@ class Emotions extends StatefulWidget {
 }
 
 class _EmotionsState extends State<Emotions> {
-  final List<String> _emotions = [
-    'fear',
-    'anger',
-    'disgust',
-    'sad',
-    'happy',
-    'surprise',
-  ];
-
   final TextEditingController _emotionNameController = TextEditingController();
-
-  //TODO
-  // 2) Display the first 3 elements
-  // 3) Add button for new emotion
-  // 4) Fetch again the emotions
 
   @override
   void dispose() {
@@ -195,18 +181,19 @@ class _EmotionsState extends State<Emotions> {
           },
         ),
         Consumer<EmotionProvider>(
-          builder: (context, emotionProvider, child) {
+          builder: (context, provider, child) {
+            final emotions = provider.emotions;
             return Wrap(spacing: 10, children: [
-              ..._emotions
-                  .where((emotion) => emotionProvider.selectedEmotionCounts
-                      .containsKey(emotion))
+              ...emotions
+                  .where((emotion) =>
+                      provider.selectedEmotionCounts.containsKey(emotion.name))
                   .map((emotion) {
                 return FilledButton(
                   onPressed: () {
-                    emotionProvider.decrementEmotion(emotion);
+                    provider.decrementEmotion(emotion.name);
                   },
                   child: Text(
-                      '$emotion (${emotionProvider.selectedEmotionCounts[emotion]})'),
+                      '${emotion.name} (${provider.selectedEmotionCounts[emotion.name]})'),
                 );
               })
             ]);
