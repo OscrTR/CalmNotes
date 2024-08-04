@@ -1,13 +1,19 @@
 import 'package:calm_notes/colors.dart';
+import 'package:calm_notes/models/emotion.dart';
 import 'package:calm_notes/providers/emotion_provider.dart';
 import 'package:calm_notes/services/database_service.dart';
 import 'package:flutter/material.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 
-class Emotions extends StatelessWidget {
-  Emotions({super.key});
+class Emotions extends StatefulWidget {
+  const Emotions({super.key});
 
-  // List of all possible emotions
+  @override
+  State<Emotions> createState() => _EmotionsState();
+}
+
+class _EmotionsState extends State<Emotions> {
   final List<String> _emotions = [
     'fear',
     'anger',
@@ -18,11 +24,7 @@ class Emotions extends StatelessWidget {
   ];
 
   final DatabaseService _databaseService = DatabaseService.instance;
-
-  Future<void> _fetchEmotions() async {
-    final data = await _databaseService.getEmotions();
-    print(data);
-  }
+  final TextEditingController _emotionNameController = TextEditingController();
 
   //TODO
   // 2) Display the first 3 elements
@@ -30,8 +32,13 @@ class Emotions extends StatelessWidget {
   // 4) Fetch again the emotions
 
   @override
+  void dispose() {
+    _emotionNameController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    _fetchEmotions();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -39,14 +46,128 @@ class Emotions extends StatelessWidget {
           ..._emotions.map((emotion) {
             return OutlinedButton(
               onPressed: () {
-                // Access the provider and increment the emotion count
                 context.read<EmotionProvider>().incrementEmotion(emotion);
               },
               child: Text(emotion),
             );
           }),
           OutlinedButton(
-            onPressed: () {},
+            onPressed: () => showDialog<String>(
+              context: context,
+              builder: (BuildContext context) => AlertDialog(
+                backgroundColor: AppColors.backgroundColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                title: const Text('Add emotion'),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text(
+                        'Select an existing emotion or create a new one.'),
+                    const SizedBox(height: 12),
+                    Consumer<EmotionProvider>(
+                      builder: (context, provider, child) {
+                        final emotions = provider.emotions;
+                        if (emotions.isEmpty) {
+                          print('No emotions found');
+                          return const Center(
+                              child: Text('No emotions found.'));
+                        }
+                        print('Emotions found');
+                        final double height =
+                            emotions.length < 5 ? emotions.length * 48.0 : 200;
+                        return SizedBox(
+                          height: height,
+                          child: SingleChildScrollView(
+                            child: Column(
+                              children: [
+                                ...emotions.map(
+                                  (emotion) {
+                                    return Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        OutlinedButton(
+                                          onPressed: () {},
+                                          child: Text(emotion.name),
+                                        ),
+                                        GestureDetector(
+                                          onTap: () => showDialog<String>(
+                                            context: context,
+                                            builder: (BuildContext context) =>
+                                                AlertDialog(
+                                              backgroundColor:
+                                                  AppColors.backgroundColor,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(5),
+                                              ),
+                                              title: const Text(
+                                                  'Emotion deletion'),
+                                              content: const Text(
+                                                  'Are you sure you want to delete this emotion?'),
+                                              actions: <Widget>[
+                                                TextButton(
+                                                  onPressed: () =>
+                                                      Navigator.pop(
+                                                          context, 'Cancel'),
+                                                  child: const Text('Cancel'),
+                                                ),
+                                                TextButton(
+                                                  onPressed: () {
+                                                    provider.deleteEmotion(
+                                                        emotion.id);
+                                                    Navigator.pop(
+                                                        context, 'Delete');
+                                                  },
+                                                  child: const Text('Delete'),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          child: Container(
+                                            height: 48,
+                                            width: 48,
+                                            alignment: Alignment.centerRight,
+                                            child: const SizedBox(
+                                              width: 20,
+                                              child: Icon(
+                                                Symbols.delete,
+                                                color: AppColors.primaryColor,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                ),
+                                _buildTitleField(context),
+                                FilledButton(
+                                    onPressed: () {
+                                      Provider.of<EmotionProvider>(context,
+                                              listen: false)
+                                          .addEmotion(
+                                              _emotionNameController.text);
+                                    },
+                                    child: const Text('Create new emotion'))
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+                actions: <Widget>[
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, 'Cancel'),
+                    child: const Text('Cancel'),
+                  ),
+                ],
+              ),
+            ),
             child: const Icon(
               Icons.add,
               color: AppColors.primaryColor,
@@ -60,10 +181,8 @@ class Emotions extends StatelessWidget {
                   .where((emotion) => emotionProvider.selectedEmotionCounts
                       .containsKey(emotion))
                   .map((emotion) {
-                // If selected, show a filled button with count
                 return FilledButton(
                   onPressed: () {
-                    // Access the provider and decrement the emotion count
                     emotionProvider.decrementEmotion(emotion);
                   },
                   child: Text(
@@ -74,6 +193,20 @@ class Emotions extends StatelessWidget {
           },
         ),
       ],
+    );
+  }
+
+  Widget _buildTitleField(BuildContext context) {
+    return TextField(
+      controller: _emotionNameController,
+      decoration: InputDecoration(
+        border: const OutlineInputBorder(borderSide: BorderSide.none),
+        hintText: 'Title',
+        hintStyle: Theme.of(context).textTheme.titleMedium,
+        contentPadding: EdgeInsets.zero,
+        isDense: true,
+      ),
+      style: Theme.of(context).textTheme.titleMedium,
     );
   }
 }

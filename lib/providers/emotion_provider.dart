@@ -1,9 +1,34 @@
+import 'package:calm_notes/models/emotion.dart';
+import 'package:calm_notes/services/database_service.dart';
 import 'package:flutter/material.dart';
 
 class EmotionProvider extends ChangeNotifier {
   final Map<String, int> _selectedEmotionCounts = {};
+  final DatabaseService _databaseService = DatabaseService.instance;
+  List<Emotion> _emotions = [];
 
   Map<String, int> get selectedEmotionCounts => _selectedEmotionCounts;
+  List<Emotion> get emotions => _emotions;
+
+  EmotionProvider() {
+    _fetchEmotions();
+  }
+
+  Future<void> _fetchEmotions() async {
+    _emotions = await _databaseService.getEmotions();
+    print('Emotions : $_emotions');
+    notifyListeners();
+  }
+
+  Future<void> addEmotion(String name) async {
+    _databaseService.addEmotion(name);
+    await _fetchEmotions();
+  }
+
+  Future<void> deleteEmotion(int id) async {
+    _databaseService.deleteEmotion(id);
+    await _fetchEmotions();
+  }
 
   void incrementEmotion(String emotion) {
     if (_selectedEmotionCounts.containsKey(emotion)) {
