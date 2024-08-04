@@ -24,8 +24,9 @@ class EmotionProvider extends ChangeNotifier {
     await _fetchEmotions();
   }
 
-  Future<void> deleteEmotion(int id) async {
+  Future<void> deleteEmotion(int id, String emotionName) async {
     _databaseService.deleteEmotion(id);
+    _selectedEmotionCounts.remove(emotionName);
     await _fetchEmotions();
   }
 
