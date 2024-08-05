@@ -36,10 +36,22 @@ class _EmotionsState extends State<Emotions> {
     final provider = context.watch<EmotionProvider>();
     final emotions = provider.emotions;
 
+    //TODO
+    // Afficher la liste des émotions sélectionnées
+    // Si liste inférieure à 3, afficher les dernières émotions utilisées
+    // Ne pas afficher de doublons
+
+    // List<Emotion> selectedEmotions = ;
+
+    List<Emotion> lastUsedEmotions = emotions.take(3).toList();
+    for (var emotion in lastUsedEmotions) {
+      print('Emotion: ${emotion.name}, Last Used: ${emotion.lastUse}');
+    }
+
     return Wrap(
       spacing: 10,
       children: [
-        ..._buildEmotionButtonList(emotions),
+        ..._buildEmotionButtonList(lastUsedEmotions),
         _buildAddEmotionButton(context),
       ],
     );
@@ -50,7 +62,7 @@ class _EmotionsState extends State<Emotions> {
       (emotion) {
         return OutlinedButton(
           onPressed: () {
-            context.read<EmotionProvider>().incrementEmotion(emotion.name);
+            context.read<EmotionProvider>().incrementEmotion(emotion);
           },
           child: Text(emotion.name),
         );
@@ -118,7 +130,7 @@ class _EmotionsState extends State<Emotions> {
           children: [
             OutlinedButton(
               onPressed: () {
-                context.read<EmotionProvider>().incrementEmotion(emotion.name);
+                context.read<EmotionProvider>().incrementEmotion(emotion);
                 Navigator.pop(context, 'Add emotion');
               },
               child: Text(emotion.name),
@@ -239,10 +251,7 @@ class _EmotionsState extends State<Emotions> {
             onPressed: () {
               context
                   .read<EmotionProvider>()
-                  .addEmotion(_emotionNameController.text);
-              context
-                  .read<EmotionProvider>()
-                  .incrementEmotion(_emotionNameController.text);
+                  .addAndIncrementEmotion(_emotionNameController.text);
               FocusScope.of(context).unfocus();
               _emotionNameController.clear();
               Navigator.pop(context, 'Create emotion');

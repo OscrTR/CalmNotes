@@ -212,13 +212,14 @@ class DatabaseService {
     return reminders;
   }
 
-  void addEmotion(String name) async {
+  Future<int> addEmotion(String name) async {
     final db = await database;
     final lastUse = DateTime.now().toUtc().millisecondsSinceEpoch;
-    await db.insert(_emotionsTableName, {
+    int id = await db.insert(_emotionsTableName, {
       _emotionsNameColumnName: name,
       _emotionsLastUseColumnName: lastUse,
     });
+    return id;
   }
 
   void deleteEmotion(int id) async {
@@ -247,5 +248,33 @@ class DatabaseService {
         .toList();
 
     return emotions;
+  }
+
+  Future<Emotion> getEmotion(int id) async {
+    final db = await database;
+    final List<Map<String, dynamic>> result = await db.query(
+      _entriesTableName,
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+
+    if (result.isNotEmpty) {
+      return Emotion.fromMap(result.first);
+    } else {
+      throw Exception('Entry with id $id not found');
+    }
+  }
+
+  void updateEmotionUse(int id) async {
+    final db = await database;
+    final lastUse = DateTime.now().toUtc().millisecondsSinceEpoch;
+    await db.update(
+      _emotionsTableName,
+      {
+        _emotionsLastUseColumnName: lastUse,
+      },
+      where: 'id = ?',
+      whereArgs: [id],
+    );
   }
 }

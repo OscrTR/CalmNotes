@@ -30,16 +30,38 @@ class EmotionProvider extends ChangeNotifier {
     await _fetchEmotions();
   }
 
-  void incrementEmotion(String emotion) {
-    if (_selectedEmotionCounts.containsKey(emotion)) {
-      if (_selectedEmotionCounts[emotion]! < 10) {
-        _selectedEmotionCounts[emotion] = _selectedEmotionCounts[emotion]! + 1;
+  void incrementEmotion(Emotion emotion) async {
+    if (_selectedEmotionCounts.containsKey(emotion.name)) {
+      if (_selectedEmotionCounts[emotion.name]! < 10) {
+        _selectedEmotionCounts[emotion.name] =
+            _selectedEmotionCounts[emotion.name]! + 1;
       }
     } else {
-      _selectedEmotionCounts[emotion] = 1;
+      _selectedEmotionCounts[emotion.name] = 1;
     }
 
-    print(_selectedEmotionCounts);
+    //TODO
+    // Fetch emotions uniquement si l'emotion n'est pas déjà affichée
+    // vérifier si elle n'est pas déjà présente dans les 3 premiers
+    List<Emotion> lastlyUsedEmotions = emotions.take(3).toList();
+    bool emotionDisplayed = lastlyUsedEmotions.any((e) => e.id == emotion.id);
+    if (!emotionDisplayed) {
+      _databaseService.updateEmotionUse(emotion.id);
+    }
+    await _fetchEmotions();
+  }
+
+  void addAndIncrementEmotion(String emotionName) async {
+    int emotionId = await _databaseService.addEmotion(emotionName);
+    if (_selectedEmotionCounts.containsKey(emotionName)) {
+      if (_selectedEmotionCounts[emotionName]! < 10) {
+        _selectedEmotionCounts[emotionName] =
+            _selectedEmotionCounts[emotionName]! + 1;
+      }
+    } else {
+      _selectedEmotionCounts[emotionName] = 1;
+    }
+    _databaseService.updateEmotionUse(emotionId);
     notifyListeners();
   }
 
