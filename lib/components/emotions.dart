@@ -35,23 +35,16 @@ class _EmotionsState extends State<Emotions> {
   Widget _buildEmotionButtons(BuildContext context) {
     final provider = context.watch<EmotionProvider>();
     final emotions = provider.emotions;
+    final emotionsToDisplay = provider.emotionsToDisplay;
 
     //TODO
-    // Afficher la liste des émotions sélectionnées
     // Si liste inférieure à 3, afficher les dernières émotions utilisées
     // Ne pas afficher de doublons
-
-    // List<Emotion> selectedEmotions = ;
-
-    List<Emotion> lastUsedEmotions = emotions.take(3).toList();
-    for (var emotion in lastUsedEmotions) {
-      print('Emotion: ${emotion.name}, Last Used: ${emotion.lastUse}');
-    }
 
     return Wrap(
       spacing: 10,
       children: [
-        ..._buildEmotionButtonList(lastUsedEmotions),
+        ..._buildEmotionButtonList(emotionsToDisplay),
         _buildAddEmotionButton(context),
       ],
     );
