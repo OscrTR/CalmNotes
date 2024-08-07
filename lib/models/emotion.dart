@@ -19,4 +19,13 @@ class Emotion {
       selectedEmotionCount: map['selectedEmotionCount'] as int,
     );
   }
+
+  Emotion updateFrom(Emotion other) {
+    return Emotion(
+      id: id,
+      name: name,
+      lastUse: other.lastUse,
+      selectedEmotionCount: other.selectedEmotionCount,
+    );
+  }
 }

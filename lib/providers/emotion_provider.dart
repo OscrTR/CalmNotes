@@ -14,8 +14,48 @@ class EmotionProvider extends ChangeNotifier {
     _fetchEmotions();
   }
 
+  List<Emotion> combineLists(List<Emotion> list1, List<Emotion> list2) {
+    // Create a map from list2 for quick lookup by id
+    Map<int, Emotion> map2 = {for (var e in list2) e.id: e};
+
+    // Create a new list with updated values from list2
+    List<Emotion> updatedList = list1
+        .map((emotion) {
+          if (map2.containsKey(emotion.id)) {
+            // Update the emotion from list1 with values from list2
+            return emotion.updateFrom(map2[emotion.id]!);
+          }
+          // If not in list2, exclude this emotion
+          return null;
+        })
+        .whereType<Emotion>()
+        .toList();
+
+    // Add new elements from list2 that were not in list1
+    List<Emotion> newElements = map2.entries
+        .where((entry) => !list1.any((e) => e.id == entry.key))
+        .map((entry) => entry.value)
+        .toList();
+
+    // Combine the updated list1 with new elements from list2
+    updatedList.addAll(newElements);
+
+    return updatedList;
+  }
+
   Future<void> _fetchEmotions() async {
     _emotions = await _databaseService.getEmotions();
+    final fetchedEmotionsToDisplay =
+        await _databaseService.fetchEmotionsToDisplay();
+    List<Emotion> newEmotionsToDisplay = List.from(fetchedEmotionsToDisplay);
+    List<Emotion> combinedEmotionsToDisplay =
+        combineLists(_emotionsToDisplay, newEmotionsToDisplay);
+
+    _emotionsToDisplay = combinedEmotionsToDisplay;
+    notifyListeners();
+  }
+
+  Future<void> fetchDisplayedEmotions() async {
     final fetchedEmotionsToDisplay =
         await _databaseService.fetchEmotionsToDisplay();
     _emotionsToDisplay = List.from(fetchedEmotionsToDisplay);

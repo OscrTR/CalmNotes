@@ -393,14 +393,10 @@ class DatabaseService {
 
   Future<void> setSelectedEmotionsCount(int id) async {
     final db = await database;
-    //TODO
-    //convertir les émotions de l'entrée en une liste d'émotions
-    // pour chaque emotion mettre à jour le selectedcount correspondant
 
     Entry entry = await getEntry(id);
 
     Map<String, int> emotionMap = convertStringToMap(entry.emotions!);
-    print(emotionMap);
 
     // Fetch emotions from the database
     List<Emotion> emotions = await getEmotions();
