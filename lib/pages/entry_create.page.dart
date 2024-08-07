@@ -1,5 +1,6 @@
 import 'package:calm_notes/colors.dart';
 import 'package:calm_notes/components/emotions.dart';
+import 'package:calm_notes/models/emotion.dart';
 import 'package:calm_notes/providers/emotion_provider.dart';
 import 'package:calm_notes/providers/tag_provider.dart';
 import 'package:calm_notes/components/slider.dart';
@@ -81,7 +82,7 @@ class _EntryCreationPageState extends State<EntryCreationPage> {
               });
             }),
             const SizedBox(height: 14),
-            Emotions(),
+            const Emotions(),
             const SizedBox(height: 24),
             _buildTitleField(context),
             const SizedBox(height: 10),
@@ -194,6 +195,19 @@ class _EntryCreationPageState extends State<EntryCreationPage> {
     );
   }
 
+  String convertEmotionsToString(List<Emotion> emotions) {
+    // Filter the emotions with selectedEmotionCount > 0
+    final filteredEmotions =
+        emotions.where((emotion) => emotion.selectedEmotionCount > 0);
+
+    // Map the filtered emotions to a list of strings
+    final emotionStrings = filteredEmotions
+        .map((emotion) => '${emotion.name} : ${emotion.selectedEmotionCount}');
+
+    // Join the strings with a comma and a space
+    return emotionStrings.join(', ');
+  }
+
   Widget _buildSaveButton(BuildContext context) {
     return Align(
       alignment: Alignment.bottomCenter,
@@ -201,7 +215,8 @@ class _EntryCreationPageState extends State<EntryCreationPage> {
         onPressed: () {
           final emotionProvider =
               Provider.of<EmotionProvider>(context, listen: false);
-          final emotionCounts = emotionProvider.selectedEmotionCounts;
+          final emotionCounts =
+              convertEmotionsToString(emotionProvider.emotionsToDisplay);
 
           final tagProvider = Provider.of<TagProvider>(context, listen: false);
           final tagCounts = tagProvider.selectedtagCounts;
@@ -209,7 +224,7 @@ class _EntryCreationPageState extends State<EntryCreationPage> {
           _databaseService.addEntry(
             '${_selectedDate.toString().split(' ')[0]}|${MaterialLocalizations.of(context).formatTimeOfDay(_selectedTime, alwaysUse24HourFormat: true)}',
             _selectedMood,
-            '$emotionCounts',
+            emotionCounts,
             _titleController.text,
             _descriptionController.text,
             '$tagCounts',

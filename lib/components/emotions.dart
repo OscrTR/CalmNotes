@@ -34,12 +34,7 @@ class _EmotionsState extends State<Emotions> {
 
   Widget _buildEmotionButtons(BuildContext context) {
     final provider = context.watch<EmotionProvider>();
-    final emotions = provider.emotions;
     final emotionsToDisplay = provider.emotionsToDisplay;
-
-    //TODO
-    // Si liste inférieure à 3, afficher les dernières émotions utilisées
-    // Ne pas afficher de doublons
 
     return Wrap(
       spacing: 10,
@@ -96,11 +91,19 @@ class _EmotionsState extends State<Emotions> {
   Widget _buildAddEmotionDialogContent(BuildContext context) {
     final provider = context.watch<EmotionProvider>();
     final emotions = provider.emotions;
+    final double height =
+        emotions.length < 5 ? emotions.length * 48.0 + 66 : 200;
 
     if (emotions.isEmpty) {
-      return const Center(child: Text('No emotions found.'));
+      return Column(
+        children: [
+          const Center(child: Text('No emotions found.')),
+          const SizedBox(height: 10),
+          _buildEmotionCreation(context),
+        ],
+      );
     }
-    final double height = emotions.length < 5 ? emotions.length * 48.0 : 200;
+
     return SizedBox(
       height: height,
       child: SingleChildScrollView(
@@ -184,12 +187,12 @@ class _EmotionsState extends State<Emotions> {
 
   Widget _buildSelectedEmotions(BuildContext context) {
     final provider = context.watch<EmotionProvider>();
-    final emotions = provider.emotions;
+    final emotionsToDisplay = provider.emotionsToDisplay;
 
     return Wrap(
       spacing: 10,
       children: [
-        ..._buildSelectedEmotionButtons(emotions, provider),
+        ..._buildSelectedEmotionButtons(emotionsToDisplay, provider),
       ],
     );
   }
@@ -197,15 +200,13 @@ class _EmotionsState extends State<Emotions> {
   List<Widget> _buildSelectedEmotionButtons(
       List<Emotion> emotions, EmotionProvider provider) {
     return emotions
-        .where((emotion) =>
-            provider.selectedEmotionCounts.containsKey(emotion.name))
+        .where((emotion) => emotion.selectedEmotionCount > 0)
         .map((emotion) {
       return FilledButton(
         onPressed: () {
-          provider.decrementEmotion(emotion.name);
+          provider.decrementEmotion(emotion);
         },
-        child: Text(
-            '${emotion.name} (${provider.selectedEmotionCounts[emotion.name]})'),
+        child: Text('${emotion.name} (${emotion.selectedEmotionCount})'),
       );
     }).toList();
   }

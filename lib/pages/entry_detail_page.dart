@@ -1,5 +1,6 @@
 import 'package:calm_notes/colors.dart';
 import 'package:calm_notes/components/emotions.dart';
+import 'package:calm_notes/models/emotion.dart';
 import 'package:calm_notes/models/entry.dart';
 import 'package:calm_notes/providers/emotion_provider.dart';
 import 'package:calm_notes/providers/tag_provider.dart';
@@ -60,7 +61,7 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
     _descriptionController.text = _savedEntry!.description!;
     Future.microtask(() {
       Provider.of<EmotionProvider>(context, listen: false)
-          .setEmotions(_parseEmotionString(_savedEntry!.emotions!));
+          .setEmotions(widget.entryId);
       Provider.of<TagProvider>(context, listen: false)
           .settags(_parseEmotionString(_savedEntry!.tags!));
     });
@@ -185,7 +186,7 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
                   }
                 }),
             const SizedBox(height: 14),
-            Emotions(),
+            const Emotions(),
             const SizedBox(height: 24),
             _buildTitleField(context),
             const SizedBox(height: 10),
@@ -345,6 +346,19 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
     );
   }
 
+  String convertEmotionsToString(List<Emotion> emotions) {
+    // Filter the emotions with selectedEmotionCount > 0
+    final filteredEmotions =
+        emotions.where((emotion) => emotion.selectedEmotionCount > 0);
+
+    // Map the filtered emotions to a list of strings
+    final emotionStrings = filteredEmotions
+        .map((emotion) => '${emotion.name} : ${emotion.selectedEmotionCount}');
+
+    // Join the strings with a comma and a space
+    return emotionStrings.join(', ');
+  }
+
   Widget _buildSaveButton(BuildContext context) {
     return Align(
       alignment: Alignment.bottomCenter,
@@ -352,7 +366,8 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
         onPressed: () {
           final emotionProvider =
               Provider.of<EmotionProvider>(context, listen: false);
-          final emotionCounts = emotionProvider.selectedEmotionCounts;
+          final emotionCounts =
+              convertEmotionsToString(emotionProvider.emotionsToDisplay);
 
           final tagProvider = Provider.of<TagProvider>(context, listen: false);
           final tagCounts = tagProvider.selectedtagCounts;
@@ -361,7 +376,7 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
             widget.entryId,
             '${_selectedDate.toString().split(' ')[0]}|${MaterialLocalizations.of(context).formatTimeOfDay(_selectedTime, alwaysUse24HourFormat: true)}',
             _selectedMood!,
-            '$emotionCounts',
+            emotionCounts,
             _titleController.text,
             _descriptionController.text,
             '$tagCounts',
