@@ -83,8 +83,8 @@ class EmotionProvider extends ChangeNotifier {
     await _fetchEmotions();
   }
 
-  void decrementEmotion(Emotion emotion) async {
-    await _databaseService.decrementSelectedEmotionCount(emotion.id);
+  void resetSelectedEmotion(Emotion emotion) async {
+    await _databaseService.resetSelectedEmotionCount(emotion.id);
     await _fetchEmotions();
   }
 

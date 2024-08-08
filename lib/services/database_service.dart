@@ -304,23 +304,6 @@ class DatabaseService {
     );
   }
 
-  Future<void> decrementSelectedEmotionCount(int id) async {
-    final db = await database;
-    final currentCount = await getSelectedEmotionCount(id) ?? 0;
-    int newCount = currentCount;
-    if (newCount > 0) {
-      newCount -= 1;
-    }
-    await db.update(
-      _emotionsTableName,
-      {
-        _emotionsSelectedEmotionCountColumnName: newCount,
-      },
-      where: 'id = ?',
-      whereArgs: [id],
-    );
-  }
-
   Future<List<Emotion>> fetchEmotionsToDisplay() async {
     final db = await database;
     final data = await db.query(
@@ -368,6 +351,18 @@ class DatabaseService {
       {
         _emotionsSelectedEmotionCountColumnName: 0,
       },
+    );
+  }
+
+  Future<void> resetSelectedEmotionCount(int id) async {
+    final db = await database;
+    await db.update(
+      _emotionsTableName,
+      {
+        _emotionsSelectedEmotionCountColumnName: 0,
+      },
+      where: 'id = ?',
+      whereArgs: [id],
     );
   }
 

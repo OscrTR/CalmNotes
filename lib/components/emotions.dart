@@ -27,7 +27,6 @@ class _EmotionsState extends State<Emotions> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildEmotionButtons(context),
-        _buildSelectedEmotions(context),
       ],
     );
   }
@@ -48,12 +47,24 @@ class _EmotionsState extends State<Emotions> {
   List<Widget> _buildEmotionButtonList(List<Emotion> emotions) {
     return emotions.map(
       (emotion) {
-        return OutlinedButton(
-          onPressed: () {
-            context.read<EmotionProvider>().incrementEmotion(emotion);
-          },
-          child: Text(emotion.name),
-        );
+        if (emotion.selectedEmotionCount > 0) {
+          return FilledButton(
+            onPressed: () {
+              context.read<EmotionProvider>().incrementEmotion(emotion);
+            },
+            onLongPress: () {
+              context.read<EmotionProvider>().resetSelectedEmotion(emotion);
+            },
+            child: Text('${emotion.name} (${emotion.selectedEmotionCount})'),
+          );
+        } else {
+          return OutlinedButton(
+            onPressed: () {
+              context.read<EmotionProvider>().incrementEmotion(emotion);
+            },
+            child: Text(emotion.name),
+          );
+        }
       },
     ).toList();
   }
@@ -119,7 +130,7 @@ class _EmotionsState extends State<Emotions> {
   }
 
   List<Widget> _buildEmotionList(List<Emotion> emotions, BuildContext context) {
-    return emotions.map(
+    return emotions.where((emotion) => emotion.selectedEmotionCount == 0).map(
       (emotion) {
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -183,32 +194,6 @@ class _EmotionsState extends State<Emotions> {
         ],
       ),
     );
-  }
-
-  Widget _buildSelectedEmotions(BuildContext context) {
-    final provider = context.watch<EmotionProvider>();
-    final emotionsToDisplay = provider.emotionsToDisplay;
-
-    return Wrap(
-      spacing: 10,
-      children: [
-        ..._buildSelectedEmotionButtons(emotionsToDisplay, provider),
-      ],
-    );
-  }
-
-  List<Widget> _buildSelectedEmotionButtons(
-      List<Emotion> emotions, EmotionProvider provider) {
-    return emotions
-        .where((emotion) => emotion.selectedEmotionCount > 0)
-        .map((emotion) {
-      return FilledButton(
-        onPressed: () {
-          provider.decrementEmotion(emotion);
-        },
-        child: Text('${emotion.name} (${emotion.selectedEmotionCount})'),
-      );
-    }).toList();
   }
 
   Widget _buildEmotionCreation(BuildContext context) {
