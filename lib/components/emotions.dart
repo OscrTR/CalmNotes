@@ -107,8 +107,10 @@ class _EmotionsState extends State<Emotions> {
 
     if (emotions.isEmpty) {
       return Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Center(child: Text('No emotions found.')),
+          const Text('No emotions found.'),
           const SizedBox(height: 10),
           _buildEmotionCreation(context),
         ],
@@ -228,12 +230,15 @@ class _EmotionsState extends State<Emotions> {
           right: 0,
           child: IconButton(
             onPressed: () {
-              context
-                  .read<EmotionProvider>()
-                  .addAndIncrementEmotion(_emotionNameController.text);
-              FocusScope.of(context).unfocus();
-              _emotionNameController.clear();
-              Navigator.pop(context, 'Create emotion');
+              final emotionName = _emotionNameController.text.trim();
+              if (emotionName.isNotEmpty) {
+                context
+                    .read<EmotionProvider>()
+                    .addAndIncrementEmotion(_emotionNameController.text);
+                FocusScope.of(context).unfocus();
+                _emotionNameController.clear();
+                Navigator.pop(context, 'Create emotion');
+              }
             },
             icon: const Icon(
               Icons.add,

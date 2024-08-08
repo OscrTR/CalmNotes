@@ -106,8 +106,10 @@ class _TagsState extends State<Tags> {
 
     if (tags.isEmpty) {
       return Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Center(child: Text('No tags found.')),
+          const Text('No tags found.'),
           const SizedBox(height: 10),
           _buildtagCreation(context),
         ],
@@ -225,12 +227,15 @@ class _TagsState extends State<Tags> {
           right: 0,
           child: IconButton(
             onPressed: () {
-              context
-                  .read<TagProvider>()
-                  .addAndIncrementTag(_tagNameController.text);
-              FocusScope.of(context).unfocus();
-              _tagNameController.clear();
-              Navigator.pop(context, 'Create tag');
+              final tagName = _tagNameController.text.trim();
+              if (tagName.isNotEmpty) {
+                context
+                    .read<TagProvider>()
+                    .addAndIncrementTag(_tagNameController.text);
+                FocusScope.of(context).unfocus();
+                _tagNameController.clear();
+                Navigator.pop(context, 'Create tag');
+              }
             },
             icon: const Icon(
               Icons.add,
