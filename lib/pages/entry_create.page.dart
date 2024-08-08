@@ -1,6 +1,7 @@
 import 'package:calm_notes/colors.dart';
 import 'package:calm_notes/components/emotions.dart';
 import 'package:calm_notes/models/emotion.dart';
+import 'package:calm_notes/models/tag.dart';
 import 'package:calm_notes/providers/emotion_provider.dart';
 import 'package:calm_notes/providers/tag_provider.dart';
 import 'package:calm_notes/components/slider.dart';
@@ -112,7 +113,7 @@ class _EntryCreationPageState extends State<EntryCreationPage> {
                 GoRouter.of(context).push('/');
                 Provider.of<EmotionProvider>(context, listen: false)
                     .resetEmotions();
-                Provider.of<TagProvider>(context, listen: false).resettags();
+                Provider.of<TagProvider>(context, listen: false).resetTags();
               },
               child: Container(
                 height: 48,
@@ -190,7 +191,7 @@ class _EntryCreationPageState extends State<EntryCreationPage> {
         Text('What was it about?',
             style: Theme.of(context).textTheme.titleMedium),
         const SizedBox(height: 10),
-        Tags(),
+        const Tags(),
       ],
     );
   }
@@ -208,6 +209,18 @@ class _EntryCreationPageState extends State<EntryCreationPage> {
     return emotionStrings.join(', ');
   }
 
+  String convertTagsToString(List<Tag> tags) {
+    // Filter the emotions with selectedEmotionCount > 0
+    final filteredEmotions = tags.where((tag) => tag.selectedTagCount > 0);
+
+    // Map the filtered emotions to a list of strings
+    final emotionStrings =
+        filteredEmotions.map((tag) => '${tag.name} : ${tag.selectedTagCount}');
+
+    // Join the strings with a comma and a space
+    return emotionStrings.join(', ');
+  }
+
   Widget _buildSaveButton(BuildContext context) {
     return Align(
       alignment: Alignment.bottomCenter,
@@ -219,7 +232,7 @@ class _EntryCreationPageState extends State<EntryCreationPage> {
               convertEmotionsToString(emotionProvider.emotionsToDisplay);
 
           final tagProvider = Provider.of<TagProvider>(context, listen: false);
-          final tagCounts = tagProvider.selectedtagCounts;
+          final tagCounts = convertTagsToString(tagProvider.tagsToDisplay);
 
           _databaseService.addEntry(
             '${_selectedDate.toString().split(' ')[0]}|${MaterialLocalizations.of(context).formatTimeOfDay(_selectedTime, alwaysUse24HourFormat: true)}',
@@ -227,11 +240,11 @@ class _EntryCreationPageState extends State<EntryCreationPage> {
             emotionCounts,
             _titleController.text,
             _descriptionController.text,
-            '$tagCounts',
+            tagCounts,
           );
           GoRouter.of(context).push('/');
           emotionProvider.resetEmotions();
-          tagProvider.resettags();
+          tagProvider.resetTags();
         },
         style: ButtonStyle(
           padding: WidgetStateProperty.all<EdgeInsetsGeometry>(

@@ -44,7 +44,7 @@ class EmotionProvider extends ChangeNotifier {
   }
 
   Future<void> _fetchEmotions() async {
-    _emotions = await _databaseService.getEmotions();
+    _emotions = await _databaseService.fetchEmotions();
     final fetchedEmotionsToDisplay =
         await _databaseService.fetchEmotionsToDisplay();
     List<Emotion> newEmotionsToDisplay = List.from(fetchedEmotionsToDisplay);

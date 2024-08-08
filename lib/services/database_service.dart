@@ -1,6 +1,7 @@
 import 'package:calm_notes/models/emotion.dart';
 import 'package:calm_notes/models/entry.dart';
 import 'package:calm_notes/models/reminder.dart';
+import 'package:calm_notes/models/tag.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -26,6 +27,12 @@ class DatabaseService {
   final String _emotionsNameColumnName = 'name';
   final String _emotionsLastUseColumnName = 'lastUse';
   final String _emotionsSelectedEmotionCountColumnName = 'selectedEmotionCount';
+
+  final String _tagsTableName = 'tags';
+  final String _tagsIdColumnName = 'id';
+  final String _tagsNameColumnName = 'name';
+  final String _tagsLastUseColumnName = 'lastUse';
+  final String _tagsSelectedTagCountColumnName = 'selectedTagCount';
 
   DatabaseService._constructor();
 
@@ -66,6 +73,15 @@ class DatabaseService {
           $_emotionsNameColumnName TEXT NOT NULL,
           $_emotionsLastUseColumnName INTEGER NOT NULL,
           $_emotionsSelectedEmotionCountColumnName INTEGER NOT NULL
+        )
+        ''');
+
+        db.execute('''
+        CREATE TABLE $_tagsTableName (
+          $_tagsIdColumnName INTEGER PRIMARY KEY,
+          $_tagsNameColumnName TEXT NOT NULL,
+          $_tagsLastUseColumnName INTEGER NOT NULL,
+          $_tagsSelectedTagCountColumnName INTEGER NOT NULL
         )
         ''');
       },
@@ -234,7 +250,7 @@ class DatabaseService {
     );
   }
 
-  Future<List<Emotion>> getEmotions() async {
+  Future<List<Emotion>> fetchEmotions() async {
     final db = await database;
     final data = await db.query(
       _emotionsTableName,
@@ -394,7 +410,7 @@ class DatabaseService {
     Map<String, int> emotionMap = convertStringToMap(entry.emotions!);
 
     // Fetch emotions from the database
-    List<Emotion> emotions = await getEmotions();
+    List<Emotion> emotions = await fetchEmotions();
 
     // Create a map for quick lookup
     final Map<String, Emotion> emotionMapFromDb = {
@@ -419,5 +435,189 @@ class DatabaseService {
         );
       }
     }
+  }
+
+  Future<List<Tag>> fetchTags() async {
+    final db = await database;
+    final data = await db.query(
+      _tagsTableName,
+      orderBy: 'lastUse DESC',
+    );
+
+    List<Tag> tags = data
+        .map(
+          (e) => Tag(
+            id: e['id'] as int,
+            name: e['name'] as String,
+            lastUse: e['lastUse'] as int,
+            selectedTagCount: e['selectedTagCount'] as int,
+          ),
+        )
+        .toList();
+
+    return tags;
+  }
+
+  Future<List<Tag>> fetchTagsToDisplay() async {
+    final db = await database;
+    final data = await db.query(
+      _tagsTableName,
+      orderBy: 'lastUse DESC',
+    );
+
+    List<Tag> tags = data
+        .map(
+          (e) => Tag(
+            id: e['id'] as int,
+            name: e['name'] as String,
+            lastUse: e['lastUse'] as int,
+            selectedTagCount: e['selectedTagCount'] as int,
+          ),
+        )
+        .toList();
+
+    // Filter the list to include only emotions with selectedEmotionCount > 0
+    List<Tag> selectedTags =
+        tags.where((tag) => tag.selectedTagCount > 0).toList();
+
+    // Initialize the emotionsToDisplay list with selected emotions
+    final List<Tag> tagsToDisplay = List.from(selectedTags);
+
+    // If emotionsToDisplay has less than 3 emotions, add unselected emotions
+    if (tagsToDisplay.length < 3) {
+      // Filter out the emotions that are not selected
+      List<Tag> unselectedTags =
+          tags.where((tag) => tag.selectedTagCount == 0).toList();
+
+      // Add unselected emotions until the list has at least 3 emotions
+      int remainingSlots = 3 - tagsToDisplay.length;
+      tagsToDisplay.addAll(unselectedTags.take(remainingSlots));
+    }
+
+    return tagsToDisplay;
+  }
+
+  Future<Tag> getTag(int id) async {
+    final db = await database;
+    final List<Map<String, dynamic>> result = await db.query(
+      _tagsTableName,
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+
+    if (result.isNotEmpty) {
+      return Tag.fromMap(result.first);
+    } else {
+      throw Exception('Entry with id $id not found');
+    }
+  }
+
+  Future<int?> getSelectedTagCount(int id) async {
+    final db = await database;
+    final List<Map<String, dynamic>> result = await db.query(
+      _tagsTableName,
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+
+    if (result.isNotEmpty) {
+      return Tag.fromMap(result.first).selectedTagCount;
+    } else {
+      throw Exception('Tag with id $id not found');
+    }
+  }
+
+  Future<void> incrementSelectedTagCount(int id) async {
+    final db = await database;
+    final lastUse = DateTime.now().toUtc().millisecondsSinceEpoch;
+    final currentCount = await getSelectedTagCount(id) ?? 0;
+    int newCount = currentCount;
+    if (newCount < 10) {
+      newCount += 1;
+    }
+    await db.update(
+      _tagsTableName,
+      {
+        _tagsSelectedTagCountColumnName: newCount,
+        _tagsLastUseColumnName: lastUse,
+      },
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  Future<void> resetSelectedTagsCount() async {
+    final db = await database;
+    await db.update(
+      _tagsTableName,
+      {
+        _tagsSelectedTagCountColumnName: 0,
+      },
+    );
+  }
+
+  Future<void> resetSelectedTagCount(int id) async {
+    final db = await database;
+    await db.update(
+      _tagsTableName,
+      {
+        _tagsSelectedTagCountColumnName: 0,
+      },
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  Future<void> setSelectedTagsCount(int id) async {
+    final db = await database;
+
+    Entry entry = await getEntry(id);
+
+    Map<String, int> tagMap = convertStringToMap(entry.tags!);
+
+    // Fetch emotions from the database
+    List<Tag> tags = await fetchTags();
+
+    // Create a map for quick lookup
+    final Map<String, Tag> tagMapFromDb = {for (var tag in tags) tag.name: tag};
+
+    // Update the emotions in the database
+    for (var entry in tagMap.entries) {
+      final name = entry.key;
+      final count = entry.value;
+
+      if (tagMapFromDb.containsKey(name)) {
+        // Emotion exists in the database, update it
+        final tag = tagMapFromDb[name];
+        await db.update(
+          _tagsTableName,
+          {
+            _tagsSelectedTagCountColumnName: count,
+          },
+          where: 'id = ?',
+          whereArgs: [tag!.id],
+        );
+      }
+    }
+  }
+
+  Future<int> addTag(String name) async {
+    final db = await database;
+    final lastUse = DateTime.now().toUtc().millisecondsSinceEpoch;
+    int id = await db.insert(_tagsTableName, {
+      _tagsNameColumnName: name,
+      _tagsLastUseColumnName: lastUse,
+      _tagsSelectedTagCountColumnName: 0,
+    });
+    return id;
+  }
+
+  void deleteTag(int id) async {
+    final db = await database;
+    await db.delete(
+      _tagsTableName,
+      where: 'id = ?',
+      whereArgs: [id],
+    );
   }
 }

@@ -2,6 +2,7 @@ import 'package:calm_notes/colors.dart';
 import 'package:calm_notes/components/emotions.dart';
 import 'package:calm_notes/models/emotion.dart';
 import 'package:calm_notes/models/entry.dart';
+import 'package:calm_notes/models/tag.dart';
 import 'package:calm_notes/providers/emotion_provider.dart';
 import 'package:calm_notes/providers/tag_provider.dart';
 import 'package:calm_notes/components/slider.dart';
@@ -62,29 +63,8 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
     Future.microtask(() {
       Provider.of<EmotionProvider>(context, listen: false)
           .setEmotions(widget.entryId);
-      Provider.of<TagProvider>(context, listen: false)
-          .settags(_parseEmotionString(_savedEntry!.tags!));
+      Provider.of<TagProvider>(context, listen: false).setTags(widget.entryId);
     });
-  }
-
-  // Parse the input string into a Map<String, int>
-  Map<String, int> _parseEmotionString(String emotionString) {
-    // Remove curly braces and split the string by comma to get each emotion entry
-    String cleanedString = emotionString.replaceAll(RegExp(r'[{} ]'), '');
-    List<String> entries = cleanedString.split(',');
-
-    // Convert the list of entries into a map
-    Map<String, int> emotionMap = {};
-    for (String entry in entries) {
-      List<String> parts = entry.split(':');
-      if (parts.length == 2) {
-        String emotion = parts[0];
-        int count = int.tryParse(parts[1]) ?? 0;
-        emotionMap[emotion] = count;
-      }
-    }
-
-    return emotionMap;
   }
 
   DateTime? getDateTime(String date) {
@@ -214,7 +194,7 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
                 GoRouter.of(context).push('/');
                 Provider.of<EmotionProvider>(context, listen: false)
                     .resetEmotions();
-                Provider.of<TagProvider>(context, listen: false).resettags();
+                Provider.of<TagProvider>(context, listen: false).resetTags();
               },
               child: Container(
                 height: 48,
@@ -258,7 +238,7 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
                         Provider.of<EmotionProvider>(context, listen: false)
                             .resetEmotions();
                         Provider.of<TagProvider>(context, listen: false)
-                            .resettags();
+                            .resetTags();
                       },
                       child: const Text('Delete'),
                     ),
@@ -341,7 +321,7 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
         Text('What was it about?',
             style: Theme.of(context).textTheme.titleMedium),
         const SizedBox(height: 10),
-        Tags(),
+        const Tags(),
       ],
     );
   }
@@ -359,6 +339,18 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
     return emotionStrings.join(', ');
   }
 
+  String convertTagsToString(List<Tag> tags) {
+    // Filter the emotions with selectedEmotionCount > 0
+    final filteredEmotions = tags.where((tag) => tag.selectedTagCount > 0);
+
+    // Map the filtered emotions to a list of strings
+    final emotionStrings =
+        filteredEmotions.map((tag) => '${tag.name} : ${tag.selectedTagCount}');
+
+    // Join the strings with a comma and a space
+    return emotionStrings.join(', ');
+  }
+
   Widget _buildSaveButton(BuildContext context) {
     return Align(
       alignment: Alignment.bottomCenter,
@@ -370,7 +362,7 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
               convertEmotionsToString(emotionProvider.emotionsToDisplay);
 
           final tagProvider = Provider.of<TagProvider>(context, listen: false);
-          final tagCounts = tagProvider.selectedtagCounts;
+          final tagCounts = convertTagsToString(tagProvider.tagsToDisplay);
 
           _databaseService.updateEntry(
             widget.entryId,
@@ -379,11 +371,11 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
             emotionCounts,
             _titleController.text,
             _descriptionController.text,
-            '$tagCounts',
+            tagCounts,
           );
           GoRouter.of(context).push('/');
           emotionProvider.resetEmotions();
-          tagProvider.resettags();
+          tagProvider.resetTags();
         },
         style: ButtonStyle(
           padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
