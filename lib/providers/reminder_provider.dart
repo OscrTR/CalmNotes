@@ -13,12 +13,15 @@ class ReminderProvider with ChangeNotifier {
   }
 
   Future<void> _fetchReminders() async {
-    _reminders = await _databaseService.getReminders();
+    _reminders = await _databaseService.fetchReminders();
     notifyListeners();
   }
 
   Future<void> addReminder(String time) async {
-    _databaseService.addReminder(time);
+    final reminder = Reminder(
+      time: time,
+    );
+    _databaseService.addReminder(reminder);
     await _fetchReminders();
   }
 

@@ -51,7 +51,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: FutureBuilder<List<Entry>>(
-        future: _databaseService.getEntries(),
+        future: _databaseService.fetchEntries(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());

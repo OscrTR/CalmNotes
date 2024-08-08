@@ -47,7 +47,7 @@ class _EmotionsState extends State<Emotions> {
   List<Widget> _buildEmotionButtonList(List<Emotion> emotions) {
     return emotions.map(
       (emotion) {
-        if (emotion.selectedEmotionCount > 0) {
+        if (emotion.selectedCount > 0) {
           return FilledButton(
             onPressed: () {
               context.read<EmotionProvider>().incrementEmotion(emotion);
@@ -55,7 +55,7 @@ class _EmotionsState extends State<Emotions> {
             onLongPress: () {
               context.read<EmotionProvider>().resetSelectedEmotion(emotion);
             },
-            child: Text('${emotion.name} (${emotion.selectedEmotionCount})'),
+            child: Text('${emotion.name} (${emotion.selectedCount})'),
           );
         } else {
           return OutlinedButton(
@@ -130,7 +130,7 @@ class _EmotionsState extends State<Emotions> {
   }
 
   List<Widget> _buildEmotionList(List<Emotion> emotions, BuildContext context) {
-    return emotions.where((emotion) => emotion.selectedEmotionCount == 0).map(
+    return emotions.where((emotion) => emotion.selectedCount == 0).map(
       (emotion) {
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -186,7 +186,7 @@ class _EmotionsState extends State<Emotions> {
             onPressed: () {
               context
                   .read<EmotionProvider>()
-                  .deleteEmotion(emotion.id, emotion.name);
+                  .deleteEmotion(emotion.id!, emotion.name);
               Navigator.pop(context, 'Delete');
             },
             child: const Text('Delete'),

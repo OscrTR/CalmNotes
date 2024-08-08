@@ -16,7 +16,7 @@ class TagProvider extends ChangeNotifier {
 
   List<Tag> combineLists(List<Tag> list1, List<Tag> list2) {
     // Create a map from list2 for quick lookup by id
-    Map<int, Tag> map2 = {for (var e in list2) e.id: e};
+    Map<int, Tag> map2 = {for (var e in list2) e.id!: e};
 
     // Create a new list with updated values from list2
     List<Tag> updatedList = list1
@@ -71,7 +71,7 @@ class TagProvider extends ChangeNotifier {
   }
 
   void incrementTag(Tag tag) async {
-    await _databaseService.incrementSelectedTagCount(tag.id);
+    await _databaseService.incrementSelectedTagCount(tag.id!);
     await _fetchTags();
   }
 
@@ -82,7 +82,7 @@ class TagProvider extends ChangeNotifier {
   }
 
   void resetSelectedTag(Tag tag) async {
-    await _databaseService.resetSelectedTagCount(tag.id);
+    await _databaseService.resetSelectedTagCount(tag.id!);
     await _fetchTags();
   }
 

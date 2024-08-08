@@ -1,6 +1,7 @@
 import 'package:calm_notes/colors.dart';
 import 'package:calm_notes/components/emotions.dart';
 import 'package:calm_notes/models/emotion.dart';
+import 'package:calm_notes/models/entry.dart';
 import 'package:calm_notes/models/tag.dart';
 import 'package:calm_notes/providers/emotion_provider.dart';
 import 'package:calm_notes/providers/tag_provider.dart';
@@ -197,27 +198,21 @@ class _EntryCreationPageState extends State<EntryCreationPage> {
   }
 
   String convertEmotionsToString(List<Emotion> emotions) {
-    // Filter the emotions with selectedEmotionCount > 0
     final filteredEmotions =
-        emotions.where((emotion) => emotion.selectedEmotionCount > 0);
+        emotions.where((emotion) => emotion.selectedCount > 0);
 
-    // Map the filtered emotions to a list of strings
     final emotionStrings = filteredEmotions
-        .map((emotion) => '${emotion.name} : ${emotion.selectedEmotionCount}');
+        .map((emotion) => '${emotion.name} : ${emotion.selectedCount}');
 
-    // Join the strings with a comma and a space
     return emotionStrings.join(', ');
   }
 
   String convertTagsToString(List<Tag> tags) {
-    // Filter the emotions with selectedEmotionCount > 0
-    final filteredEmotions = tags.where((tag) => tag.selectedTagCount > 0);
+    final filteredEmotions = tags.where((tag) => tag.selectedCount > 0);
 
-    // Map the filtered emotions to a list of strings
     final emotionStrings =
-        filteredEmotions.map((tag) => '${tag.name} : ${tag.selectedTagCount}');
+        filteredEmotions.map((tag) => '${tag.name} : ${tag.selectedCount}');
 
-    // Join the strings with a comma and a space
     return emotionStrings.join(', ');
   }
 
@@ -234,14 +229,17 @@ class _EntryCreationPageState extends State<EntryCreationPage> {
           final tagProvider = Provider.of<TagProvider>(context, listen: false);
           final tagCounts = convertTagsToString(tagProvider.tagsToDisplay);
 
-          _databaseService.addEntry(
-            '${_selectedDate.toString().split(' ')[0]}|${MaterialLocalizations.of(context).formatTimeOfDay(_selectedTime, alwaysUse24HourFormat: true)}',
-            _selectedMood,
-            emotionCounts,
-            _titleController.text,
-            _descriptionController.text,
-            tagCounts,
+          final entry = Entry(
+            date:
+                '${_selectedDate.toString().split(' ')[0]}|${MaterialLocalizations.of(context).formatTimeOfDay(_selectedTime, alwaysUse24HourFormat: true)}',
+            mood: _selectedMood,
+            emotions: emotionCounts,
+            title: _titleController.text,
+            description: _descriptionController.text,
+            tags: tagCounts,
           );
+
+          _databaseService.addEntry(entry);
           GoRouter.of(context).push('/');
           emotionProvider.resetEmotions();
           tagProvider.resetTags();

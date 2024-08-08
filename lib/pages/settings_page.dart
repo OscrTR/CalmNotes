@@ -97,7 +97,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         ),
                         IconButton(
                           onPressed: () {
-                            provider.deleteReminder(reminder.id);
+                            provider.deleteReminder(reminder.id!);
                           },
                           style: const ButtonStyle(
                             tapTargetSize: MaterialTapTargetSize.shrinkWrap,

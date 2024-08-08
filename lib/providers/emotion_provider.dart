@@ -16,7 +16,7 @@ class EmotionProvider extends ChangeNotifier {
 
   List<Emotion> combineLists(List<Emotion> list1, List<Emotion> list2) {
     // Create a map from list2 for quick lookup by id
-    Map<int, Emotion> map2 = {for (var e in list2) e.id: e};
+    Map<int, Emotion> map2 = {for (var e in list2) e.id!: e};
 
     // Create a new list with updated values from list2
     List<Emotion> updatedList = list1
@@ -73,7 +73,7 @@ class EmotionProvider extends ChangeNotifier {
   }
 
   void incrementEmotion(Emotion emotion) async {
-    await _databaseService.incrementSelectedEmotionCount(emotion.id);
+    await _databaseService.incrementSelectedEmotionCount(emotion.id!);
     await _fetchEmotions();
   }
 
@@ -84,7 +84,7 @@ class EmotionProvider extends ChangeNotifier {
   }
 
   void resetSelectedEmotion(Emotion emotion) async {
-    await _databaseService.resetSelectedEmotionCount(emotion.id);
+    await _databaseService.resetSelectedEmotionCount(emotion.id!);
     await _fetchEmotions();
   }
 

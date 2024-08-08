@@ -47,7 +47,7 @@ class _TagsState extends State<Tags> {
   List<Widget> _buildtagButtonList(List<Tag> tags) {
     return tags.map(
       (tag) {
-        if (tag.selectedTagCount > 0) {
+        if (tag.selectedCount > 0) {
           return FilledButton(
             onPressed: () {
               context.read<TagProvider>().incrementTag(tag);
@@ -55,7 +55,7 @@ class _TagsState extends State<Tags> {
             onLongPress: () {
               context.read<TagProvider>().resetSelectedTag(tag);
             },
-            child: Text('${tag.name} (${tag.selectedTagCount})'),
+            child: Text('${tag.name} (${tag.selectedCount})'),
           );
         } else {
           return OutlinedButton(
@@ -129,7 +129,7 @@ class _TagsState extends State<Tags> {
   }
 
   List<Widget> _buildtagList(List<Tag> tags, BuildContext context) {
-    return tags.where((tag) => tag.selectedTagCount == 0).map(
+    return tags.where((tag) => tag.selectedCount == 0).map(
       (tag) {
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -183,7 +183,7 @@ class _TagsState extends State<Tags> {
           ),
           TextButton(
             onPressed: () {
-              context.read<TagProvider>().deleteTag(tag.id, tag.name);
+              context.read<TagProvider>().deleteTag(tag.id!, tag.name);
               Navigator.pop(context, 'Delete');
             },
             child: const Text('Delete'),

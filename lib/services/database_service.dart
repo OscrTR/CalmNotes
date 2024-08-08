@@ -9,31 +9,6 @@ class DatabaseService {
   static Database? _db;
   static final DatabaseService instance = DatabaseService._constructor();
 
-  final String _entriesTableName = 'entries';
-  final String _entriesIdColumnName = 'id';
-  final String _entriesTitleColumnName = 'title';
-  final String _entriesDescriptionColumnName = 'description';
-  final String _entriesDateColumnName = 'date';
-  final String _entriesMoodColumnName = 'mood';
-  final String _entriesEmotionsColumnName = 'emotions';
-  final String _entriesTagsColumnName = 'tags';
-
-  final String _remindersTableName = 'reminders';
-  final String _remindersIdColumnName = 'id';
-  final String _remindersTimeColumnName = 'time';
-
-  final String _emotionsTableName = 'emotions';
-  final String _emotionsIdColumnName = 'id';
-  final String _emotionsNameColumnName = 'name';
-  final String _emotionsLastUseColumnName = 'lastUse';
-  final String _emotionsSelectedEmotionCountColumnName = 'selectedEmotionCount';
-
-  final String _tagsTableName = 'tags';
-  final String _tagsIdColumnName = 'id';
-  final String _tagsNameColumnName = 'name';
-  final String _tagsLastUseColumnName = 'lastUse';
-  final String _tagsSelectedTagCountColumnName = 'selectedTagCount';
-
   DatabaseService._constructor();
 
   Future<Database> get database async {
@@ -50,518 +25,274 @@ class DatabaseService {
       version: 1,
       onCreate: (db, version) {
         db.execute('''
-        CREATE TABLE $_entriesTableName (
-          $_entriesIdColumnName INTEGER PRIMARY KEY,
-          $_entriesDateColumnName TEXT NOT NULL,
-          $_entriesMoodColumnName INTEGER NOT NULL,
-          $_entriesEmotionsColumnName TEXT,
-          $_entriesTitleColumnName TEXT,
-          $_entriesDescriptionColumnName TEXT,
-          $_entriesTagsColumnName TEXT
+        CREATE TABLE entries (
+          id INTEGER PRIMARY KEY,
+          date TEXT NOT NULL,
+          mood INTEGER NOT NULL,
+          emotions TEXT,
+          title TEXT,
+          description TEXT,
+          tags TEXT
         )
         ''');
         db.execute('''
-        CREATE TABLE $_remindersTableName (
-          $_remindersIdColumnName INTEGER PRIMARY KEY,
-          $_remindersTimeColumnName TEXT NOT NULL
-        )
-        ''');
-
-        db.execute('''
-        CREATE TABLE $_emotionsTableName (
-          $_emotionsIdColumnName INTEGER PRIMARY KEY,
-          $_emotionsNameColumnName TEXT NOT NULL,
-          $_emotionsLastUseColumnName INTEGER NOT NULL,
-          $_emotionsSelectedEmotionCountColumnName INTEGER NOT NULL
+        CREATE TABLE reminders (
+          id INTEGER PRIMARY KEY,
+          time TEXT NOT NULL
         )
         ''');
 
         db.execute('''
-        CREATE TABLE $_tagsTableName (
-          $_tagsIdColumnName INTEGER PRIMARY KEY,
-          $_tagsNameColumnName TEXT NOT NULL,
-          $_tagsLastUseColumnName INTEGER NOT NULL,
-          $_tagsSelectedTagCountColumnName INTEGER NOT NULL
+        CREATE TABLE emotions (
+          id INTEGER PRIMARY KEY,
+          name TEXT NOT NULL,
+          lastUse INTEGER NOT NULL,
+          selectedCount INTEGER NOT NULL
+        )
+        ''');
+
+        db.execute('''
+        CREATE TABLE tags (
+          id INTEGER PRIMARY KEY,
+          name TEXT NOT NULL,
+          lastUse INTEGER NOT NULL,
+          selectedCount INTEGER NOT NULL
         )
         ''');
       },
     );
   }
 
-  void addEntry(
-    String date,
-    int mood,
-    String emotions,
-    String title,
-    String description,
-    String tags,
-  ) async {
+  Future<void> _insert(String table, Map<String, dynamic> values) async {
     final db = await database;
-    await db.insert(_entriesTableName, {
-      _entriesDateColumnName: date,
-      _entriesMoodColumnName: mood,
-      _entriesEmotionsColumnName: emotions,
-      _entriesTitleColumnName: title,
-      _entriesDescriptionColumnName: description,
-      _entriesTagsColumnName: tags
-    });
+    await db.insert(table, values);
   }
 
-  Future<List<Entry>> getEntries() async {
+  Future<void> _update(
+      String table, Map<String, dynamic> values, int id) async {
     final db = await database;
-    final data = await db.query(
-      _entriesTableName,
-      orderBy: 'date DESC',
-    );
-    List<Entry> entries = data
-        .map(
-          (e) => Entry(
-            id: e['id'] as int,
-            mood: e['mood'] as int,
-            date: e['date'] as String,
-            emotions: e['emotions'] as String,
-            title: e['title'] as String,
-            description: e['description'] as String,
-            tags: e['tags'] as String,
-          ),
-        )
-        .toList();
-    return entries;
+    await db.update(table, values, where: 'id = ?', whereArgs: [id]);
+  }
+
+  Future<void> _delete(String table, int id) async {
+    final db = await database;
+    await db.delete(table, where: 'id = ?', whereArgs: [id]);
+  }
+
+  Future<List<Map<String, dynamic>>> _query(String table,
+      {String? orderBy}) async {
+    final db = await database;
+    return db.query(table, orderBy: orderBy);
+  }
+
+  Future<Map<String, dynamic>?> _queryById(String table, int id) async {
+    final db = await database;
+    final result = await db.query(table, where: 'id = ?', whereArgs: [id]);
+    return result.isNotEmpty ? result.first : null;
+  }
+
+  // Entry methods
+
+  Future<void> addEntry(Entry entry) async {
+    await _insert('entries', entry.toMap());
+  }
+
+  Future<List<Entry>> fetchEntries() async {
+    final data = await _query('entries', orderBy: 'date DESC');
+    return data.map((e) => Entry.fromMap(e)).toList();
   }
 
   Future<Entry> getEntry(int id) async {
-    final db = await database;
-    final List<Map<String, dynamic>> result = await db.query(
-      _entriesTableName,
-      where: 'id = ?',
-      whereArgs: [id],
-    );
-
-    if (result.isNotEmpty) {
-      final entry = Entry(
-        id: result.first['id'] as int,
-        mood: result.first['mood'] as int,
-        date: result.first['date'] as String,
-        emotions: result.first['emotions'] as String,
-        title: result.first['title'] as String,
-        description: result.first['description'] as String,
-        tags: result.first['tags'] as String,
-      );
-      return entry;
-    } else {
-      throw Exception('Entry with id $id not found');
-    }
+    final data = await _queryById('entries', id);
+    if (data == null) throw Exception('Entry with id $id not found');
+    return Entry.fromMap(data);
   }
 
   Future<int> getEntryMood(int id) async {
-    final db = await database;
-    final List<Map<String, dynamic>> result = await db.query(
-      _entriesTableName,
-      where: 'id = ?',
-      whereArgs: [id],
-    );
-
-    if (result.isNotEmpty) {
-      return result.first['mood'] as int;
-    } else {
-      throw Exception('Entry with id $id not found');
-    }
+    final data = await _queryById('entries', id);
+    if (data == null) throw Exception('Entry with id $id not found');
+    return Entry.fromMap(data).mood;
   }
 
-  void updateEntry(int id, String date, int mood, String emotions, String title,
-      String description, String tags) async {
-    final db = await database;
-    db.update(
-      _entriesTableName,
-      {
-        _entriesDateColumnName: date,
-        _entriesMoodColumnName: mood,
-        _entriesEmotionsColumnName: emotions,
-        _entriesTitleColumnName: title,
-        _entriesDescriptionColumnName: description,
-        _entriesTagsColumnName: tags,
-      },
-      where: 'id = ?',
-      whereArgs: [id],
-    );
+  Future<void> updateEntry(Entry entry) async {
+    await _update('entries', entry.toMap(), entry.id!);
   }
 
-  void deleteEntry(int id) async {
-    final db = await database;
-    await db.delete(
-      _entriesTableName,
-      where: 'id = ?',
-      whereArgs: [id],
-    );
+  Future<void> deleteEntry(int id) async {
+    await _delete('entries', id);
   }
 
-  void addReminder(String time) async {
-    final db = await database;
-    await db.insert(_remindersTableName, {
-      _remindersTimeColumnName: time,
-    });
+// Reminder methods
+
+  Future<void> addReminder(Reminder reminder) async {
+    await _insert('reminders', reminder.toMap());
   }
 
-  void deleteReminder(int id) async {
-    final db = await database;
-    await db.delete(
-      _remindersTableName,
-      where: 'id = ?',
-      whereArgs: [id],
-    );
+  Future<List<Reminder>> fetchReminders() async {
+    final data = await _query('reminders', orderBy: 'time ASC');
+    return data.map((e) => Reminder.fromMap(e)).toList();
   }
 
-  Future<List<Reminder>> getReminders() async {
-    final db = await database;
-    final data = await db.query(
-      _remindersTableName,
-      orderBy: 'time ASC',
-    );
-
-    List<Reminder> reminders = data
-        .map(
-          (e) => Reminder(
-            id: e['id'] as int,
-            time: e['time'] as String,
-          ),
-        )
-        .toList();
-
-    return reminders;
+  Future<void> deleteReminder(int id) async {
+    await _delete('reminders', id);
   }
+
+  // Emotion methods
 
   Future<int> addEmotion(String name) async {
-    final db = await database;
     final lastUse = DateTime.now().toUtc().millisecondsSinceEpoch;
-    int id = await db.insert(_emotionsTableName, {
-      _emotionsNameColumnName: name,
-      _emotionsLastUseColumnName: lastUse,
-      _emotionsSelectedEmotionCountColumnName: 0,
-    });
-    return id;
+    final emotion = Emotion(name: name, lastUse: lastUse, selectedCount: 0);
+    final db = await database;
+    return db.insert('emotions', emotion.toMap());
   }
 
-  void deleteEmotion(int id) async {
-    final db = await database;
-    await db.delete(
-      _emotionsTableName,
-      where: 'id = ?',
-      whereArgs: [id],
-    );
+  Future<void> deleteEmotion(int id) async {
+    await _delete('emotions', id);
   }
 
   Future<List<Emotion>> fetchEmotions() async {
-    final db = await database;
-    final data = await db.query(
-      _emotionsTableName,
-      orderBy: 'lastUse DESC',
-    );
-
-    List<Emotion> emotions = data
-        .map(
-          (e) => Emotion(
-            id: e['id'] as int,
-            name: e['name'] as String,
-            lastUse: e['lastUse'] as int,
-            selectedEmotionCount: e['selectedEmotionCount'] as int,
-          ),
-        )
-        .toList();
-
-    return emotions;
+    final data = await _query('emotions', orderBy: 'lastUse DESC');
+    return data.map((e) => Emotion.fromMap(e)).toList();
   }
 
   Future<Emotion> getEmotion(int id) async {
-    final db = await database;
-    final List<Map<String, dynamic>> result = await db.query(
-      _entriesTableName,
-      where: 'id = ?',
-      whereArgs: [id],
-    );
-
-    if (result.isNotEmpty) {
-      return Emotion.fromMap(result.first);
-    } else {
-      throw Exception('Entry with id $id not found');
-    }
+    final data = await _queryById('emotions', id);
+    if (data == null) throw Exception('Emotion with id $id not found');
+    return Emotion.fromMap(data);
   }
 
-  Future<int?> getSelectedEmotionCount(int id) async {
-    final db = await database;
-    final List<Map<String, dynamic>> result = await db.query(
-      _emotionsTableName,
-      where: 'id = ?',
-      whereArgs: [id],
-    );
-
-    if (result.isNotEmpty) {
-      return Emotion.fromMap(result.first).selectedEmotionCount;
-    } else {
-      throw Exception('Emotion with id $id not found');
-    }
+  Future<int> getSelectedEmotionCount(int id) async {
+    final emotion = await getEmotion(id);
+    return emotion.selectedCount;
   }
 
   Future<void> incrementSelectedEmotionCount(int id) async {
-    final db = await database;
+    final emotion = await getEmotion(id);
+    final newCount = (emotion.selectedCount < 10)
+        ? emotion.selectedCount + 1
+        : emotion.selectedCount;
     final lastUse = DateTime.now().toUtc().millisecondsSinceEpoch;
-    final currentCount = await getSelectedEmotionCount(id) ?? 0;
-    int newCount = currentCount;
-    if (newCount < 10) {
-      newCount += 1;
-    }
-    await db.update(
-      _emotionsTableName,
-      {
-        _emotionsSelectedEmotionCountColumnName: newCount,
-        _emotionsLastUseColumnName: lastUse,
-      },
-      where: 'id = ?',
-      whereArgs: [id],
-    );
+    await _update(
+        'emotions',
+        {
+          'selectedCount': newCount,
+          'lastUse': lastUse,
+        },
+        id);
   }
 
   Future<List<Emotion>> fetchEmotionsToDisplay() async {
-    final db = await database;
-    final data = await db.query(
-      _emotionsTableName,
-      orderBy: 'lastUse DESC',
-    );
-
-    List<Emotion> emotions = data
-        .map(
-          (e) => Emotion(
-            id: e['id'] as int,
-            name: e['name'] as String,
-            lastUse: e['lastUse'] as int,
-            selectedEmotionCount: e['selectedEmotionCount'] as int,
-          ),
-        )
-        .toList();
-
-    // Filter the list to include only emotions with selectedEmotionCount > 0
-    List<Emotion> selectedEmotions =
-        emotions.where((emotion) => emotion.selectedEmotionCount > 0).toList();
-
-    // Initialize the emotionsToDisplay list with selected emotions
-    final List<Emotion> emotionsToDisplay = List.from(selectedEmotions);
-
-    // If emotionsToDisplay has less than 3 emotions, add unselected emotions
-    if (emotionsToDisplay.length < 3) {
-      // Filter out the emotions that are not selected
-      List<Emotion> unselectedEmotions = emotions
-          .where((emotion) => emotion.selectedEmotionCount == 0)
-          .toList();
-
-      // Add unselected emotions until the list has at least 3 emotions
-      int remainingSlots = 3 - emotionsToDisplay.length;
-      emotionsToDisplay.addAll(unselectedEmotions.take(remainingSlots));
+    final emotions = await fetchEmotions();
+    final selectedEmotions =
+        emotions.where((e) => e.selectedCount > 0).toList();
+    if (selectedEmotions.length >= 3) {
+      return selectedEmotions;
     }
-
-    return emotionsToDisplay;
+    final unselectedEmotions =
+        emotions.where((e) => e.selectedCount == 0).toList();
+    final required = 3 - selectedEmotions.length;
+    return selectedEmotions + unselectedEmotions.take(required).toList();
   }
 
   Future<void> resetSelectedEmotionsCount() async {
     final db = await database;
-    await db.update(
-      _emotionsTableName,
-      {
-        _emotionsSelectedEmotionCountColumnName: 0,
-      },
-    );
+    await db.update('emotions', {'selectedCount': 0});
   }
 
   Future<void> resetSelectedEmotionCount(int id) async {
-    final db = await database;
-    await db.update(
-      _emotionsTableName,
-      {
-        _emotionsSelectedEmotionCountColumnName: 0,
-      },
-      where: 'id = ?',
-      whereArgs: [id],
-    );
-  }
-
-  Map<String, int> convertStringToMap(String emotionsString) {
-    // Initialize the map to store emotion names and counts
-    final Map<String, int> emotionMap = {};
-
-    // Split the string into individual emotion parts
-    final emotionParts = emotionsString.split(', ');
-
-    // Process each part to extract name and count
-    for (var part in emotionParts) {
-      final parts = part.split(' : ');
-      if (parts.length == 2) {
-        final name = parts[0].trim();
-        final count = int.tryParse(parts[1].trim()) ?? 0;
-        emotionMap[name] = count;
-      }
-    }
-
-    return emotionMap;
+    await _update(
+        'emotions',
+        {
+          'selectedCount': 0,
+        },
+        id);
   }
 
   Future<void> setSelectedEmotionsCount(int id) async {
-    final db = await database;
-
-    Entry entry = await getEntry(id);
-
-    Map<String, int> emotionMap = convertStringToMap(entry.emotions!);
-
-    // Fetch emotions from the database
-    List<Emotion> emotions = await fetchEmotions();
-
-    // Create a map for quick lookup
-    final Map<String, Emotion> emotionMapFromDb = {
-      for (var emotion in emotions) emotion.name: emotion
-    };
-
-    // Update the emotions in the database
+    final entry = await getEntry(id);
+    final emotionMap = convertStringToMap(entry.emotions!);
+    final emotions = await fetchEmotions();
+    final emotionMapFromDb = {for (var e in emotions) e.name: e};
     for (var entry in emotionMap.entries) {
       final name = entry.key;
       final count = entry.value;
-
       if (emotionMapFromDb.containsKey(name)) {
-        // Emotion exists in the database, update it
-        final emotion = emotionMapFromDb[name];
-        await db.update(
-          _emotionsTableName,
-          {
-            _emotionsSelectedEmotionCountColumnName: count,
-          },
-          where: 'id = ?',
-          whereArgs: [emotion!.id],
-        );
+        final emotion = emotionMapFromDb[name]!;
+        await _update(
+            'emotions',
+            {
+              'selectedCount': count,
+            },
+            emotion.id!);
       }
     }
   }
 
-  Future<List<Tag>> fetchTags() async {
+  // Tag methods
+
+  Future<int> addTag(String name) async {
+    final lastUse = DateTime.now().toUtc().millisecondsSinceEpoch;
+    final tag = Tag(name: name, lastUse: lastUse, selectedCount: 0);
     final db = await database;
-    final data = await db.query(
-      _tagsTableName,
-      orderBy: 'lastUse DESC',
-    );
-
-    List<Tag> tags = data
-        .map(
-          (e) => Tag(
-            id: e['id'] as int,
-            name: e['name'] as String,
-            lastUse: e['lastUse'] as int,
-            selectedTagCount: e['selectedTagCount'] as int,
-          ),
-        )
-        .toList();
-
-    return tags;
+    return db.insert('tags', tag.toMap());
   }
 
-  Future<List<Tag>> fetchTagsToDisplay() async {
-    final db = await database;
-    final data = await db.query(
-      _tagsTableName,
-      orderBy: 'lastUse DESC',
-    );
+  Future<void> deleteTag(int id) async {
+    await _delete('tags', id);
+  }
 
-    List<Tag> tags = data
-        .map(
-          (e) => Tag(
-            id: e['id'] as int,
-            name: e['name'] as String,
-            lastUse: e['lastUse'] as int,
-            selectedTagCount: e['selectedTagCount'] as int,
-          ),
-        )
-        .toList();
-
-    // Filter the list to include only emotions with selectedEmotionCount > 0
-    List<Tag> selectedTags =
-        tags.where((tag) => tag.selectedTagCount > 0).toList();
-
-    // Initialize the emotionsToDisplay list with selected emotions
-    final List<Tag> tagsToDisplay = List.from(selectedTags);
-
-    // If emotionsToDisplay has less than 3 emotions, add unselected emotions
-    if (tagsToDisplay.length < 3) {
-      // Filter out the emotions that are not selected
-      List<Tag> unselectedTags =
-          tags.where((tag) => tag.selectedTagCount == 0).toList();
-
-      // Add unselected emotions until the list has at least 3 emotions
-      int remainingSlots = 3 - tagsToDisplay.length;
-      tagsToDisplay.addAll(unselectedTags.take(remainingSlots));
-    }
-
-    return tagsToDisplay;
+  Future<List<Tag>> fetchTags() async {
+    final data = await _query('tags', orderBy: 'lastUse DESC');
+    return data.map((e) => Tag.fromMap(e)).toList();
   }
 
   Future<Tag> getTag(int id) async {
-    final db = await database;
-    final List<Map<String, dynamic>> result = await db.query(
-      _tagsTableName,
-      where: 'id = ?',
-      whereArgs: [id],
-    );
-
-    if (result.isNotEmpty) {
-      return Tag.fromMap(result.first);
-    } else {
-      throw Exception('Entry with id $id not found');
-    }
+    final data = await _queryById('tags', id);
+    if (data == null) throw Exception('Tag with id $id not found');
+    return Tag.fromMap(data);
   }
 
-  Future<int?> getSelectedTagCount(int id) async {
-    final db = await database;
-    final List<Map<String, dynamic>> result = await db.query(
-      _tagsTableName,
-      where: 'id = ?',
-      whereArgs: [id],
-    );
-
-    if (result.isNotEmpty) {
-      return Tag.fromMap(result.first).selectedTagCount;
-    } else {
-      throw Exception('Tag with id $id not found');
-    }
+  Future<int> getSelectedTagCount(int id) async {
+    final tag = await getTag(id);
+    return tag.selectedCount;
   }
 
   Future<void> incrementSelectedTagCount(int id) async {
-    final db = await database;
+    final tag = await getTag(id);
+    final newCount =
+        (tag.selectedCount < 10) ? tag.selectedCount + 1 : tag.selectedCount;
     final lastUse = DateTime.now().toUtc().millisecondsSinceEpoch;
-    final currentCount = await getSelectedTagCount(id) ?? 0;
-    int newCount = currentCount;
-    if (newCount < 10) {
-      newCount += 1;
+    await _update(
+        'tags',
+        {
+          'selectedCount': newCount,
+          'lastUse': lastUse,
+        },
+        id);
+  }
+
+  Future<List<Tag>> fetchTagsToDisplay() async {
+    final tags = await fetchTags();
+    final selectedTags = tags.where((t) => t.selectedCount > 0).toList();
+    if (selectedTags.length >= 3) {
+      return selectedTags;
     }
-    await db.update(
-      _tagsTableName,
-      {
-        _tagsSelectedTagCountColumnName: newCount,
-        _tagsLastUseColumnName: lastUse,
-      },
-      where: 'id = ?',
-      whereArgs: [id],
-    );
+    final unselectedTags = tags.where((t) => t.selectedCount == 0).toList();
+    final required = 3 - selectedTags.length;
+    return selectedTags + unselectedTags.take(required).toList();
   }
 
   Future<void> resetSelectedTagsCount() async {
     final db = await database;
-    await db.update(
-      _tagsTableName,
-      {
-        _tagsSelectedTagCountColumnName: 0,
-      },
-    );
+    await db.update('tags', {'selectedCount': 0});
   }
 
   Future<void> resetSelectedTagCount(int id) async {
     final db = await database;
     await db.update(
-      _tagsTableName,
+      'tags',
       {
-        _tagsSelectedTagCountColumnName: 0,
+        'selectedCount': 0,
       },
       where: 'id = ?',
       whereArgs: [id],
@@ -569,55 +300,37 @@ class DatabaseService {
   }
 
   Future<void> setSelectedTagsCount(int id) async {
-    final db = await database;
-
-    Entry entry = await getEntry(id);
-
-    Map<String, int> tagMap = convertStringToMap(entry.tags!);
-
-    // Fetch emotions from the database
-    List<Tag> tags = await fetchTags();
-
-    // Create a map for quick lookup
-    final Map<String, Tag> tagMapFromDb = {for (var tag in tags) tag.name: tag};
-
-    // Update the emotions in the database
+    final entry = await getEntry(id);
+    final tagMap = convertStringToMap(entry.tags!);
+    final tags = await fetchTags();
+    final tagMapFromDb = {for (var t in tags) t.name: t};
     for (var entry in tagMap.entries) {
       final name = entry.key;
       final count = entry.value;
-
       if (tagMapFromDb.containsKey(name)) {
-        // Emotion exists in the database, update it
-        final tag = tagMapFromDb[name];
-        await db.update(
-          _tagsTableName,
-          {
-            _tagsSelectedTagCountColumnName: count,
-          },
-          where: 'id = ?',
-          whereArgs: [tag!.id],
-        );
+        final tag = tagMapFromDb[name]!;
+        await _update(
+            'tags',
+            {
+              'selectedCount': count,
+            },
+            tag.id!);
       }
     }
   }
 
-  Future<int> addTag(String name) async {
-    final db = await database;
-    final lastUse = DateTime.now().toUtc().millisecondsSinceEpoch;
-    int id = await db.insert(_tagsTableName, {
-      _tagsNameColumnName: name,
-      _tagsLastUseColumnName: lastUse,
-      _tagsSelectedTagCountColumnName: 0,
-    });
-    return id;
-  }
+  // Helper method for converting String to Map
 
-  void deleteTag(int id) async {
-    final db = await database;
-    await db.delete(
-      _tagsTableName,
-      where: 'id = ?',
-      whereArgs: [id],
-    );
+  Map<String, int> convertStringToMap(String data) {
+    final items = data.split(',');
+    final Map<String, int> map = {};
+    for (var item in items) {
+      if (item.isEmpty) continue;
+      final parts = item.split(':');
+      final key = parts[0];
+      final value = int.tryParse(parts[1]) ?? 0;
+      map[key] = value;
+    }
+    return map;
   }
 }

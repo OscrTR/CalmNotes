@@ -1,22 +1,31 @@
 class Tag {
-  final int id;
+  final int? id;
   final String name;
   final int lastUse;
-  final int selectedTagCount;
+  final int selectedCount;
 
   Tag({
-    required this.id,
+    this.id,
     required this.name,
     required this.lastUse,
-    required this.selectedTagCount,
+    required this.selectedCount,
   });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'name': name,
+      'lastUse': lastUse,
+      'selectedCount': selectedCount,
+    };
+  }
 
   factory Tag.fromMap(Map<String, dynamic> map) {
     return Tag(
-      id: map['id'] as int,
-      name: map['name'] as String,
-      lastUse: map['lastUse'] as int,
-      selectedTagCount: map['selectedTagCount'] as int,
+      id: map['id'],
+      name: map['name'],
+      lastUse: map['lastUse'],
+      selectedCount: map['selectedCount'],
     );
   }
 
@@ -25,7 +34,7 @@ class Tag {
       id: id,
       name: name,
       lastUse: other.lastUse,
-      selectedTagCount: other.selectedTagCount,
+      selectedCount: other.selectedCount,
     );
   }
 }
