@@ -20,23 +20,43 @@ class _ChartState extends State<Chart> {
     final orderedEntries = entries.reversed.toList();
 
     List<FlSpot> convertEntriesToSpots(List<Entry> entries) {
-      return List.generate(entries.length, (index) {
-        return FlSpot(index.toDouble(), entries[index].mood.toDouble());
-      });
+      // Map to store date-wise aggregated mood values
+      final Map<String, List<double>> moodMap = {};
+
+      // Group entries by date and collect moods
+      for (var entry in entries) {
+        if (moodMap.containsKey(entry.date.substring(0, 10))) {
+          moodMap[entry.date.substring(0, 10)]!.add(entry.mood.toDouble());
+        } else {
+          moodMap[entry.date.substring(0, 10)] = [entry.mood.toDouble()];
+        }
+      }
+
+      // Create FlSpots using the average mood per date
+      List<FlSpot> spots = [];
+      int index = 0;
+      for (var date in moodMap.keys) {
+        final moods = moodMap[date]!;
+        final averageMood = moods.reduce((a, b) => a + b) / moods.length;
+        spots.add(FlSpot(index.toDouble(), averageMood));
+        index++;
+      }
+
+      return spots;
     }
 
     List<Color> moodColors = [
-      AppColors.color0, // Mood 0
-      AppColors.color1, // Mood 1
-      AppColors.color2, // Mood 2
-      AppColors.color3, // Mood 3
-      AppColors.color4, // Mood 4
-      AppColors.color5, // Mood 5
-      AppColors.color6, // Mood 6
-      AppColors.color7, // Mood 7
-      AppColors.color8, // Mood 8
-      AppColors.color9, // Mood 9
-      AppColors.color10, // Mood 10
+      AppColors.color0,
+      AppColors.color1,
+      AppColors.color2,
+      AppColors.color3,
+      AppColors.color4,
+      AppColors.color5,
+      AppColors.color6,
+      AppColors.color7,
+      AppColors.color8,
+      AppColors.color9,
+      AppColors.color10,
     ];
 
     List<Color> gradientColors = orderedEntries
