@@ -1,3 +1,4 @@
+import 'package:calm_notes/components/chart.dart';
 import 'package:flutter/material.dart';
 
 class ScreenStatistics extends StatelessWidget {
@@ -14,6 +15,24 @@ class ScreenStatistics extends StatelessWidget {
             'Statistics',
             style: Theme.of(context).textTheme.headlineMedium,
           ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              TextButton(onPressed: () {}, child: const Text('Week')),
+              TextButton(onPressed: () {}, child: const Text('Month')),
+              TextButton(onPressed: () {}, child: const Text('Year'))
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('Mood graph',
+                  style: Theme.of(context).textTheme.titleMedium),
+              OutlinedButton(onPressed: () {}, child: const Text('Add factor'))
+            ],
+          ),
+          const SizedBox(height: 10),
+          const Chart(),
         ],
       ),
     );

@@ -1,4 +1,5 @@
 import 'package:calm_notes/providers/emotion_provider.dart';
+import 'package:calm_notes/providers/entry_provider.dart';
 import 'package:calm_notes/providers/reminder_provider.dart';
 import 'package:calm_notes/providers/tag_provider.dart';
 import 'package:calm_notes/services/notification_service.dart';
@@ -16,6 +17,7 @@ void main() async {
         ChangeNotifierProvider(create: (context) => EmotionProvider()),
         ChangeNotifierProvider(create: (context) => TagProvider()),
         ChangeNotifierProvider(create: (context) => ReminderProvider()),
+        ChangeNotifierProvider(create: (context) => EntryProvider()),
       ],
       child: const MyApp(),
     ),
