@@ -16,4 +16,9 @@ class EntryProvider extends ChangeNotifier {
     _entries = await _databaseService.fetchEntries();
     notifyListeners();
   }
+
+  Future<void> addEntry(Entry entry) async {
+    _databaseService.addEntry(entry);
+    await _fetchEntries();
+  }
 }

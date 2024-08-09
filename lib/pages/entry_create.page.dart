@@ -4,6 +4,7 @@ import 'package:calm_notes/models/emotion.dart';
 import 'package:calm_notes/models/entry.dart';
 import 'package:calm_notes/models/tag.dart';
 import 'package:calm_notes/providers/emotion_provider.dart';
+import 'package:calm_notes/providers/entry_provider.dart';
 import 'package:calm_notes/providers/tag_provider.dart';
 import 'package:calm_notes/components/slider.dart';
 import 'package:calm_notes/components/tags.dart';
@@ -239,7 +240,7 @@ class _EntryCreationPageState extends State<EntryCreationPage> {
             tags: tagCounts,
           );
 
-          _databaseService.addEntry(entry);
+          Provider.of<EntryProvider>(context, listen: false).addEntry(entry);
           GoRouter.of(context).push('/');
           emotionProvider.resetEmotions();
           tagProvider.resetTags();

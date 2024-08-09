@@ -21,10 +21,31 @@ class _ChartState extends State<Chart> {
 
     List<FlSpot> convertEntriesToSpots(List<Entry> entries) {
       return List.generate(entries.length, (index) {
-        // Use index for x-value and mood for y-value
         return FlSpot(index.toDouble(), entries[index].mood.toDouble());
       });
     }
+
+    List<Color> moodColors = [
+      AppColors.color0, // Mood 0
+      AppColors.color1, // Mood 1
+      AppColors.color2, // Mood 2
+      AppColors.color3, // Mood 3
+      AppColors.color4, // Mood 4
+      AppColors.color5, // Mood 5
+      AppColors.color6, // Mood 6
+      AppColors.color7, // Mood 7
+      AppColors.color8, // Mood 8
+      AppColors.color9, // Mood 9
+      AppColors.color10, // Mood 10
+    ];
+
+    List<Color> gradientColors = orderedEntries
+        .map((entry) => moodColors[entry.mood.clamp(0, 10)])
+        .toList();
+
+    List<double> colorStops = List.generate(orderedEntries.length, (index) {
+      return index / (orderedEntries.length - 1);
+    });
 
     return Container(
       height: 250,
@@ -42,8 +63,10 @@ class _ChartState extends State<Chart> {
             LineChartBarData(
               spots: convertEntriesToSpots(orderedEntries),
               isCurved: true,
-              gradient: LinearGradient(colors: [Colors.red, Colors.blue]),
-              color: Colors.blue,
+              gradient: gradientColors.length > 1
+                  ? LinearGradient(colors: gradientColors, stops: colorStops)
+                  : null,
+              color: gradientColors.length == 1 ? gradientColors.first : null,
               barWidth: 3,
               dotData: const FlDotData(
                 show: false,
@@ -60,13 +83,22 @@ class _ChartState extends State<Chart> {
                 getTitlesWidget: (value, meta) {
                   int index = value.toInt();
                   if (index >= 0 && index < orderedEntries.length) {
-                    return Text(
-                      orderedEntries[index].date.substring(8, 10),
-                      style: const TextStyle(fontSize: 10),
+                    return Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const SizedBox(height: 8),
+                        Text(
+                          orderedEntries[index].date.substring(8, 10),
+                          style: TextStyle(
+                              fontSize: 10,
+                              color: AppColors.primaryColor.withOpacity(0.3)),
+                        )
+                      ],
                     );
                   }
                   return const Text('');
                 },
+                interval: 1,
               ),
             ),
             leftTitles: AxisTitles(
@@ -133,7 +165,7 @@ class _ChartState extends State<Chart> {
                     ],
                   );
                 },
-                interval: 1, // Show every label on the left axis
+                interval: 1,
               ),
             ),
             rightTitles: const AxisTitles(
@@ -149,14 +181,13 @@ class _ChartState extends State<Chart> {
           ),
           gridData: FlGridData(
             show: true,
-            drawVerticalLine: false, // Hide vertical lines
+            drawVerticalLine: false,
             drawHorizontalLine: true,
             horizontalInterval: 1,
             getDrawingHorizontalLine: (value) {
               return FlLine(
-                color: AppColors.secondaryColor
-                    .withOpacity(0.3), // Customize the color of the lines
-                strokeWidth: 1, // Set the stroke width of the lines
+                color: AppColors.secondaryColor.withOpacity(0.3),
+                strokeWidth: 1,
               );
             },
           ),
@@ -164,13 +195,11 @@ class _ChartState extends State<Chart> {
             show: true,
             border: Border(
               top: BorderSide(
-                  color: AppColors.secondaryColor.withOpacity(0.3),
-                  width: 1), // Top border
+                  color: AppColors.secondaryColor.withOpacity(0.3), width: 1),
               bottom: BorderSide(
-                  color: AppColors.secondaryColor.withOpacity(0.3),
-                  width: 1), // Bottom border
-              left: BorderSide.none, // Hide left border
-              right: BorderSide.none, // Hide right border
+                  color: AppColors.secondaryColor.withOpacity(0.3), width: 1),
+              left: BorderSide.none,
+              right: BorderSide.none,
             ),
           ),
         ),
