@@ -13,15 +13,19 @@ class ScreenStatistics extends StatefulWidget {
 
 class _ScreenStatisticsState extends State<ScreenStatistics> {
   String rangeType = 'week';
-  DateTime _currentWeekStartDate = _getCurrentWeekStartDate();
+  final DateTime _currentWeekStartDate = _getCurrentWeekStartDate();
   List<DateTime> _weekStartDates = [];
   DateTime? _selectedWeekDate;
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
     _weekStartDates = _generateWeekStartDates();
     _selectedWeekDate = _currentWeekStartDate;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollToSelectedWeek();
+    });
   }
 
   static DateTime _getCurrentWeekStartDate() {
@@ -46,10 +50,27 @@ class _ScreenStatisticsState extends State<ScreenStatistics> {
     return weekStartDates;
   }
 
-  bool _isCurrentWeek(DateTime date) {
-    return date.year == _currentWeekStartDate.year &&
-        date.month == _currentWeekStartDate.month &&
-        date.day == _currentWeekStartDate.day;
+  void _scrollToSelectedWeek() {
+    if (_selectedWeekDate == null) return;
+
+    final index = _weekStartDates.indexWhere((date) =>
+        date.year == _selectedWeekDate!.year &&
+        date.month == _selectedWeekDate!.month &&
+        date.day == _selectedWeekDate!.day);
+
+    if (index == -1) return;
+
+    // Assuming each week button has a fixed width of 100 pixels plus padding
+    const double weekButtonWidth = 85;
+    final offset = (index * (weekButtonWidth)) -
+        (MediaQuery.of(context).size.width / 2 - weekButtonWidth / 2) +
+        30;
+
+    _scrollController.animateTo(
+      offset,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
   }
 
   @override
@@ -81,19 +102,34 @@ class _ScreenStatisticsState extends State<ScreenStatistics> {
           ),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
+            controller: _scrollController,
             child: Row(
               children: _weekStartDates.map((date) {
                 String weekLabel = DateFormat('MMM d').format(date);
-                bool isSelectedWeek = date == _selectedWeekDate;
+                bool isSelectedWeek = date.year == _selectedWeekDate?.year &&
+                    date.month == _selectedWeekDate?.month &&
+                    date.day == _selectedWeekDate?.day;
 
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 4.0),
                   child: isSelectedWeek
                       ? FilledButton(
                           onPressed: () {},
+                          style: ButtonStyle(
+                            minimumSize:
+                                WidgetStateProperty.all(const Size(77.0, 40.0)),
+                            maximumSize:
+                                WidgetStateProperty.all(const Size(77.0, 40.0)),
+                          ),
                           child: Text(weekLabel),
                         )
                       : OutlinedButton(
+                          style: ButtonStyle(
+                            minimumSize:
+                                WidgetStateProperty.all(const Size(77.0, 40.0)),
+                            maximumSize:
+                                WidgetStateProperty.all(const Size(77.0, 40.0)),
+                          ),
                           onPressed: () {
                             setState(() {
                               _selectedWeekDate = date;
