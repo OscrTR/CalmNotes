@@ -16,8 +16,6 @@ class EntryProvider extends ChangeNotifier {
 
   List<Entry> get entries => _entries;
   List<Entry> get filteredEntries => _filteredEntries;
-
-  // Getter methods for startDate and endDate
   DateTime get startDate => _startDate;
   DateTime get endDate => _endDate;
 

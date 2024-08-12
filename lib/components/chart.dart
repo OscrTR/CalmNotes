@@ -20,14 +20,11 @@ class _ChartState extends State<Chart> {
     final entries = provider.entries;
     final orderedEntries = entries.reversed.toList();
     List<String> spotsDate = [];
+    List<FlSpot> invisibleSpots = [];
+    final startDate = provider.startDate;
+    final endDate = provider.endDate;
 
-    // Function to generate a full list of dates between the oldest and newest entry
-    List<String> generateFullDateRange(List<Entry> entries) {
-      if (entries.isEmpty) return [];
-
-      DateTime startDate = DateTime.parse(entries.first.date.substring(0, 10));
-      DateTime endDate = DateTime.parse(entries.last.date.substring(0, 10));
-
+    List<String> generateFullDateRange() {
       List<String> dateRange = [];
       for (var date = startDate;
           date.isBefore(endDate) || date.isAtSameMomentAs(endDate);
@@ -39,8 +36,6 @@ class _ChartState extends State<Chart> {
 
     // Function to convert entries to FlSpots with gaps for missing dates
     List<FlSpot> convertEntriesToSpots(List<Entry> entries) {
-      if (entries.isEmpty) return [];
-
       final Map<String, double> moodMap = {};
 
       // Populate the moodMap with entries
@@ -50,7 +45,7 @@ class _ChartState extends State<Chart> {
       }
 
       // Generate the full date range
-      spotsDate = generateFullDateRange(entries);
+      spotsDate = generateFullDateRange();
 
       List<FlSpot> spots = [];
       int index = 0;
@@ -61,6 +56,7 @@ class _ChartState extends State<Chart> {
         } else {
           spots.add(FlSpot.nullSpot);
         }
+        invisibleSpots.add(FlSpot(index.toDouble(), 0));
         index++;
       }
 
@@ -81,171 +77,208 @@ class _ChartState extends State<Chart> {
       AppColors.color10,
     ];
 
-    List<Color> gradientColors = orderedEntries
-        .map((entry) => moodColors[entry.mood.clamp(0, 10)])
-        .toList();
+    List<Color> createGradientColors(List<FlSpot> spotsList) {
+      List<Color> result = [];
+      for (var spot in spotsList) {
+        if (!spot.y.isNaN) {
+          result.add(moodColors[spot.y.toInt()]);
+        }
+      }
+      return result;
+    }
 
-    List<double> colorStops = List.generate(orderedEntries.length, (index) {
-      return index / (orderedEntries.length - 1);
-    });
+    List<double> createColorStops(List<FlSpot> spotsList) {
+      List<double> stops = [];
 
-    return Container(
-      height: 250,
-      width: 352.7,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        color: Colors.white,
-      ),
-      padding: const EdgeInsets.only(top: 24, bottom: 14, left: 0, right: 20),
-      child: LineChart(
-        LineChartData(
-          minY: 0,
-          maxY: 10,
-          lineBarsData: [
-            LineChartBarData(
-              spots: convertEntriesToSpots(orderedEntries),
-              isCurved: true,
-              gradient: gradientColors.length > 1
-                  ? LinearGradient(colors: gradientColors, stops: colorStops)
-                  : null,
-              color: gradientColors.length == 1 ? gradientColors.first : null,
-              barWidth: 3,
-              dotData: const FlDotData(
+      double increment = 1 / (spotsList.length - 1);
+
+      for (var i = 0; i < spotsList.length; i++) {
+        if (!spotsList[i].y.isNaN) {
+          stops.add(i * increment);
+        }
+      }
+
+      return stops;
+    }
+
+    createColorStops(convertEntriesToSpots(orderedEntries));
+
+    return Column(
+      children: [
+        Container(
+          height: 250,
+          width: 352.7,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            color: Colors.white,
+          ),
+          padding:
+              const EdgeInsets.only(top: 24, bottom: 14, left: 0, right: 20),
+          child: LineChart(
+            LineChartData(
+              minY: 0,
+              maxY: 10,
+              lineBarsData: [
+                LineChartBarData(
+                  spots: convertEntriesToSpots(orderedEntries),
+                  isCurved: true,
+                  gradient: LinearGradient(
+                      colors: createGradientColors(
+                          convertEntriesToSpots(orderedEntries)),
+                      stops: createColorStops(
+                          convertEntriesToSpots(orderedEntries))),
+                  barWidth: 3,
+                  dotData: const FlDotData(
+                    show: true,
+                  ),
+                  belowBarData: BarAreaData(
+                    show: false,
+                  ),
+                ),
+                LineChartBarData(
+                  spots: invisibleSpots,
+                  barWidth: 0,
+                  dotData: const FlDotData(
+                    show: false,
+                  ),
+                  belowBarData: BarAreaData(
+                    show: false,
+                  ),
+                ),
+              ],
+              titlesData: FlTitlesData(
+                bottomTitles: AxisTitles(
+                  sideTitles: SideTitles(
+                    showTitles: true,
+                    getTitlesWidget: (value, meta) {
+                      int index = value.toInt();
+                      if (index >= 0 && index < spotsDate.length) {
+                        return Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const SizedBox(height: 8),
+                            Text(
+                              spotsDate[index].substring(8, 10),
+                              style: TextStyle(
+                                  fontSize: 10,
+                                  color:
+                                      AppColors.primaryColor.withOpacity(0.3)),
+                            )
+                          ],
+                        );
+                      }
+                      return const Text('');
+                    },
+                    interval: 1,
+                  ),
+                ),
+                leftTitles: AxisTitles(
+                  sideTitles: SideTitles(
+                    showTitles: true,
+                    reservedSize: 40,
+                    getTitlesWidget: (value, meta) {
+                      Color color;
+                      switch (value.toInt()) {
+                        case 0:
+                          color = AppColors.color0;
+                          break;
+                        case 1:
+                          color = AppColors.color1;
+                          break;
+                        case 2:
+                          color = AppColors.color2;
+                          break;
+                        case 3:
+                          color = AppColors.color3;
+                          break;
+                        case 4:
+                          color = AppColors.color4;
+                          break;
+                        case 5:
+                          color = AppColors.color5;
+                          break;
+                        case 6:
+                          color = AppColors.color6;
+                          break;
+                        case 7:
+                          color = AppColors.color7;
+                          break;
+                        case 8:
+                          color = AppColors.color8;
+                          break;
+                        case 9:
+                          color = AppColors.color9;
+                          break;
+                        case 10:
+                          color = AppColors.color10;
+                          break;
+                        default:
+                          color = AppColors.primaryColor;
+                      }
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const SizedBox(
+                            width: 8,
+                          ),
+                          Center(
+                            child: Text(
+                              value.toInt().toString(),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium
+                                  ?.copyWith(color: color),
+                            ),
+                          ),
+                          const SizedBox(
+                            width: 8,
+                          ),
+                        ],
+                      );
+                    },
+                    interval: 1,
+                  ),
+                ),
+                rightTitles: const AxisTitles(
+                  sideTitles: SideTitles(
+                    showTitles: false,
+                  ),
+                ),
+                topTitles: const AxisTitles(
+                  sideTitles: SideTitles(
+                    showTitles: false,
+                  ),
+                ),
+              ),
+              gridData: FlGridData(
                 show: true,
-              ),
-              belowBarData: BarAreaData(
-                show: false,
-              ),
-            ),
-          ],
-          titlesData: FlTitlesData(
-            bottomTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                getTitlesWidget: (value, meta) {
-                  int index = value.toInt();
-                  if (index >= 0 && index < spotsDate.length) {
-                    return Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const SizedBox(height: 8),
-                        Text(
-                          spotsDate[index].substring(8, 10),
-                          style: TextStyle(
-                              fontSize: 10,
-                              color: AppColors.primaryColor.withOpacity(0.3)),
-                        )
-                      ],
-                    );
-                  }
-                  return const Text('');
-                },
-                interval: 1,
-              ),
-            ),
-            leftTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                reservedSize: 40,
-                getTitlesWidget: (value, meta) {
-                  Color color;
-                  switch (value.toInt()) {
-                    case 0:
-                      color = AppColors.color0;
-                      break;
-                    case 1:
-                      color = AppColors.color1;
-                      break;
-                    case 2:
-                      color = AppColors.color2;
-                      break;
-                    case 3:
-                      color = AppColors.color3;
-                      break;
-                    case 4:
-                      color = AppColors.color4;
-                      break;
-                    case 5:
-                      color = AppColors.color5;
-                      break;
-                    case 6:
-                      color = AppColors.color6;
-                      break;
-                    case 7:
-                      color = AppColors.color7;
-                      break;
-                    case 8:
-                      color = AppColors.color8;
-                      break;
-                    case 9:
-                      color = AppColors.color9;
-                      break;
-                    case 10:
-                      color = AppColors.color10;
-                      break;
-                    default:
-                      color = AppColors.primaryColor;
-                  }
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const SizedBox(
-                        width: 8,
-                      ),
-                      Center(
-                        child: Text(
-                          value.toInt().toString(),
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleMedium
-                              ?.copyWith(color: color),
-                        ),
-                      ),
-                      const SizedBox(
-                        width: 8,
-                      ),
-                    ],
+                drawVerticalLine: false,
+                drawHorizontalLine: true,
+                horizontalInterval: 1,
+                getDrawingHorizontalLine: (value) {
+                  return FlLine(
+                    color: AppColors.secondaryColor.withOpacity(0.3),
+                    strokeWidth: 1,
                   );
                 },
-                interval: 1,
               ),
-            ),
-            rightTitles: const AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: false,
+              borderData: FlBorderData(
+                show: true,
+                border: Border(
+                  top: BorderSide(
+                      color: AppColors.secondaryColor.withOpacity(0.3),
+                      width: 1),
+                  bottom: BorderSide(
+                      color: AppColors.secondaryColor.withOpacity(0.3),
+                      width: 1),
+                  left: BorderSide.none,
+                  right: BorderSide.none,
+                ),
               ),
-            ),
-            topTitles: const AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: false,
-              ),
-            ),
-          ),
-          gridData: FlGridData(
-            show: true,
-            drawVerticalLine: false,
-            drawHorizontalLine: true,
-            horizontalInterval: 1,
-            getDrawingHorizontalLine: (value) {
-              return FlLine(
-                color: AppColors.secondaryColor.withOpacity(0.3),
-                strokeWidth: 1,
-              );
-            },
-          ),
-          borderData: FlBorderData(
-            show: true,
-            border: Border(
-              top: BorderSide(
-                  color: AppColors.secondaryColor.withOpacity(0.3), width: 1),
-              bottom: BorderSide(
-                  color: AppColors.secondaryColor.withOpacity(0.3), width: 1),
-              left: BorderSide.none,
-              right: BorderSide.none,
             ),
           ),
         ),
-      ),
+      ],
     );
   }
 }
