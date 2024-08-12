@@ -85,20 +85,41 @@ class _ScreenStatisticsState extends State<ScreenStatistics> {
             'Statistics',
             style: Theme.of(context).textTheme.headlineMedium,
           ),
+          const SizedBox(
+            height: 20,
+          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              TextButton(
-                  onPressed: () {
-                    rangeType = 'week';
-                  },
-                  child: const Text('Week')),
-              TextButton(
-                  onPressed: () {
-                    rangeType = 'month';
-                  },
-                  child: const Text('Month'))
+              rangeType == 'week'
+                  ? Expanded(
+                      child: FilledButton(
+                          onPressed: () {}, child: const Text('Week')))
+                  : Expanded(
+                      child: TextButton(
+                          onPressed: () {
+                            setState(() {
+                              rangeType = 'week';
+                            });
+                          },
+                          child: const Text('Week')),
+                    ),
+              rangeType == 'month'
+                  ? Expanded(
+                      child: FilledButton(
+                          onPressed: () {}, child: const Text('Month')))
+                  : Expanded(
+                      child: TextButton(
+                          onPressed: () {
+                            setState(() {
+                              rangeType = 'month';
+                            });
+                          },
+                          child: const Text('Month')))
             ],
+          ),
+          const SizedBox(
+            height: 10,
           ),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
@@ -145,6 +166,9 @@ class _ScreenStatisticsState extends State<ScreenStatistics> {
                 );
               }).toList(),
             ),
+          ),
+          const SizedBox(
+            height: 20,
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,

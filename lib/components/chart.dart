@@ -151,7 +151,7 @@ class _ChartState extends State<Chart> {
                             : null,
                         barWidth: 3,
                         dotData: const FlDotData(
-                          show: true,
+                          show: false,
                         ),
                         belowBarData: BarAreaData(
                           show: false,
