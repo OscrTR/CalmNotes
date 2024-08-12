@@ -3,6 +3,7 @@ import 'package:calm_notes/models/entry.dart';
 import 'package:calm_notes/providers/entry_provider.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class Chart extends StatefulWidget {
@@ -18,27 +19,81 @@ class _ChartState extends State<Chart> {
     final provider = context.watch<EntryProvider>();
     final entries = provider.entries;
     final orderedEntries = entries.reversed.toList();
+    List<String> spotsDate = [];
 
+    // List<FlSpot> convertEntriesToSpots(List<Entry> entries) {
+    //   if (entries.isEmpty) return [];
+    //   // Map to store date-wise aggregated mood values
+    //   final Map<String, List<double>> moodMap = {};
+
+    //   // Populate the mood map and the spotsDate list
+    //   for (var entry in entries) {
+    //     String date = entry.date.substring(0, 10);
+    //     moodMap.putIfAbsent(date, () => []).add(entry.mood.toDouble());
+    //   }
+
+    //   // Populate the mood map and the spotsDate list
+    //   for (var entry in entries) {
+    //     String date = entry.date.substring(0, 10);
+    //     moodMap.putIfAbsent(date, () => []).add(entry.mood.toDouble());
+    //     if (!spotsDate.contains(date)) {
+    //       spotsDate.add(date);
+    //     }
+    //   }
+
+    //   // Create FlSpots using the average mood per date
+    //   List<FlSpot> spots = [];
+    //   int index = 0;
+    //   for (var date in moodMap.keys) {
+    //     final moods = moodMap[date]!;
+    //     final averageMood = moods.reduce((a, b) => a + b) / moods.length;
+    //     spots.add(FlSpot(index.toDouble(), averageMood));
+    //     index++;
+    //   }
+
+    //   return spots;
+    // }
+
+    // Function to generate a full list of dates between the oldest and newest entry
+    List<String> generateFullDateRange(List<Entry> entries) {
+      if (entries.isEmpty) return [];
+
+      DateTime startDate = DateTime.parse(entries.first.date.substring(0, 10));
+      DateTime endDate = DateTime.parse(entries.last.date.substring(0, 10));
+
+      List<String> dateRange = [];
+      for (var date = startDate;
+          date.isBefore(endDate) || date.isAtSameMomentAs(endDate);
+          date = date.add(const Duration(days: 1))) {
+        dateRange.add(DateFormat('yyyy-MM-dd').format(date));
+      }
+      return dateRange;
+    }
+
+    // Function to convert entries to FlSpots with gaps for missing dates
     List<FlSpot> convertEntriesToSpots(List<Entry> entries) {
-      // Map to store date-wise aggregated mood values
-      final Map<String, List<double>> moodMap = {};
+      if (entries.isEmpty) return [];
 
-      // Group entries by date and collect moods
+      final Map<String, double> moodMap = {};
+
+      // Populate the moodMap with entries
       for (var entry in entries) {
-        if (moodMap.containsKey(entry.date.substring(0, 10))) {
-          moodMap[entry.date.substring(0, 10)]!.add(entry.mood.toDouble());
-        } else {
-          moodMap[entry.date.substring(0, 10)] = [entry.mood.toDouble()];
-        }
+        String date = entry.date.substring(0, 10);
+        moodMap[date] = entry.mood.toDouble();
       }
 
-      // Create FlSpots using the average mood per date
+      // Generate the full date range
+      spotsDate = generateFullDateRange(entries);
+
       List<FlSpot> spots = [];
       int index = 0;
-      for (var date in moodMap.keys) {
-        final moods = moodMap[date]!;
-        final averageMood = moods.reduce((a, b) => a + b) / moods.length;
-        spots.add(FlSpot(index.toDouble(), averageMood));
+
+      for (var date in spotsDate) {
+        if (moodMap.containsKey(date)) {
+          spots.add(FlSpot(index.toDouble(), moodMap[date]!));
+        } else {
+          spots.add(FlSpot.nullSpot);
+        }
         index++;
       }
 
@@ -89,7 +144,7 @@ class _ChartState extends State<Chart> {
               color: gradientColors.length == 1 ? gradientColors.first : null,
               barWidth: 3,
               dotData: const FlDotData(
-                show: false,
+                show: true,
               ),
               belowBarData: BarAreaData(
                 show: false,
@@ -102,13 +157,13 @@ class _ChartState extends State<Chart> {
                 showTitles: true,
                 getTitlesWidget: (value, meta) {
                   int index = value.toInt();
-                  if (index >= 0 && index < orderedEntries.length) {
+                  if (index >= 0 && index < spotsDate.length) {
                     return Column(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         const SizedBox(height: 8),
                         Text(
-                          orderedEntries[index].date.substring(8, 10),
+                          spotsDate[index].substring(8, 10),
                           style: TextStyle(
                               fontSize: 10,
                               color: AppColors.primaryColor.withOpacity(0.3)),
