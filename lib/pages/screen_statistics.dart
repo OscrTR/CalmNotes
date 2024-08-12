@@ -19,7 +19,8 @@ class _ScreenStatisticsState extends State<ScreenStatistics> {
   List<DateTime> _months = [];
   DateTime? _selectedWeekDate;
   DateTime? _selectedMonthDate;
-  final ScrollController _scrollController = ScrollController();
+  final ScrollController _scrollControllerWeeks = ScrollController();
+  final ScrollController _scrollControllerMonths = ScrollController();
 
   @override
   void initState() {
@@ -76,26 +77,56 @@ class _ScreenStatisticsState extends State<ScreenStatistics> {
   }
 
   void _scrollToSelectedWeek() {
-    if (_selectedWeekDate == null) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_weeks.isNotEmpty && rangeType == 'week') {
+        if (_selectedWeekDate == null) return;
 
-    final index = _weeks.indexWhere((date) =>
-        date.year == _selectedWeekDate!.year &&
-        date.month == _selectedWeekDate!.month &&
-        date.day == _selectedWeekDate!.day);
+        final index = _weeks.indexWhere((date) =>
+            date.year == _selectedWeekDate!.year &&
+            date.month == _selectedWeekDate!.month &&
+            date.day == _selectedWeekDate!.day);
 
-    if (index == -1) return;
+        if (index == -1) return;
 
-    // Assuming each week button has a fixed width of 100 pixels plus padding
-    const double weekButtonWidth = 85;
-    final offset = (index * (weekButtonWidth)) -
-        (MediaQuery.of(context).size.width / 2 - weekButtonWidth / 2) +
-        30;
+        // Assuming each week button has a fixed width of 100 pixels plus padding
+        const double weekButtonWidth = 85;
+        final offset = (index * (weekButtonWidth)) -
+            (MediaQuery.of(context).size.width / 2 - weekButtonWidth / 2) +
+            30;
 
-    _scrollController.animateTo(
-      offset,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-    );
+        _scrollControllerWeeks.animateTo(
+          offset,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        );
+      }
+    });
+  }
+
+  void _scrollToSelectedMonth() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_months.isNotEmpty && rangeType == 'month') {
+        if (_selectedMonthDate == null) return;
+
+        final index = _months.indexWhere((date) =>
+            date.year == _selectedMonthDate!.year &&
+            date.month == _selectedMonthDate!.month);
+
+        if (index == -1) return;
+
+        // Assuming each week button has a fixed width of 100 pixels plus padding
+        const double monthButtonWidth = 85;
+        final offset = (index * (monthButtonWidth)) -
+            (MediaQuery.of(context).size.width / 2 - monthButtonWidth / 2) +
+            30;
+
+        _scrollControllerMonths.animateTo(
+          offset,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        );
+      }
+    });
   }
 
   @override
@@ -127,6 +158,7 @@ class _ScreenStatisticsState extends State<ScreenStatistics> {
                               rangeType = 'week';
                             });
                             provider.setDefaultWeekDate();
+                            _scrollToSelectedWeek();
                           },
                           child: const Text('Week')),
                     ),
@@ -141,6 +173,7 @@ class _ScreenStatisticsState extends State<ScreenStatistics> {
                               rangeType = 'month';
                             });
                             provider.setDefaultMonthDate();
+                            _scrollToSelectedMonth();
                           },
                           child: const Text('Month')))
             ],
@@ -151,7 +184,7 @@ class _ScreenStatisticsState extends State<ScreenStatistics> {
           rangeType == 'week'
               ? SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
-                  controller: _scrollController,
+                  controller: _scrollControllerWeeks,
                   child: Row(
                     children: _weeks.map((date) {
                       String weekLabel = DateFormat('MMM d').format(date);
@@ -200,8 +233,8 @@ class _ScreenStatisticsState extends State<ScreenStatistics> {
               : const SizedBox(),
           rangeType == 'month'
               ? SingleChildScrollView(
+                  controller: _scrollControllerMonths,
                   scrollDirection: Axis.horizontal,
-                  controller: _scrollController,
                   child: Row(
                     children: _months.map((date) {
                       String monthLabel = DateFormat('MMM').format(date);
