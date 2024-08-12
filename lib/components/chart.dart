@@ -103,14 +103,18 @@ class _ChartState extends State<Chart> {
       return result;
     }
 
+    final gradientColors = createGradientColors(entrySpots);
+
     List<double> createColorStops(List<FlSpot> spotsList) {
       List<double> stops = [];
 
-      double increment = 1 / (spotsList.length - 1);
+      double increment = 1 / (gradientColors.length - 1);
 
+      int colorIndex = 0;
       for (var i = 0; i < spotsList.length; i++) {
         if (!spotsList[i].y.isNaN) {
-          stops.add(i * increment);
+          stops.add(colorIndex * increment);
+          colorIndex += 1;
         }
       }
 
