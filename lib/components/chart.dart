@@ -20,7 +20,6 @@ class _ChartState extends State<Chart> {
     final entries = provider.entries;
     final orderedEntries = entries.reversed.toList();
     List<String> spotsDate = [];
-    List<FlSpot> invisibleSpots = [];
     final startDate = provider.startDate;
     final endDate = provider.endDate;
 
@@ -34,6 +33,15 @@ class _ChartState extends State<Chart> {
       return dateRange;
     }
 
+    spotsDate = generateFullDateRange();
+
+    List<FlSpot> getInvisibleSpots() {
+      return List.generate(
+        spotsDate.length,
+        (index) => FlSpot(index.toDouble(), 0),
+      );
+    }
+
     // Function to convert entries to FlSpots with gaps for missing dates
     List<FlSpot> convertEntriesToSpots(List<Entry> entries) {
       final Map<String, double> moodMap = {};
@@ -44,8 +52,6 @@ class _ChartState extends State<Chart> {
         moodMap[date] = entry.mood.toDouble();
       }
 
-      spotsDate = generateFullDateRange();
-
       List<FlSpot> spots = [];
       int index = 0;
 
@@ -55,11 +61,22 @@ class _ChartState extends State<Chart> {
         } else {
           spots.add(FlSpot.nullSpot);
         }
-        invisibleSpots.add(FlSpot(index.toDouble(), 0));
         index++;
       }
 
       return spots;
+    }
+
+    final entrySpots = convertEntriesToSpots(orderedEntries);
+
+    bool isOnlyNaN(List<FlSpot> spots) {
+      bool onlyNaN = true;
+      for (var spot in spots) {
+        if (!spot.y.isNaN) {
+          onlyNaN = false;
+        }
+      }
+      return onlyNaN;
     }
 
     List<Color> moodColors = [
@@ -116,35 +133,29 @@ class _ChartState extends State<Chart> {
               minY: 0,
               maxY: 10,
               lineBarsData: [
+                !isOnlyNaN(entrySpots)
+                    ? LineChartBarData(
+                        spots: entrySpots,
+                        isCurved: true,
+                        gradient: createGradientColors(entrySpots).length > 1
+                            ? LinearGradient(
+                                colors: createGradientColors(entrySpots),
+                                stops: createColorStops(entrySpots))
+                            : null,
+                        color: createGradientColors(entrySpots).length == 1
+                            ? AppColors.primaryColor
+                            : null,
+                        barWidth: 3,
+                        dotData: const FlDotData(
+                          show: true,
+                        ),
+                        belowBarData: BarAreaData(
+                          show: false,
+                        ),
+                      )
+                    : LineChartBarData(),
                 LineChartBarData(
-                  spots: convertEntriesToSpots(orderedEntries),
-                  isCurved: true,
-                  gradient: createGradientColors(
-                                  convertEntriesToSpots(orderedEntries))
-                              .length >
-                          1
-                      ? LinearGradient(
-                          colors: createGradientColors(
-                              convertEntriesToSpots(orderedEntries)),
-                          stops: createColorStops(
-                              convertEntriesToSpots(orderedEntries)))
-                      : null,
-                  color: createGradientColors(
-                                  convertEntriesToSpots(orderedEntries))
-                              .length ==
-                          1
-                      ? AppColors.primaryColor
-                      : null,
-                  barWidth: 3,
-                  dotData: const FlDotData(
-                    show: true,
-                  ),
-                  belowBarData: BarAreaData(
-                    show: false,
-                  ),
-                ),
-                LineChartBarData(
-                  spots: invisibleSpots,
+                  spots: getInvisibleSpots(),
                   barWidth: 0,
                   dotData: const FlDotData(
                     show: false,
