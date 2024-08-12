@@ -15,11 +15,13 @@ class _ScreenStatisticsState extends State<ScreenStatistics> {
   String rangeType = 'week';
   DateTime _currentWeekStartDate = _getCurrentWeekStartDate();
   List<DateTime> _weekStartDates = [];
+  DateTime? _selectedWeekDate;
 
   @override
   void initState() {
     super.initState();
     _weekStartDates = _generateWeekStartDates();
+    _selectedWeekDate = _currentWeekStartDate;
   }
 
   static DateTime _getCurrentWeekStartDate() {
@@ -52,6 +54,7 @@ class _ScreenStatisticsState extends State<ScreenStatistics> {
 
   @override
   Widget build(BuildContext context) {
+    final provider = context.watch<EntryProvider>();
     return Scaffold(
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -73,12 +76,7 @@ class _ScreenStatisticsState extends State<ScreenStatistics> {
                   onPressed: () {
                     rangeType = 'month';
                   },
-                  child: const Text('Month')),
-              TextButton(
-                  onPressed: () {
-                    rangeType = 'year';
-                  },
-                  child: const Text('Year'))
+                  child: const Text('Month'))
             ],
           ),
           SingleChildScrollView(
@@ -86,17 +84,26 @@ class _ScreenStatisticsState extends State<ScreenStatistics> {
             child: Row(
               children: _weekStartDates.map((date) {
                 String weekLabel = DateFormat('MMM d').format(date);
-                bool isCurrentWeek = _isCurrentWeek(date);
+                bool isSelectedWeek = date == _selectedWeekDate;
 
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                  child: isCurrentWeek
+                  child: isSelectedWeek
                       ? FilledButton(
                           onPressed: () {},
                           child: Text(weekLabel),
                         )
                       : OutlinedButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            setState(() {
+                              _selectedWeekDate = date;
+                            });
+                            provider.setStartEndDate(
+                                date,
+                                date
+                                    .add(const Duration(days: 7))
+                                    .subtract(const Duration(seconds: 1)));
+                          },
                           child: Text(weekLabel),
                         ),
                 );

@@ -44,7 +44,6 @@ class _ChartState extends State<Chart> {
         moodMap[date] = entry.mood.toDouble();
       }
 
-      // Generate the full date range
       spotsDate = generateFullDateRange();
 
       List<FlSpot> spots = [];
@@ -101,8 +100,6 @@ class _ChartState extends State<Chart> {
       return stops;
     }
 
-    createColorStops(convertEntriesToSpots(orderedEntries));
-
     return Column(
       children: [
         Container(
@@ -122,11 +119,22 @@ class _ChartState extends State<Chart> {
                 LineChartBarData(
                   spots: convertEntriesToSpots(orderedEntries),
                   isCurved: true,
-                  gradient: LinearGradient(
-                      colors: createGradientColors(
-                          convertEntriesToSpots(orderedEntries)),
-                      stops: createColorStops(
-                          convertEntriesToSpots(orderedEntries))),
+                  gradient: createGradientColors(
+                                  convertEntriesToSpots(orderedEntries))
+                              .length >
+                          1
+                      ? LinearGradient(
+                          colors: createGradientColors(
+                              convertEntriesToSpots(orderedEntries)),
+                          stops: createColorStops(
+                              convertEntriesToSpots(orderedEntries)))
+                      : null,
+                  color: createGradientColors(
+                                  convertEntriesToSpots(orderedEntries))
+                              .length ==
+                          1
+                      ? AppColors.primaryColor
+                      : null,
                   barWidth: 3,
                   dotData: const FlDotData(
                     show: true,

@@ -27,9 +27,12 @@ class EntryProvider extends ChangeNotifier {
     _entries = await _databaseService.fetchEntries();
     _filteredEntries = filterEntriesBetweenDates(_startDate, _endDate);
     notifyListeners();
-    for (var entry in _filteredEntries) {
-      print(entry.date);
-    }
+  }
+
+  void setStartEndDate(DateTime startDate, DateTime endDate) {
+    _startDate = startDate;
+    _endDate = endDate;
+    _fetchEntries();
   }
 
   Future<void> addEntry(Entry entry) async {
