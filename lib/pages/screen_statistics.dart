@@ -13,47 +13,72 @@ class ScreenStatistics extends StatefulWidget {
 
 class _ScreenStatisticsState extends State<ScreenStatistics> {
   String rangeType = 'week';
-  final DateTime _currentWeekStartDate = _getCurrentWeekStartDate();
-  List<DateTime> _weekStartDates = [];
+  final DateTime _currentWeek = _getCurrentWeek();
+  final DateTime _currentMonth = _getCurrentMonth();
+  List<DateTime> _weeks = [];
+  List<DateTime> _months = [];
   DateTime? _selectedWeekDate;
+  DateTime? _selectedMonthDate;
   final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
-    _weekStartDates = _generateWeekStartDates();
-    _selectedWeekDate = _currentWeekStartDate;
+    _weeks = _generateWeeks();
+    _months = _generateMonths();
+    _selectedWeekDate = _currentWeek;
+    _selectedMonthDate = _currentMonth;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollToSelectedWeek();
     });
   }
 
-  static DateTime _getCurrentWeekStartDate() {
+  static DateTime _getCurrentWeek() {
     DateTime now = DateTime.now();
     int weekday = now.weekday;
-    // Get the start of the week (Monday), adjust if needed
     DateTime startOfWeek = now.subtract(Duration(days: weekday - 1));
     // Normalize to midnight to avoid time component issues
     return DateTime(startOfWeek.year, startOfWeek.month, startOfWeek.day);
   }
 
-  List<DateTime> _generateWeekStartDates() {
-    List<DateTime> weekStartDates = [];
+  static DateTime _getCurrentMonth() {
+    DateTime now = DateTime.now();
+    // Get the first day of the current month
+    DateTime startOfMonth = DateTime(now.year, now.month, 1);
+    // Normalize to midnight to avoid time component issues
+    return DateTime(startOfMonth.year, startOfMonth.month, startOfMonth.day);
+  }
+
+  List<DateTime> _generateWeeks() {
+    List<DateTime> weeks = [];
     DateTime currentDate = DateTime(DateTime.now().year, 1, 1);
     DateTime endDate = DateTime(DateTime.now().year, 12, 31);
 
     while (currentDate.isBefore(endDate)) {
-      weekStartDates.add(currentDate);
+      weeks.add(currentDate);
       currentDate = currentDate.add(const Duration(days: 7));
     }
 
-    return weekStartDates;
+    return weeks;
+  }
+
+  List<DateTime> _generateMonths() {
+    List<DateTime> months = [];
+    DateTime currentDate = DateTime(DateTime.now().year, 1, 1);
+    DateTime endDate = DateTime(DateTime.now().year, 12, 31);
+
+    while (currentDate.isBefore(endDate)) {
+      months.add(currentDate);
+      currentDate = DateTime(currentDate.year, currentDate.month + 1, 1);
+    }
+
+    return months;
   }
 
   void _scrollToSelectedWeek() {
     if (_selectedWeekDate == null) return;
 
-    final index = _weekStartDates.indexWhere((date) =>
+    final index = _weeks.indexWhere((date) =>
         date.year == _selectedWeekDate!.year &&
         date.month == _selectedWeekDate!.month &&
         date.day == _selectedWeekDate!.day);
@@ -101,6 +126,7 @@ class _ScreenStatisticsState extends State<ScreenStatistics> {
                             setState(() {
                               rangeType = 'week';
                             });
+                            provider.setDefaultWeekDate();
                           },
                           child: const Text('Week')),
                     ),
@@ -114,6 +140,7 @@ class _ScreenStatisticsState extends State<ScreenStatistics> {
                             setState(() {
                               rangeType = 'month';
                             });
+                            provider.setDefaultMonthDate();
                           },
                           child: const Text('Month')))
             ],
@@ -121,52 +148,105 @@ class _ScreenStatisticsState extends State<ScreenStatistics> {
           const SizedBox(
             height: 10,
           ),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            controller: _scrollController,
-            child: Row(
-              children: _weekStartDates.map((date) {
-                String weekLabel = DateFormat('MMM d').format(date);
-                bool isSelectedWeek = date.year == _selectedWeekDate?.year &&
-                    date.month == _selectedWeekDate?.month &&
-                    date.day == _selectedWeekDate?.day;
+          rangeType == 'week'
+              ? SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  controller: _scrollController,
+                  child: Row(
+                    children: _weeks.map((date) {
+                      String weekLabel = DateFormat('MMM d').format(date);
+                      bool isSelectedWeek =
+                          date.year == _selectedWeekDate?.year &&
+                              date.month == _selectedWeekDate?.month &&
+                              date.day == _selectedWeekDate?.day;
 
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                  child: isSelectedWeek
-                      ? FilledButton(
-                          onPressed: () {},
-                          style: ButtonStyle(
-                            minimumSize:
-                                WidgetStateProperty.all(const Size(77.0, 40.0)),
-                            maximumSize:
-                                WidgetStateProperty.all(const Size(77.0, 40.0)),
-                          ),
-                          child: Text(weekLabel),
-                        )
-                      : OutlinedButton(
-                          style: ButtonStyle(
-                            minimumSize:
-                                WidgetStateProperty.all(const Size(77.0, 40.0)),
-                            maximumSize:
-                                WidgetStateProperty.all(const Size(77.0, 40.0)),
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              _selectedWeekDate = date;
-                            });
-                            provider.setStartEndDate(
-                                date,
-                                date
-                                    .add(const Duration(days: 7))
-                                    .subtract(const Duration(seconds: 1)));
-                          },
-                          child: Text(weekLabel),
-                        ),
-                );
-              }).toList(),
-            ),
-          ),
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                        child: isSelectedWeek
+                            ? FilledButton(
+                                onPressed: () {},
+                                style: ButtonStyle(
+                                  minimumSize: WidgetStateProperty.all(
+                                      const Size(77.0, 40.0)),
+                                  maximumSize: WidgetStateProperty.all(
+                                      const Size(77.0, 40.0)),
+                                ),
+                                child: Text(weekLabel),
+                              )
+                            : OutlinedButton(
+                                style: ButtonStyle(
+                                  minimumSize: WidgetStateProperty.all(
+                                      const Size(77.0, 40.0)),
+                                  maximumSize: WidgetStateProperty.all(
+                                      const Size(77.0, 40.0)),
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    _selectedWeekDate = date;
+                                  });
+                                  provider.setStartEndDate(
+                                      date,
+                                      date
+                                          .add(const Duration(days: 7))
+                                          .subtract(
+                                              const Duration(seconds: 1)));
+                                },
+                                child: Text(weekLabel),
+                              ),
+                      );
+                    }).toList(),
+                  ),
+                )
+              : const SizedBox(),
+          rangeType == 'month'
+              ? SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  controller: _scrollController,
+                  child: Row(
+                    children: _months.map((date) {
+                      String monthLabel = DateFormat('MMM').format(date);
+                      bool isSelectedMonth =
+                          date.year == _selectedMonthDate?.year &&
+                              date.month == _selectedMonthDate?.month;
+
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                        child: isSelectedMonth
+                            ? FilledButton(
+                                onPressed: () {},
+                                style: ButtonStyle(
+                                  minimumSize: WidgetStateProperty.all(
+                                      const Size(77.0, 40.0)),
+                                  maximumSize: WidgetStateProperty.all(
+                                      const Size(77.0, 40.0)),
+                                ),
+                                child: Text(monthLabel),
+                              )
+                            : OutlinedButton(
+                                style: ButtonStyle(
+                                  minimumSize: WidgetStateProperty.all(
+                                      const Size(77.0, 40.0)),
+                                  maximumSize: WidgetStateProperty.all(
+                                      const Size(77.0, 40.0)),
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    _selectedWeekDate = date;
+                                  });
+                                  provider.setStartEndDate(
+                                      date,
+                                      date
+                                          .add(const Duration(days: 7))
+                                          .subtract(
+                                              const Duration(seconds: 1)));
+                                },
+                                child: Text(monthLabel),
+                              ),
+                      );
+                    }).toList(),
+                  ),
+                )
+              : const SizedBox(),
           const SizedBox(
             height: 20,
           ),

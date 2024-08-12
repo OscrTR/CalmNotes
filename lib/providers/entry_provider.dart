@@ -35,6 +35,22 @@ class EntryProvider extends ChangeNotifier {
     _fetchEntries();
   }
 
+  void setDefaultWeekDate() {
+    _startDate =
+        DateTime.now().subtract(Duration(days: DateTime.now().weekday - 1));
+    _endDate = DateTime.now()
+        .subtract(Duration(days: DateTime.now().weekday - 1))
+        .add(const Duration(days: 6));
+    _fetchEntries();
+  }
+
+  void setDefaultMonthDate() {
+    DateTime now = DateTime.now();
+    _startDate = DateTime(now.year, now.month, 1);
+    _endDate = DateTime(now.year, now.month + 1, 0);
+    _fetchEntries();
+  }
+
   Future<void> addEntry(Entry entry) async {
     await _databaseService.addEntry(entry);
     await _fetchEntries();
