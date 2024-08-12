@@ -21,39 +21,6 @@ class _ChartState extends State<Chart> {
     final orderedEntries = entries.reversed.toList();
     List<String> spotsDate = [];
 
-    // List<FlSpot> convertEntriesToSpots(List<Entry> entries) {
-    //   if (entries.isEmpty) return [];
-    //   // Map to store date-wise aggregated mood values
-    //   final Map<String, List<double>> moodMap = {};
-
-    //   // Populate the mood map and the spotsDate list
-    //   for (var entry in entries) {
-    //     String date = entry.date.substring(0, 10);
-    //     moodMap.putIfAbsent(date, () => []).add(entry.mood.toDouble());
-    //   }
-
-    //   // Populate the mood map and the spotsDate list
-    //   for (var entry in entries) {
-    //     String date = entry.date.substring(0, 10);
-    //     moodMap.putIfAbsent(date, () => []).add(entry.mood.toDouble());
-    //     if (!spotsDate.contains(date)) {
-    //       spotsDate.add(date);
-    //     }
-    //   }
-
-    //   // Create FlSpots using the average mood per date
-    //   List<FlSpot> spots = [];
-    //   int index = 0;
-    //   for (var date in moodMap.keys) {
-    //     final moods = moodMap[date]!;
-    //     final averageMood = moods.reduce((a, b) => a + b) / moods.length;
-    //     spots.add(FlSpot(index.toDouble(), averageMood));
-    //     index++;
-    //   }
-
-    //   return spots;
-    // }
-
     // Function to generate a full list of dates between the oldest and newest entry
     List<String> generateFullDateRange(List<Entry> entries) {
       if (entries.isEmpty) return [];

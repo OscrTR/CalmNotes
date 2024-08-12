@@ -5,8 +5,21 @@ import 'package:flutter/material.dart';
 class EntryProvider extends ChangeNotifier {
   final DatabaseService _databaseService = DatabaseService.instance;
   List<Entry> _entries = [];
+  List<Entry> _filteredEntries = [];
+
+  // Properties to hold the start and end dates for filtering
+  DateTime _startDate =
+      DateTime.now().subtract(Duration(days: DateTime.now().weekday - 1));
+  DateTime _endDate = DateTime.now()
+      .subtract(Duration(days: DateTime.now().weekday - 1))
+      .add(const Duration(days: 6));
 
   List<Entry> get entries => _entries;
+  List<Entry> get filteredEntries => _filteredEntries;
+
+  // Getter methods for startDate and endDate
+  DateTime get startDate => _startDate;
+  DateTime get endDate => _endDate;
 
   EntryProvider() {
     _fetchEntries();
@@ -14,11 +27,39 @@ class EntryProvider extends ChangeNotifier {
 
   Future<void> _fetchEntries() async {
     _entries = await _databaseService.fetchEntries();
+    _filteredEntries = filterEntriesBetweenDates(_startDate, _endDate);
     notifyListeners();
+    for (var entry in _filteredEntries) {
+      print(entry.date);
+    }
   }
 
   Future<void> addEntry(Entry entry) async {
-    _databaseService.addEntry(entry);
+    await _databaseService.addEntry(entry);
     await _fetchEntries();
+  }
+
+  // Method to update the date range and refresh the filtered entries
+  void updateDateRange(DateTime startDate, DateTime endDate) {
+    _startDate = startDate;
+    _endDate = endDate;
+    _filteredEntries = filterEntriesBetweenDates(_startDate, _endDate);
+    notifyListeners();
+  }
+
+  // Method to filter entries between specified dates
+  List<Entry> filterEntriesBetweenDates(DateTime startDate, DateTime endDate) {
+    return _entries.where((entry) {
+      DateTime entryDate =
+          _convertStringToDateTime(entry.date); // Convert string to DateTime
+      return entryDate
+              .isAfter(startDate.subtract(const Duration(seconds: 1))) &&
+          entryDate.isBefore(endDate.add(const Duration(seconds: 1)));
+    }).toList();
+  }
+
+  // Helper method to convert a date string to DateTime
+  DateTime _convertStringToDateTime(String dateString) {
+    return DateTime.parse(dateString.replaceFirst('|', 'T'));
   }
 }
