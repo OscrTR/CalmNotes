@@ -175,7 +175,10 @@ class _ChartState extends State<Chart> {
                     showTitles: true,
                     getTitlesWidget: (value, meta) {
                       int index = value.toInt();
-                      if (index >= 0 && index < spotsDate.length) {
+                      int modulo = spotsDate.length > 15 ? 2 : 1;
+                      if (index >= 0 &&
+                          index < spotsDate.length &&
+                          value % modulo == 0) {
                         return Column(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
