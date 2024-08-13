@@ -66,12 +66,16 @@ class EntryProvider extends ChangeNotifier {
 
   // Method to filter entries between specified dates
   List<Entry> filterEntriesBetweenDates(DateTime startDate, DateTime endDate) {
+    DateTime startOfDay =
+        DateTime(startDate.year, startDate.month, startDate.day);
+    DateTime endOfDay = DateTime(
+        endDate.year, endDate.month, endDate.day, 23, 59, 59, 999, 999);
     return _entries.where((entry) {
       DateTime entryDate =
           _convertStringToDateTime(entry.date); // Convert string to DateTime
       return entryDate
-              .isAfter(startDate.subtract(const Duration(seconds: 1))) &&
-          entryDate.isBefore(endDate.add(const Duration(seconds: 1)));
+              .isAfter(startOfDay.subtract(const Duration(seconds: 1))) &&
+          entryDate.isBefore(endOfDay.add(const Duration(seconds: 1)));
     }).toList();
   }
 

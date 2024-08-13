@@ -1,4 +1,5 @@
 import 'package:calm_notes/components/chart.dart';
+import 'package:calm_notes/components/half_pie_chart.dart';
 import 'package:calm_notes/providers/entry_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -133,9 +134,7 @@ class _ScreenStatisticsState extends State<ScreenStatistics> {
   Widget build(BuildContext context) {
     final provider = context.watch<EntryProvider>();
     return Scaffold(
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.start,
+      body: ListView(
         children: [
           Text(
             'Statistics',
@@ -293,6 +292,11 @@ class _ScreenStatisticsState extends State<ScreenStatistics> {
           ),
           const SizedBox(height: 10),
           const Chart(),
+          const SizedBox(height: 30),
+          Text('Mood distribution',
+              style: Theme.of(context).textTheme.titleMedium),
+          const SizedBox(height: 20),
+          const HalfPieChart(),
         ],
       ),
     );

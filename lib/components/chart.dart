@@ -17,7 +17,7 @@ class _ChartState extends State<Chart> {
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<EntryProvider>();
-    final entries = provider.entries;
+    final entries = provider.filteredEntries;
     final orderedEntries = entries.reversed.toList();
     List<String> spotsDate = [];
     final startDate = provider.startDate;
