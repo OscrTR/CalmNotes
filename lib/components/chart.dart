@@ -169,6 +169,7 @@ class _ChartState extends State<Chart> {
                   ),
                 ),
               ],
+              lineTouchData: const LineTouchData(enabled: false),
               titlesData: FlTitlesData(
                 bottomTitles: AxisTitles(
                   sideTitles: SideTitles(
