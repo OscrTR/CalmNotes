@@ -1,3 +1,4 @@
+import 'package:calm_notes/components/calendar.dart';
 import 'package:calm_notes/components/chart.dart';
 import 'package:calm_notes/components/half_pie_chart.dart';
 import 'package:calm_notes/providers/entry_provider.dart';
@@ -292,6 +293,10 @@ class _ScreenStatisticsState extends State<ScreenStatistics> {
           ),
           const SizedBox(height: 10),
           const Chart(),
+          const SizedBox(height: 30),
+          Text('Mood calendar', style: Theme.of(context).textTheme.titleMedium),
+          const SizedBox(height: 20),
+          const Calendar(),
           const SizedBox(height: 30),
           Text('Mood distribution',
               style: Theme.of(context).textTheme.titleMedium),

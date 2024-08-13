@@ -78,7 +78,7 @@ class _HalfPieChartState extends State<HalfPieChart> {
       padding: const EdgeInsets.only(top: 24, bottom: 24, left: 0, right: 20),
       child: PieChart(
         PieChartData(
-          sectionsSpace: 0,
+          sectionsSpace: 2,
           centerSpaceRadius: 70,
           pieTouchData: PieTouchData(
             enabled: true,
