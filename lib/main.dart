@@ -5,6 +5,7 @@ import 'package:calm_notes/providers/reminder_provider.dart';
 import 'package:calm_notes/providers/tag_provider.dart';
 import 'package:calm_notes/services/notification_service.dart';
 import 'package:calm_notes/theme.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'router.dart';
@@ -12,16 +13,14 @@ import 'router.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await NotificationService.initializeNotification();
+  await EasyLocalization.ensureInitialized();
   runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (context) => EmotionProvider()),
-        ChangeNotifierProvider(create: (context) => TagProvider()),
-        ChangeNotifierProvider(create: (context) => ReminderProvider()),
-        ChangeNotifierProvider(create: (context) => EntryProvider()),
-        ChangeNotifierProvider(create: (context) => FactorProvider()),
-      ],
-      child: const MyApp(),
+    EasyLocalization(
+      supportedLocales: [Locale('en', 'US'), Locale('fr', 'FR')],
+      path:
+          'assets/translations', // <-- change the path of the translation files
+      fallbackLocale: Locale('en', 'US'),
+      child: MyApp(),
     ),
   );
 }
@@ -33,9 +32,22 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => EmotionProvider()),
+        ChangeNotifierProvider(create: (context) => TagProvider()),
+        ChangeNotifierProvider(create: (context) => ReminderProvider()),
+        ChangeNotifierProvider(create: (context) => EntryProvider()),
+        ChangeNotifierProvider(create: (context) => FactorProvider()),
+      ],
+      child: MaterialApp.router(
         routerConfig: router,
         debugShowCheckedModeBanner: false,
-        theme: appTheme);
+        theme: appTheme,
+        localizationsDelegates: context.localizationDelegates,
+        supportedLocales: context.supportedLocales,
+        locale: context.locale,
+      ),
+    );
   }
 }
