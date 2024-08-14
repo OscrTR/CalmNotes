@@ -1,6 +1,8 @@
+import 'package:calm_notes/colors.dart';
 import 'package:calm_notes/components/calendar.dart';
 import 'package:calm_notes/components/chart.dart';
 import 'package:calm_notes/components/half_pie_chart.dart';
+import 'package:calm_notes/models/entry.dart';
 import 'package:calm_notes/providers/entry_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -34,6 +36,35 @@ class _ScreenStatisticsState extends State<ScreenStatistics> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollToSelectedWeek();
     });
+  }
+
+  List<String> _getFactorsList(List<Entry> entries) {
+    Set<String> factorsSet = {};
+
+    void processEntry(String? entryString) {
+      if (entryString != null && entryString.isNotEmpty) {
+        for (var item in entryString.split(',')) {
+          var trimmedItem = item.trim().split(" : ")[0];
+          if (trimmedItem.isNotEmpty) {
+            factorsSet.add(trimmedItem);
+          }
+        }
+      }
+    }
+
+    for (var entry in entries) {
+      processEntry(entry.emotions);
+      processEntry(entry.tags);
+    }
+
+    return factorsSet.toList();
+  }
+
+  List<Widget> _buildFactorButtonList(
+      List<String> factorsList, BuildContext context) {
+    return factorsList.map((factor) {
+      return OutlinedButton(onPressed: () {}, child: Text(factor));
+    }).toList();
   }
 
   static DateTime _getCurrentWeek() {
@@ -131,9 +162,53 @@ class _ScreenStatisticsState extends State<ScreenStatistics> {
     });
   }
 
+  void _showFactorSelectionDialog(List<Entry> entries, BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) => AlertDialog(
+              backgroundColor: AppColors.backgroundColor,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(5),
+              ),
+              title: const Text('Factor selection'),
+              content: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text('Select a factor to compare with your mood.'),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Wrap(
+                      spacing: 10,
+                      children: [
+                        ..._buildFactorButtonList(
+                            _getFactorsList(entries), context)
+                      ],
+                    ),
+                  ]),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () => Navigator.pop(context, 'Cancel'),
+                  child: const Text('Cancel'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context, 'Add');
+                  },
+                  child: const Text('Add'),
+                ),
+              ],
+            ));
+  }
+
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<EntryProvider>();
+    final entries = provider.filteredEntries;
+
+    final List<String> _factorsList = [];
+    _getFactorsList(entries);
     return Scaffold(
       body: ListView(
         children: [
@@ -288,7 +363,11 @@ class _ScreenStatisticsState extends State<ScreenStatistics> {
             children: [
               Text('Mood graph',
                   style: Theme.of(context).textTheme.titleMedium),
-              OutlinedButton(onPressed: () {}, child: const Text('Add factor'))
+              OutlinedButton(
+                  onPressed: () {
+                    _showFactorSelectionDialog(entries, context);
+                  },
+                  child: const Text('Add factor'))
             ],
           ),
           const SizedBox(height: 10),

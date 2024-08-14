@@ -9,7 +9,6 @@ import 'package:calm_notes/providers/tag_provider.dart';
 import 'package:calm_notes/components/slider.dart';
 import 'package:calm_notes/components/tags.dart';
 import 'package:flutter/material.dart';
-import 'package:calm_notes/services/database_service.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -22,7 +21,6 @@ class EntryCreationPage extends StatefulWidget {
 }
 
 class _EntryCreationPageState extends State<EntryCreationPage> {
-  final DatabaseService _databaseService = DatabaseService.instance;
   final DateFormat _dateFormatter = DateFormat('d MMMM yyyy');
   DateTime _selectedDate = DateTime.now();
   TimeOfDay _selectedTime = TimeOfDay.now();
