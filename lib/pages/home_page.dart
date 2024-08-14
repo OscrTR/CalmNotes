@@ -1,6 +1,6 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:calm_notes/colors.dart';
@@ -49,6 +49,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final Locale currentLocale = context.locale;
     return Scaffold(
       body: FutureBuilder<List<Entry>>(
         future: _databaseService.fetchEntries(),
@@ -69,7 +70,7 @@ class _HomePageState extends State<HomePage> {
                 children: [
                   _buildHeader(context),
                   const SizedBox(height: 24),
-                  const Text('No entries found.')
+                  Text(context.tr('home_no_entry'))
                 ]);
           }
 
@@ -79,13 +80,17 @@ class _HomePageState extends State<HomePage> {
 
             for (var entry in entries) {
               final DateTime date = getDateTime(entry.date)!;
-              final String monthYear = DateFormat('MMMM yyyy').format(date);
+              final String monthYear =
+                  DateFormat('MMMM yyyy', currentLocale.toString())
+                      .format(date);
+              final String capitalizedMonthYear =
+                  monthYear[0].toUpperCase() + monthYear.substring(1);
 
-              if (groupedEntries[monthYear] == null) {
-                groupedEntries[monthYear] = [];
+              if (groupedEntries[capitalizedMonthYear] == null) {
+                groupedEntries[capitalizedMonthYear] = [];
               }
 
-              groupedEntries[monthYear]!.add(entry);
+              groupedEntries[capitalizedMonthYear]!.add(entry);
             }
 
             return groupedEntries;
@@ -165,7 +170,7 @@ class _HomePageState extends State<HomePage> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Hello!',
+              context.tr('home_title'),
               style: Theme.of(context).textTheme.headlineMedium,
             ),
             IconButton(
@@ -180,7 +185,7 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
         Text(
-          "Don't make a bad day make you feel like you have a bad life.",
+          context.tr('home_subtitle'),
           style: Theme.of(context).textTheme.bodyMedium,
         ),
       ],
@@ -189,6 +194,12 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildEntryDate(String date) {
     final dateTime = getDateTime(date)!;
+    final Locale currentLocale = context.locale;
+    String dateString =
+        DateFormat('MMM', currentLocale.toString()).format(dateTime);
+    String capitalizedDateString =
+        dateString[0].toUpperCase() + dateString.substring(1);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -201,7 +212,7 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         Text(
-          DateFormat('MMM').format(dateTime),
+          capitalizedDateString,
           style: const TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 12,

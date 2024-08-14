@@ -7,10 +7,10 @@ import 'package:calm_notes/providers/emotion_provider.dart';
 import 'package:calm_notes/providers/tag_provider.dart';
 import 'package:calm_notes/components/slider.dart';
 import 'package:calm_notes/components/tags.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:calm_notes/services/database_service.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 
@@ -26,7 +26,6 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
   final DatabaseService _databaseService = DatabaseService.instance;
   Entry? _savedEntry;
 
-  final DateFormat _dateFormatter = DateFormat('d MMMM yyyy');
   DateTime _selectedDate = DateTime.now();
   TimeOfDay _selectedTime = TimeOfDay.now();
   int? _selectedMood;
@@ -152,7 +151,7 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
                   } else if (snapshot.hasError) {
                     return Text('Error: ${snapshot.error}');
                   } else if (!snapshot.hasData) {
-                    return const Text('No data found');
+                    return Text(context.tr('edit_no_data'));
                   } else {
                     final initialValue =
                         _selectedMood ?? snapshot.data!.toDouble();
@@ -182,6 +181,7 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
   }
 
   Widget _buildHeader(BuildContext context) {
+    final Locale currentLocale = context.locale;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -212,7 +212,7 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
                 ),
               ),
             ),
-            Text('Edit entry',
+            Text(context.tr('edit_page_title'),
                 style: Theme.of(context).textTheme.headlineMedium),
             GestureDetector(
               onTap: () => showDialog<String>(
@@ -222,13 +222,12 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(5),
                   ),
-                  title: const Text('Entry deletion'),
-                  content:
-                      const Text('Are you sure you want to delete this entry?'),
+                  title: Text(context.tr('edit_delete_dialog_title')),
+                  content: Text(context.tr('edit_delete_dialog_subtitle')),
                   actions: <Widget>[
                     TextButton(
                       onPressed: () => Navigator.pop(context, 'Cancel'),
-                      child: const Text('Cancel'),
+                      child: Text(context.tr('global_dialog_cancel')),
                     ),
                     TextButton(
                       onPressed: () {
@@ -240,7 +239,7 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
                         Provider.of<TagProvider>(context, listen: false)
                             .resetTags();
                       },
-                      child: const Text('Delete'),
+                      child: Text(context.tr('edit_delete_dialog_delete')),
                     ),
                   ],
                 ),
@@ -265,7 +264,8 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
             TextButton(
               onPressed: () => _selectDate(context),
               child: Text(
-                _dateFormatter.format(_selectedDate),
+                DateFormat('d MMMM yyyy', currentLocale.toString())
+                    .format(_selectedDate),
                 style: Theme.of(context).textTheme.titleMedium,
               ),
             ),
@@ -289,7 +289,7 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
       controller: _titleController,
       decoration: InputDecoration(
         border: const OutlineInputBorder(borderSide: BorderSide.none),
-        hintText: 'Title',
+        hintText: context.tr('edit_title'),
         hintStyle: Theme.of(context).textTheme.titleMedium,
         contentPadding: EdgeInsets.zero,
         isDense: true,
@@ -303,7 +303,7 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
       controller: _descriptionController,
       decoration: InputDecoration(
         border: const OutlineInputBorder(borderSide: BorderSide.none),
-        hintText: 'Description',
+        hintText: context.tr('edit_description'),
         hintStyle: Theme.of(context).textTheme.bodyMedium,
         contentPadding: EdgeInsets.zero,
         isDense: true,
@@ -318,7 +318,7 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('What was it about?',
+        Text(context.tr('edit_tags'),
             style: Theme.of(context).textTheme.titleMedium),
         const SizedBox(height: 10),
         const Tags(),
@@ -379,7 +379,7 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
             const EdgeInsets.symmetric(horizontal: 60, vertical: 12),
           ),
         ),
-        child: const Text('Save'),
+        child: Text(context.tr('edit_save')),
       ),
     );
   }

@@ -1,6 +1,7 @@
 import 'package:calm_notes/colors.dart';
 import 'package:calm_notes/models/entry.dart';
 import 'package:calm_notes/providers/entry_provider.dart'; // Adjust import based on your file structure
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:flutter_svg/svg.dart';
@@ -124,6 +125,26 @@ class _CalendarState extends State<Calendar> {
       return dayWidgets;
     }
 
+    final Locale currentLocale = context.locale;
+    List<String> localizedDays = [];
+    DateFormat dayFormat = DateFormat.E(currentLocale.toString());
+    for (int i = 0; i < 7; i++) {
+      DateTime date = DateTime(2023, 8, 13 + i);
+      String dayAbbreviation = dayFormat.format(date);
+
+      // Remove trailing dot if present
+      if (dayAbbreviation.endsWith('.')) {
+        dayAbbreviation =
+            dayAbbreviation.substring(0, dayAbbreviation.length - 1);
+      }
+
+      // Capitalize the first letter and make the rest lowercase
+      String formattedDay = dayAbbreviation.substring(0, 1).toUpperCase() +
+          dayAbbreviation.substring(1).toLowerCase();
+
+      localizedDays.add(formattedDay);
+    }
+
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -142,25 +163,22 @@ class _CalendarState extends State<Calendar> {
           children: [
             // Day of the week header
             LayoutGrid(
-              columnSizes: [1.fr, 1.fr, 1.fr, 1.fr, 1.fr, 1.fr, 1.fr],
-              rowSizes: const [auto],
-              children: [
-                for (var day in [
-                  'Sun',
-                  'Mon',
-                  'Tue',
-                  'Wed',
-                  'Thu',
-                  'Fri',
-                  'Sat'
-                ])
-                  Center(
-                      child: Text(day,
+                columnSizes: [1.fr, 1.fr, 1.fr, 1.fr, 1.fr, 1.fr, 1.fr],
+                rowSizes: const [auto],
+                children: localizedDays
+                    .map(
+                      (day) => Container(
+                        width: 44.68,
+                        alignment: Alignment.center,
+                        child: Text(
+                          day,
                           style: const TextStyle(
                               fontWeight: FontWeight.bold,
-                              color: AppColors.ternaryColor))),
-              ],
-            ),
+                              color: AppColors.ternaryColor),
+                        ),
+                      ),
+                    )
+                    .toList()),
             const SizedBox(height: 14),
             // Calendar grid
             LayoutGrid(

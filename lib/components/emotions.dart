@@ -1,6 +1,7 @@
 import 'package:calm_notes/colors.dart';
 import 'package:calm_notes/models/emotion.dart';
 import 'package:calm_notes/providers/emotion_provider.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
@@ -87,12 +88,12 @@ class _EmotionsState extends State<Emotions> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(5),
         ),
-        title: const Text('Add emotion'),
+        title: Text(context.tr('emotion_dialog_title')),
         content: _buildAddEmotionDialogContent(context),
         actions: <Widget>[
           TextButton(
             onPressed: () => Navigator.pop(context, 'Cancel'),
-            child: const Text('Cancel'),
+            child: Text(context.tr('global_dialog_cancel')),
           ),
         ],
       ),
@@ -110,7 +111,7 @@ class _EmotionsState extends State<Emotions> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('No emotions found.'),
+          Text(context.tr('emotion_dialog_no_tag')),
           const SizedBox(height: 10),
           _buildEmotionCreation(context),
         ],
@@ -177,12 +178,12 @@ class _EmotionsState extends State<Emotions> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(5),
         ),
-        title: const Text('Emotion deletion'),
-        content: const Text('Are you sure you want to delete this emotion?'),
+        title: Text(context.tr('emotion_dialog_delete_dialog_title')),
+        content: Text(context.tr('emotion_dialog_delete_dialog_subtitle')),
         actions: <Widget>[
           TextButton(
             onPressed: () => Navigator.pop(context, 'Cancel'),
-            child: const Text('Cancel'),
+            child: Text(context.tr('global_dialog_cancel')),
           ),
           TextButton(
             onPressed: () {
@@ -191,7 +192,7 @@ class _EmotionsState extends State<Emotions> {
                   .deleteEmotion(emotion.id!, emotion.name);
               Navigator.pop(context, 'Delete');
             },
-            child: const Text('Delete'),
+            child: Text(context.tr('emotion_dialog_delete_dialog_delete')),
           ),
         ],
       ),
@@ -204,7 +205,7 @@ class _EmotionsState extends State<Emotions> {
         TextField(
           controller: _emotionNameController,
           decoration: InputDecoration(
-            labelText: 'Emotion name',
+            labelText: context.tr('emotion_dialog_hint'),
             labelStyle: Theme.of(context)
                 .textTheme
                 .bodyMedium

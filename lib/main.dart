@@ -16,11 +16,10 @@ void main() async {
   await EasyLocalization.ensureInitialized();
   runApp(
     EasyLocalization(
-      supportedLocales: [Locale('en', 'US'), Locale('fr', 'FR')],
-      path:
-          'assets/translations', // <-- change the path of the translation files
-      fallbackLocale: Locale('en', 'US'),
-      child: MyApp(),
+      supportedLocales: const [Locale('en', 'US'), Locale('fr', 'FR')],
+      path: 'assets/translations',
+      fallbackLocale: const Locale('en', 'US'),
+      child: const MyApp(),
     ),
   );
 }

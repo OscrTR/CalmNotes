@@ -4,6 +4,7 @@ import 'package:calm_notes/services/notification_service.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:path/path.dart';
 import 'package:provider/provider.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -54,21 +55,25 @@ class _SettingsPageState extends State<SettingsPage> {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Text(
-            'Settings',
+            context.tr('settings_title'),
             style: Theme.of(context).textTheme.headlineMedium,
           ),
           const SizedBox(
             height: 24,
           ),
           Text(
-            'Reminders',
+            context.tr('settings_reminders'),
             style: Theme.of(context).textTheme.titleMedium,
           ),
           Consumer<ReminderProvider>(
             builder: (context, provider, child) {
               final reminders = provider.reminders;
               if (reminders.isEmpty) {
-                return const Center(child: Text('No reminders found.'));
+                return Column(children: [
+                  const SizedBox(height: 10),
+                  Text(context.tr('settings_reminders_not_found')),
+                  const SizedBox(height: 10),
+                ]);
               }
               final double height = reminders.length * 40.0;
               return SizedBox(
@@ -102,29 +107,27 @@ class _SettingsPageState extends State<SettingsPage> {
               );
             },
           ),
-          Center(
-            child: FilledButton(
-              onPressed: () {
-                selectTime(context, () {
-                  if (!mounted) return;
-                  final reminderProvider =
-                      Provider.of<ReminderProvider>(context, listen: false);
-                  reminderProvider.addReminder(
-                    MaterialLocalizations.of(context).formatTimeOfDay(
-                        selectedTime,
-                        alwaysUse24HourFormat: true),
-                  );
-                  NotificationService.showNotification(selectedTime);
-                });
-              },
-              child: const Text('Add a reminder'),
-            ),
+          FilledButton(
+            onPressed: () {
+              selectTime(context, () {
+                if (!mounted) return;
+                final reminderProvider =
+                    Provider.of<ReminderProvider>(context, listen: false);
+                reminderProvider.addReminder(
+                  MaterialLocalizations.of(context).formatTimeOfDay(
+                      selectedTime,
+                      alwaysUse24HourFormat: true),
+                );
+                NotificationService.showNotification(selectedTime);
+              });
+            },
+            child: Text(context.tr('settings_reminders_add')),
           ),
           const SizedBox(
             height: 24,
           ),
           Text(
-            'Language',
+            context.tr('settings_language'),
             style: Theme.of(context).textTheme.titleMedium,
           ),
           TextButton(
@@ -150,12 +153,12 @@ void _showLanguageDialog(BuildContext context) {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(5),
       ),
-      title: const Text('Select the app language'),
+      title: Text(context.tr('settings_language_dialog_title')),
       content: _buildLanguageDialogContent(context),
       actions: <Widget>[
         TextButton(
           onPressed: () => Navigator.pop(context, 'Cancel'),
-          child: const Text('Cancel'),
+          child: Text(context.tr('global_dialog_cancel')),
         ),
       ],
     ),
@@ -168,16 +171,16 @@ Widget _buildLanguageDialogContent(BuildContext context) {
     children: [
       OutlinedButton(
           onPressed: () {
-            context.setLocale(const Locale('en', 'US'));
             Navigator.pop(context, 'Language selection');
+            context.setLocale(const Locale('en', 'US'));
           },
-          child: const Text('English')),
+          child: Text(context.tr('settings_language_dialog_english'))),
       OutlinedButton(
           onPressed: () {
-            context.setLocale(const Locale('fr', 'FR'));
             Navigator.pop(context, 'Language selection');
+            context.setLocale(const Locale('fr', 'FR'));
           },
-          child: const Text('French')),
+          child: Text(context.tr('settings_language_dialog_french'))),
     ],
   );
 }

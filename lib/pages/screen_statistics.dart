@@ -7,7 +7,6 @@ import 'package:calm_notes/providers/entry_provider.dart';
 import 'package:calm_notes/providers/factor_provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class ScreenStatistics extends StatefulWidget {
@@ -129,10 +128,10 @@ class _ScreenStatisticsState extends State<ScreenStatistics> {
         if (index == -1) return;
 
         // Assuming each week button has a fixed width of 100 pixels plus padding
-        const double weekButtonWidth = 85;
+        const double weekButtonWidth = 88;
         final offset = (index * (weekButtonWidth)) -
             (MediaQuery.of(context).size.width / 2 - weekButtonWidth / 2) +
-            30;
+            20;
 
         _scrollControllerWeeks.animateTo(
           offset,
@@ -177,12 +176,12 @@ class _ScreenStatisticsState extends State<ScreenStatistics> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(5),
               ),
-              title: const Text('Factor selection'),
+              title: Text(context.tr('statistics_factor_dialog_title')),
               content: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Text('Select a factor to compare with your mood.'),
+                    Text(context.tr('statistics_factor_dialog_subtitle')),
                     const SizedBox(
                       height: 10,
                     ),
@@ -197,13 +196,7 @@ class _ScreenStatisticsState extends State<ScreenStatistics> {
               actions: <Widget>[
                 TextButton(
                   onPressed: () => Navigator.pop(context, 'Cancel'),
-                  child: const Text('Cancel'),
-                ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context, 'Add');
-                  },
-                  child: const Text('Add'),
+                  child: Text(context.tr('global_dialog_cancel')),
                 ),
               ],
             ));
@@ -233,7 +226,8 @@ class _ScreenStatisticsState extends State<ScreenStatistics> {
               rangeType == 'week'
                   ? Expanded(
                       child: FilledButton(
-                          onPressed: () {}, child: const Text('Week')))
+                          onPressed: () {},
+                          child: Text(context.tr('statistics_week'))))
                   : Expanded(
                       child: TextButton(
                           onPressed: () {
@@ -243,12 +237,13 @@ class _ScreenStatisticsState extends State<ScreenStatistics> {
                             provider.setDefaultWeekDate();
                             _scrollToSelectedWeek();
                           },
-                          child: const Text('Week')),
+                          child: Text(context.tr('statistics_week'))),
                     ),
               rangeType == 'month'
                   ? Expanded(
                       child: FilledButton(
-                          onPressed: () {}, child: const Text('Month')))
+                          onPressed: () {},
+                          child: Text(context.tr('statistics_month'))))
                   : Expanded(
                       child: TextButton(
                           onPressed: () {
@@ -258,7 +253,7 @@ class _ScreenStatisticsState extends State<ScreenStatistics> {
                             provider.setDefaultMonthDate();
                             _scrollToSelectedMonth();
                           },
-                          child: const Text('Month')))
+                          child: Text(context.tr('statistics_month'))))
             ],
           ),
           const SizedBox(
@@ -270,7 +265,12 @@ class _ScreenStatisticsState extends State<ScreenStatistics> {
                   controller: _scrollControllerWeeks,
                   child: Row(
                     children: _weeks.map((date) {
-                      String weekLabel = DateFormat('MMM d').format(date);
+                      final Locale currentLocale = context.locale;
+                      String weekLabel =
+                          DateFormat('MMM d', currentLocale.toString())
+                              .format(date);
+                      final String capitalizedweekLabel =
+                          weekLabel[0].toUpperCase() + weekLabel.substring(1);
                       bool isSelectedWeek =
                           date.year == _selectedWeekDate?.year &&
                               date.month == _selectedWeekDate?.month &&
@@ -283,18 +283,18 @@ class _ScreenStatisticsState extends State<ScreenStatistics> {
                                 onPressed: () {},
                                 style: ButtonStyle(
                                   minimumSize: WidgetStateProperty.all(
-                                      const Size(77.0, 40.0)),
+                                      const Size(80.0, 40.0)),
                                   maximumSize: WidgetStateProperty.all(
-                                      const Size(77.0, 40.0)),
+                                      const Size(80.0, 40.0)),
                                 ),
-                                child: Text(weekLabel),
+                                child: Text(capitalizedweekLabel),
                               )
                             : OutlinedButton(
                                 style: ButtonStyle(
                                   minimumSize: WidgetStateProperty.all(
-                                      const Size(77.0, 40.0)),
+                                      const Size(80.0, 40.0)),
                                   maximumSize: WidgetStateProperty.all(
-                                      const Size(77.0, 40.0)),
+                                      const Size(80.0, 40.0)),
                                 ),
                                 onPressed: () {
                                   setState(() {
@@ -307,7 +307,7 @@ class _ScreenStatisticsState extends State<ScreenStatistics> {
                                           .subtract(
                                               const Duration(seconds: 1)));
                                 },
-                                child: Text(weekLabel),
+                                child: Text(capitalizedweekLabel),
                               ),
                       );
                     }).toList(),
@@ -320,7 +320,12 @@ class _ScreenStatisticsState extends State<ScreenStatistics> {
                   scrollDirection: Axis.horizontal,
                   child: Row(
                     children: _months.map((date) {
-                      String monthLabel = DateFormat('MMM').format(date);
+                      final Locale currentLocale = context.locale;
+                      final String monthLabel =
+                          DateFormat('MMM', currentLocale.toString())
+                              .format(date);
+                      final String capitalizedMonthLabel =
+                          monthLabel[0].toUpperCase() + monthLabel.substring(1);
                       bool isSelectedMonth =
                           date.year == _selectedMonthDate?.year &&
                               date.month == _selectedMonthDate?.month;
@@ -332,18 +337,18 @@ class _ScreenStatisticsState extends State<ScreenStatistics> {
                                 onPressed: () {},
                                 style: ButtonStyle(
                                   minimumSize: WidgetStateProperty.all(
-                                      const Size(77.0, 40.0)),
+                                      const Size(80.0, 40.0)),
                                   maximumSize: WidgetStateProperty.all(
-                                      const Size(77.0, 40.0)),
+                                      const Size(80.0, 40.0)),
                                 ),
-                                child: Text(monthLabel),
+                                child: Text(capitalizedMonthLabel),
                               )
                             : OutlinedButton(
                                 style: ButtonStyle(
                                   minimumSize: WidgetStateProperty.all(
-                                      const Size(77.0, 40.0)),
+                                      const Size(80.0, 40.0)),
                                   maximumSize: WidgetStateProperty.all(
-                                      const Size(77.0, 40.0)),
+                                      const Size(80.0, 40.0)),
                                 ),
                                 onPressed: () {
                                   setState(() {
@@ -356,7 +361,7 @@ class _ScreenStatisticsState extends State<ScreenStatistics> {
                                           .subtract(
                                               const Duration(seconds: 1)));
                                 },
-                                child: Text(monthLabel),
+                                child: Text(capitalizedMonthLabel),
                               ),
                       );
                     }).toList(),
@@ -370,18 +375,18 @@ class _ScreenStatisticsState extends State<ScreenStatistics> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Mood graph',
+                Text(context.tr('statistics_mood_graph'),
                     style: Theme.of(context).textTheme.titleMedium),
                 OutlinedButton(
                     onPressed: () {
                       _showFactorSelectionDialog(entries, context);
                     },
-                    child: const Text('Add factor'))
+                    child: Text(context.tr('statistics_mood_graph_add_factor')))
               ],
             ),
           if (factorProvider.selectedFactor != '')
             Row(children: [
-              Text('Mood graph vs',
+              Text(context.tr('statistics_mood_graph_vs'),
                   style: Theme.of(context).textTheme.titleMedium),
               const SizedBox(
                 width: 10,
@@ -395,12 +400,12 @@ class _ScreenStatisticsState extends State<ScreenStatistics> {
           const SizedBox(height: 10),
           const Chart(),
           const SizedBox(height: 30),
-          Text(context.tr('mood_calendar'),
+          Text(context.tr('statistics_mood_calendar'),
               style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: 20),
           const Calendar(),
           const SizedBox(height: 30),
-          Text('Mood distribution',
+          Text(context.tr('statistics_mood_distribution'),
               style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: 20),
           const HalfPieChart(),

@@ -8,9 +8,9 @@ import 'package:calm_notes/providers/entry_provider.dart';
 import 'package:calm_notes/providers/tag_provider.dart';
 import 'package:calm_notes/components/slider.dart';
 import 'package:calm_notes/components/tags.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class EntryCreationPage extends StatefulWidget {
@@ -21,7 +21,6 @@ class EntryCreationPage extends StatefulWidget {
 }
 
 class _EntryCreationPageState extends State<EntryCreationPage> {
-  final DateFormat _dateFormatter = DateFormat('d MMMM yyyy');
   DateTime _selectedDate = DateTime.now();
   TimeOfDay _selectedTime = TimeOfDay.now();
   int _selectedMood = 5;
@@ -99,6 +98,7 @@ class _EntryCreationPageState extends State<EntryCreationPage> {
   }
 
   Widget _buildHeader(BuildContext context) {
+    final Locale currentLocale = context.locale;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -106,7 +106,7 @@ class _EntryCreationPageState extends State<EntryCreationPage> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text('How do you feel?',
+            Text(context.tr('create_page_title'),
                 style: Theme.of(context).textTheme.headlineMedium),
             GestureDetector(
               onTap: () {
@@ -135,7 +135,8 @@ class _EntryCreationPageState extends State<EntryCreationPage> {
             TextButton(
               onPressed: () => _selectDate(context),
               child: Text(
-                _dateFormatter.format(_selectedDate),
+                DateFormat('d MMMM yyyy', currentLocale.toString())
+                    .format(_selectedDate),
                 style: Theme.of(context).textTheme.titleMedium,
               ),
             ),
@@ -159,7 +160,7 @@ class _EntryCreationPageState extends State<EntryCreationPage> {
       controller: _titleController,
       decoration: InputDecoration(
         border: const OutlineInputBorder(borderSide: BorderSide.none),
-        hintText: 'Title',
+        hintText: context.tr('create_title'),
         hintStyle: Theme.of(context).textTheme.titleMedium,
         contentPadding: EdgeInsets.zero,
         isDense: true,
@@ -173,7 +174,7 @@ class _EntryCreationPageState extends State<EntryCreationPage> {
       controller: _descriptionController,
       decoration: InputDecoration(
         border: const OutlineInputBorder(borderSide: BorderSide.none),
-        hintText: 'Description',
+        hintText: context.tr('create_description'),
         hintStyle: Theme.of(context).textTheme.bodyMedium,
         contentPadding: EdgeInsets.zero,
         isDense: true,
@@ -188,7 +189,7 @@ class _EntryCreationPageState extends State<EntryCreationPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('What was it about?',
+        Text(context.tr('create_tags'),
             style: Theme.of(context).textTheme.titleMedium),
         const SizedBox(height: 10),
         const Tags(),
@@ -248,7 +249,7 @@ class _EntryCreationPageState extends State<EntryCreationPage> {
             const EdgeInsets.symmetric(horizontal: 60, vertical: 12),
           ),
         ),
-        child: const Text('Save'),
+        child: Text(context.tr('create_save')),
       ),
     );
   }

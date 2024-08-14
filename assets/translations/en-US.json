@@ -1,3 +1,57 @@
 {
-    "mood_calendar":"Mood calendar"
+    "global_dialog_cancel":"Cancel",
+
+    "tag_dialog_title":"Add tag",
+    "tag_dialog_hint":"tag name",
+    "tag_dialog_no_tag":"No tag found.",
+    "tag_dialog_delete_dialog_title":"Tag deletion",
+    "tag_dialog_delete_dialog_subtitle":"Are you sure you want to delete this tag?",
+    "tag_dialog_delete_dialog_delete":"Delete",
+
+    "emotion_dialog_title":"Add emotion",
+    "emotion_dialog_hint":"emotion name",
+    "emotion_dialog_no_tag":"No emotion found.",
+    "emotion_dialog_delete_dialog_title":"Emotion deletion",
+    "emotion_dialog_delete_dialog_subtitle":"Are you sure you want to delete this emotion?",
+    "emotion_dialog_delete_dialog_delete":"Delete",
+
+    "home_title":"Hello!",
+    "home_subtitle":"Don't make a bad day make you feel like you have a bad life.",
+    "home_no_entry":"No entries found.",
+
+    "settings_title":"Settings",
+    "settings_reminders":"Reminders",
+    "settings_reminders_add":"Add a reminder",
+    "settings_reminders_not_found":"No reminder found.",
+    "settings_language":"Language",
+    "settings_language_dialog_title":"Select the app language",
+    "settings_language_dialog_english":"English",
+    "settings_language_dialog_french":"French",
+
+    "statistics_factor_dialog_title":"Factor selection",
+    "statistics_factor_dialog_subtitle":"Select a factor to compare with your mood.",
+    "statistics_factor_dialog_add":"Add",
+    "statistics_week":"Week",
+    "statistics_month":"Month",
+    "statistics_mood_graph":"Mood graph",
+    "statistics_mood_graph_vs":"Mood graph vs",
+    "statistics_mood_graph_add_factor":"Add factor",
+    "statistics_mood_calendar":"Mood calendar",
+    "statistics_mood_distribution":"Mood distribution",
+
+    "edit_page_title":"Edit entry",
+    "edit_title":"Title",
+    "edit_description":"Description",
+    "edit_tags":"What was it about?",
+    "edit_save":"Save",
+    "edit_no_data":"No data foud.",
+    "edit_delete_dialog_title":"Entry deletion",
+    "edit_delete_dialog_subtitle":"Are you sure you want to delete this entry?",
+    "edit_delete_dialog_delete":"Delete",
+
+    "create_page_title":"How do you feel?",
+    "create_title":"Title",
+    "create_description":"Description",
+    "create_tags":"What was it about?",
+    "create_save":"Save"
 }
