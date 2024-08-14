@@ -1,8 +1,8 @@
 import 'package:calm_notes/colors.dart';
+import 'package:calm_notes/models/entry.dart';
 import 'package:calm_notes/providers/entry_provider.dart'; // Adjust import based on your file structure
 import 'package:flutter/material.dart';
 import 'package:flutter_layout_grid/flutter_layout_grid.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class Calendar extends StatelessWidget {
@@ -16,13 +16,49 @@ class Calendar extends StatelessWidget {
     final endDate = provider.endDate;
     final entries = provider.filteredEntries;
 
-    // TODO pour chaque jour vérifier le mood correspondant
-
-    // Convertir la liste des entrées en map de date / color
     Map<DateTime, int> entryMap = {};
-    for (var entry in entries) {
-      // print(DateTime.parse(entry.date.replaceAll('|', ' ')));
+
+    List<Color> moodColors = [
+      AppColors.color0,
+      AppColors.color1,
+      AppColors.color2,
+      AppColors.color3,
+      AppColors.color4,
+      AppColors.color5,
+      AppColors.color6,
+      AppColors.color7,
+      AppColors.color8,
+      AppColors.color9,
+      AppColors.color10,
+    ];
+
+    Map<DateTime, int> convertEntriesToMap(List<Entry> entries) {
+      Map<DateTime, double> moodTotalMap = {};
+      Map<DateTime, int> moodCountMap = {};
+
+      // Populate the moodMap with entries
+      for (var entry in entries) {
+        DateTime date = DateTime.parse(entry.date.split('|')[0]);
+        // Accumulate the mood values for each date
+        if (moodTotalMap.containsKey(date)) {
+          moodTotalMap[date] = moodTotalMap[date]! + entry.mood.toDouble();
+          moodCountMap[date] = moodCountMap[date]! + 1;
+        } else {
+          moodTotalMap[date] = entry.mood.toDouble();
+          moodCountMap[date] = 1;
+        }
+      }
+      Map<DateTime, int> moodAverageMap = {};
+
+      for (var date in moodTotalMap.keys) {
+        moodAverageMap[date] =
+            (moodTotalMap[date]! / moodCountMap[date]!).round();
+      }
+
+      return moodAverageMap;
     }
+
+    entryMap = convertEntriesToMap(entries);
 
     final firstDayOfRange =
         DateTime(startDate.year, startDate.month, startDate.day);
@@ -46,13 +82,15 @@ class Calendar extends StatelessWidget {
             currentDate.isAfter(startDate.subtract(const Duration(days: 1))) &&
                 currentDate.isBefore(endDate.add(const Duration(days: 1)));
 
+        Color currentDateColor = entryMap.containsKey(currentDate)
+            ? moodColors[entryMap[currentDate]!]
+            : AppColors.primaryColor.withOpacity(0.1);
+
         dayWidgets.add(
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             decoration: BoxDecoration(
-              color: isInRange
-                  ? AppColors.primaryColor.withOpacity(0.1)
-                  : Colors.transparent,
+              color: isInRange ? currentDateColor : Colors.transparent,
               borderRadius: BorderRadius.circular(90),
             ),
             child: Center(
