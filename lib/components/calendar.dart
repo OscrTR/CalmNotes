@@ -3,6 +3,7 @@ import 'package:calm_notes/models/entry.dart';
 import 'package:calm_notes/providers/entry_provider.dart'; // Adjust import based on your file structure
 import 'package:flutter/material.dart';
 import 'package:flutter_layout_grid/flutter_layout_grid.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 
 class Calendar extends StatelessWidget {
@@ -94,14 +95,21 @@ class Calendar extends StatelessWidget {
               borderRadius: BorderRadius.circular(90),
             ),
             child: Center(
-              child: Text(
-                currentDate.day.toString(),
-                style: const TextStyle(
-                  fontSize: 16,
-                  color: Colors.transparent,
+                child: Stack(
+              children: [
+                Text(
+                  currentDate.day.toString(),
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: Colors.transparent,
+                  ),
                 ),
-              ),
-            ),
+                isInRange && entryMap.containsKey(currentDate)
+                    ? SvgPicture.asset(
+                        'assets/images/mood${entryMap[currentDate]}.svg')
+                    : const SizedBox()
+              ],
+            )),
           ),
         );
       }
