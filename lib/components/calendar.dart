@@ -2,6 +2,7 @@ import 'package:calm_notes/colors.dart';
 import 'package:calm_notes/providers/entry_provider.dart'; // Adjust import based on your file structure
 import 'package:flutter/material.dart';
 import 'package:flutter_layout_grid/flutter_layout_grid.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class Calendar extends StatelessWidget {
@@ -13,7 +14,15 @@ class Calendar extends StatelessWidget {
     final provider = Provider.of<EntryProvider>(context);
     final startDate = provider.startDate;
     final endDate = provider.endDate;
-    final daysInMonth = DateTime(startDate.year, startDate.month + 1, 0).day;
+    final entries = provider.filteredEntries;
+
+    // TODO pour chaque jour vérifier le mood correspondant
+
+    // Convertir la liste des entrées en map de date / color
+    Map<DateTime, int> entryMap = {};
+    for (var entry in entries) {
+      // print(DateTime.parse(entry.date.replaceAll('|', ' ')));
+    }
 
     final firstDayOfRange =
         DateTime(startDate.year, startDate.month, startDate.day);

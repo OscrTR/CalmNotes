@@ -44,20 +44,33 @@ class _ChartState extends State<Chart> {
 
     // Function to convert entries to FlSpots with gaps for missing dates
     List<FlSpot> convertEntriesToSpots(List<Entry> entries) {
-      final Map<String, double> moodMap = {};
+      Map<String, double> moodTotalMap = {};
+      Map<String, int> moodCountMap = {};
 
       // Populate the moodMap with entries
       for (var entry in entries) {
         String date = entry.date.substring(0, 10);
-        moodMap[date] = entry.mood.toDouble();
+        // Accumulate the mood values for each date
+        if (moodTotalMap.containsKey(date)) {
+          moodTotalMap[date] = moodTotalMap[date]! + entry.mood.toDouble();
+          moodCountMap[date] = moodCountMap[date]! + 1;
+        } else {
+          moodTotalMap[date] = entry.mood.toDouble();
+          moodCountMap[date] = 1;
+        }
+      }
+      Map<String, double> moodAverageMap = {};
+
+      for (var date in moodTotalMap.keys) {
+        moodAverageMap[date] = moodTotalMap[date]! / moodCountMap[date]!;
       }
 
       List<FlSpot> spots = [];
       int index = 0;
 
       for (var date in spotsDate) {
-        if (moodMap.containsKey(date)) {
-          spots.add(FlSpot(index.toDouble(), moodMap[date]!));
+        if (moodAverageMap.containsKey(date)) {
+          spots.add(FlSpot(index.toDouble(), moodAverageMap[date]!));
         } else {
           spots.add(FlSpot.nullSpot);
         }
