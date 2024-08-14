@@ -12,7 +12,7 @@ class HalfPieChart extends StatefulWidget {
 }
 
 class _HalfPieChartState extends State<HalfPieChart> {
-  int? touchedIndex;
+  bool _showMood = false;
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<EntryProvider>();
@@ -52,14 +52,11 @@ class _HalfPieChartState extends State<HalfPieChart> {
     }
 
     List<PieChartSectionData> showingSections() {
-      int index = -1;
       return moodSumMap.entries.map((entry) {
-        index++;
-        final isTouched = index == touchedIndex;
         return PieChartSectionData(
           color: getColor(entry.key),
           value: entry.value.toDouble(),
-          title: isTouched ? '${entry.key}' : '',
+          title: _showMood ? '${entry.key}' : '',
           titleStyle: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -68,34 +65,26 @@ class _HalfPieChartState extends State<HalfPieChart> {
       }).toList();
     }
 
-    return Container(
-      height: 250,
-      width: 352.7,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        color: Colors.white,
-      ),
-      padding: const EdgeInsets.only(top: 24, bottom: 24, left: 0, right: 20),
-      child: PieChart(
-        PieChartData(
-          sectionsSpace: 2,
-          centerSpaceRadius: 70,
-          pieTouchData: PieTouchData(
-            enabled: true,
-            touchCallback: (FlTouchEvent event, pieTouchResponse) {
-              setState(() {
-                if (!event.isInterestedForInteractions ||
-                    pieTouchResponse == null ||
-                    pieTouchResponse.touchedSection == null) {
-                  touchedIndex = -1;
-                  return;
-                }
-                touchedIndex =
-                    pieTouchResponse.touchedSection!.touchedSectionIndex;
-              });
-            },
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _showMood = !_showMood;
+        });
+      },
+      child: Container(
+        height: 250,
+        width: 352.7,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          color: Colors.white,
+        ),
+        padding: const EdgeInsets.only(top: 24, bottom: 24, left: 0, right: 20),
+        child: PieChart(
+          PieChartData(
+            sectionsSpace: 2,
+            centerSpaceRadius: 70,
+            sections: showingSections(),
           ),
-          sections: showingSections(),
         ),
       ),
     );
