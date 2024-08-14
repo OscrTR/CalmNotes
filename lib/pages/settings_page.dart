@@ -1,6 +1,7 @@
-import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:calm_notes/colors.dart';
 import 'package:calm_notes/providers/reminder_provider.dart';
 import 'package:calm_notes/services/notification_service.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
@@ -34,23 +35,16 @@ class _SettingsPageState extends State<SettingsPage> {
     }
   }
 
-  // Future<void> printScheduledNotifications() async {
-  //   List<NotificationModel> scheduledNotifications =
-  //       await AwesomeNotifications().listScheduledNotifications();
-
-  //   for (NotificationModel notification in scheduledNotifications) {
-  //     print('Notification ID: ${notification.content?.id}');
-  //     print('Title: ${notification.content?.title}');
-  //     print('Body: ${notification.content?.body}');
-  //     print('Schedule: ${notification.schedule}');
-  //     print('Repeats: ${notification.schedule?.repeats}');
-  //     print('==================================');
-  //   }
-  // }
-
-  // void cancelNotification(int id) {
-  //   AwesomeNotifications().cancelSchedule(id);
-  // }
+  String getLanguageName(Locale locale) {
+    switch (locale.languageCode) {
+      case 'en':
+        return 'English';
+      case 'fr':
+        return 'Français';
+      default:
+        return locale.languageCode;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,11 +53,6 @@ class _SettingsPageState extends State<SettingsPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          // ElevatedButton(
-          //     onPressed: () {
-          //       printScheduledNotifications();
-          //     },
-          //     child: Text('list')),
           Text(
             'Settings',
             style: Theme.of(context).textTheme.headlineMedium,
@@ -125,15 +114,70 @@ class _SettingsPageState extends State<SettingsPage> {
                         selectedTime,
                         alwaysUse24HourFormat: true),
                   );
-                  //TODO add notification creation
                   NotificationService.showNotification(selectedTime);
                 });
               },
               child: const Text('Add a reminder'),
             ),
           ),
+          const SizedBox(
+            height: 24,
+          ),
+          Text(
+            'Language',
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+          TextButton(
+            onPressed: () {
+              _showLanguageDialog(context);
+            },
+            child: Text(
+              getLanguageName(context.locale),
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+          )
         ],
       ),
     );
   }
+}
+
+void _showLanguageDialog(BuildContext context) {
+  showDialog<String>(
+    context: context,
+    builder: (BuildContext context) => AlertDialog(
+      backgroundColor: AppColors.backgroundColor,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(5),
+      ),
+      title: const Text('Select the app language'),
+      content: _buildLanguageDialogContent(context),
+      actions: <Widget>[
+        TextButton(
+          onPressed: () => Navigator.pop(context, 'Cancel'),
+          child: const Text('Cancel'),
+        ),
+      ],
+    ),
+  );
+}
+
+Widget _buildLanguageDialogContent(BuildContext context) {
+  return Wrap(
+    spacing: 10,
+    children: [
+      OutlinedButton(
+          onPressed: () {
+            context.setLocale(const Locale('en', 'US'));
+            Navigator.pop(context, 'Language selection');
+          },
+          child: const Text('English')),
+      OutlinedButton(
+          onPressed: () {
+            context.setLocale(const Locale('fr', 'FR'));
+            Navigator.pop(context, 'Language selection');
+          },
+          child: const Text('French')),
+    ],
+  );
 }
