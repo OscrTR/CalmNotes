@@ -1,6 +1,8 @@
 import 'package:calm_notes/colors.dart';
 import 'package:calm_notes/models/entry.dart';
+import 'package:calm_notes/models/factor.dart';
 import 'package:calm_notes/providers/entry_provider.dart';
+import 'package:calm_notes/providers/factor_provider.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -22,6 +24,103 @@ class _ChartState extends State<Chart> {
     List<String> spotsDate = [];
     final startDate = provider.startDate;
     final endDate = provider.endDate;
+    final factorProvider = context.watch<FactorProvider>();
+
+    List<Factor> createFactorsList() {
+      List<Factor> tempFactorsList = [];
+
+      for (var entry in entries) {
+        DateTime date = DateTime.parse(entry.date.split('|')[0]);
+        List<String> emotionsList = [];
+        List<String> tagsList = [];
+        List<String> factorsList = [];
+
+        emotionsList = entry.emotions!.replaceAll(' ', '').split(',');
+        tagsList = entry.tags!.replaceAll(' ', '').split(',');
+        for (var emotion in emotionsList) {
+          if (emotion != '') {
+            factorsList.add(emotion);
+          }
+        }
+        for (var tag in tagsList) {
+          if (tag != '') {
+            factorsList.add(tag);
+          }
+        }
+        for (var factor in factorsList) {
+          if (factor != '') {
+            Factor newFactor = Factor(
+                date: date,
+                name: factor.split(':')[0],
+                value: int.parse(factor.split(':')[1]));
+            tempFactorsList.add(newFactor);
+          }
+        }
+      }
+      Map<String, FactorSummary> summaryMap = {};
+      // Iterate over each factor to populate the summaryMap
+      for (var factor in tempFactorsList) {
+        // Create a unique key for each (date, name) combination
+        String key = '${factor.date},${factor.name}';
+
+        if (!summaryMap.containsKey(key)) {
+          summaryMap[key] = FactorSummary(
+            sum: 0,
+            count: 0,
+          );
+        }
+
+        var summary = summaryMap[key]!;
+        summary.sum += factor.value;
+        summary.count += 1;
+      }
+      // Create a new list of factors with the average values
+      List<Factor> averageFactors = summaryMap.entries.map((entry) {
+        var keyParts = entry.key.split(',');
+        var date = DateTime.parse(keyParts[0]);
+        var name = keyParts[1];
+        var summary = entry.value;
+
+        return Factor(
+          date: date,
+          name: name,
+          value: summary.sum ~/ summary.count,
+        );
+      }).toList();
+
+      return averageFactors;
+    }
+
+    List<FlSpot> convertFactorsListToSpots(
+        List<Factor> factorsList, String factorName) {
+      List<FlSpot> spots = [];
+      int index = 0;
+
+      int? getValueForDateAndFactor(
+          List<Factor> factors, DateTime date, String factorName) {
+        for (var factor in factors) {
+          if (factor.date == date && factor.name == factorName) {
+            return factor.value;
+          }
+        }
+        return null;
+      }
+
+      for (var date in spotsDate) {
+        DateTime factorDate = DateTime.parse(date);
+        // Si date contien un facteur avec le nom, ajouter un spot avec la valeur
+        int? factorValue =
+            getValueForDateAndFactor(factorsList, factorDate, factorName);
+        if (factorValue != null) {
+          spots.add(FlSpot(index.toDouble(), factorValue.toDouble()));
+        } else {
+          spots.add(FlSpot.nullSpot);
+        }
+        index++;
+      }
+
+      return spots;
+    }
 
     List<String> generateFullDateRange() {
       List<String> dateRange = [];
@@ -150,28 +249,41 @@ class _ChartState extends State<Chart> {
               minY: 0,
               maxY: 10,
               lineBarsData: [
-                !isOnlyNaN(entrySpots)
-                    ? LineChartBarData(
-                        spots: entrySpots,
-                        isCurved: true,
-                        gradient: createGradientColors(entrySpots).length > 1
-                            ? LinearGradient(
-                                colors: createGradientColors(entrySpots),
-                                stops: createColorStops(entrySpots))
-                            : null,
-                        color: createGradientColors(entrySpots).length == 1
-                            ? AppColors.primaryColor
-                            : null,
-                        barWidth: 3,
-                        dotData: const FlDotData(
-                          show: false,
-                        ),
-                        belowBarData: BarAreaData(
-                          show: false,
-                        ),
-                      )
-                    : LineChartBarData(),
+                if (!isOnlyNaN(entrySpots))
+                  LineChartBarData(
+                    spots: entrySpots,
+                    isCurved: true,
+                    gradient: createGradientColors(entrySpots).length > 1
+                        ? LinearGradient(
+                            colors: createGradientColors(entrySpots),
+                            stops: createColorStops(entrySpots))
+                        : null,
+                    color: createGradientColors(entrySpots).length == 1
+                        ? AppColors.primaryColor
+                        : null,
+                    barWidth: 3,
+                    dotData: const FlDotData(
+                      show: false,
+                    ),
+                    belowBarData: BarAreaData(
+                      show: false,
+                    ),
+                  ),
+                if (factorProvider.selectedFactor != '')
+                  LineChartBarData(
+                    color: AppColors.primaryColor.withOpacity(0.5),
+                    spots: convertFactorsListToSpots(
+                        createFactorsList(), factorProvider.selectedFactor),
+                    barWidth: 3,
+                    dotData: const FlDotData(
+                      show: true,
+                    ),
+                    belowBarData: BarAreaData(
+                      show: false,
+                    ),
+                  ),
                 LineChartBarData(
+                  color: Colors.transparent,
                   spots: getInvisibleSpots(),
                   barWidth: 0,
                   dotData: const FlDotData(

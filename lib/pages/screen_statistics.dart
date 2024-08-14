@@ -215,7 +215,6 @@ class _ScreenStatisticsState extends State<ScreenStatistics> {
 
     final factorProvider = context.watch<FactorProvider>();
 
-    final List<String> _factorsList = [];
     _getFactorsList(entries);
     return Scaffold(
       body: ListView(
