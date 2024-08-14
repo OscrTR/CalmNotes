@@ -4,6 +4,7 @@ import 'package:calm_notes/components/chart.dart';
 import 'package:calm_notes/components/half_pie_chart.dart';
 import 'package:calm_notes/models/entry.dart';
 import 'package:calm_notes/providers/entry_provider.dart';
+import 'package:calm_notes/providers/factor_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -63,7 +64,12 @@ class _ScreenStatisticsState extends State<ScreenStatistics> {
   List<Widget> _buildFactorButtonList(
       List<String> factorsList, BuildContext context) {
     return factorsList.map((factor) {
-      return OutlinedButton(onPressed: () {}, child: Text(factor));
+      return OutlinedButton(
+          onPressed: () {
+            context.read<FactorProvider>().selectFactor(factor);
+            Navigator.pop(context, 'Add factor');
+          },
+          child: Text(factor));
     }).toList();
   }
 
@@ -206,6 +212,8 @@ class _ScreenStatisticsState extends State<ScreenStatistics> {
   Widget build(BuildContext context) {
     final provider = context.watch<EntryProvider>();
     final entries = provider.filteredEntries;
+
+    final factorProvider = context.watch<FactorProvider>();
 
     final List<String> _factorsList = [];
     _getFactorsList(entries);
@@ -358,18 +366,32 @@ class _ScreenStatisticsState extends State<ScreenStatistics> {
           const SizedBox(
             height: 20,
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('Mood graph',
+          if (factorProvider.selectedFactor == '')
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Mood graph',
+                    style: Theme.of(context).textTheme.titleMedium),
+                OutlinedButton(
+                    onPressed: () {
+                      _showFactorSelectionDialog(entries, context);
+                    },
+                    child: const Text('Add factor'))
+              ],
+            ),
+          if (factorProvider.selectedFactor != '')
+            Row(children: [
+              Text('Mood graph vs',
                   style: Theme.of(context).textTheme.titleMedium),
-              OutlinedButton(
+              const SizedBox(
+                width: 10,
+              ),
+              FilledButton(
                   onPressed: () {
-                    _showFactorSelectionDialog(entries, context);
+                    factorProvider.removeFactor();
                   },
-                  child: const Text('Add factor'))
-            ],
-          ),
+                  child: Text(factorProvider.selectedFactor))
+            ]),
           const SizedBox(height: 10),
           const Chart(),
           const SizedBox(height: 30),
