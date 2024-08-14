@@ -41,6 +41,8 @@ final ThemeData appTheme = ThemeData(
     textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
       foregroundColor: AppColors.primaryColor,
+      splashFactory: NoSplash.splashFactory,
+      overlayColor: Colors.transparent,
       padding: EdgeInsets.zero,
       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
       minimumSize: const Size(0, 40),
