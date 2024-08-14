@@ -6,9 +6,15 @@ import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 
-class Calendar extends StatelessWidget {
+class Calendar extends StatefulWidget {
   const Calendar({super.key});
 
+  @override
+  State<Calendar> createState() => _CalendarState();
+}
+
+class _CalendarState extends State<Calendar> {
+  bool _showSmileys = false;
   @override
   Widget build(BuildContext context) {
     // Fetch the EntryProvider from the context
@@ -97,17 +103,18 @@ class Calendar extends StatelessWidget {
             child: Center(
                 child: Stack(
               children: [
-                Text(
-                  currentDate.day.toString(),
-                  style: const TextStyle(
-                    fontSize: 16,
-                    color: Colors.transparent,
-                  ),
+                const SizedBox(
+                  height: 24.7,
+                  width: 24.7,
                 ),
-                isInRange && entryMap.containsKey(currentDate)
-                    ? SvgPicture.asset(
-                        'assets/images/mood${entryMap[currentDate]}.svg')
-                    : const SizedBox()
+                if (isInRange &&
+                    entryMap.containsKey(currentDate) &&
+                    _showSmileys)
+                  SvgPicture.asset(
+                    'assets/images/mood${entryMap[currentDate]}.svg',
+                    height: 24.7,
+                    width: 24.7,
+                  )
               ],
             )),
           ),
@@ -117,36 +124,52 @@ class Calendar extends StatelessWidget {
       return dayWidgets;
     }
 
-    return Container(
-      width: 352.7,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        color: Colors.white,
-      ),
-      padding: const EdgeInsets.only(top: 24, bottom: 24, left: 20, right: 20),
-      child: Column(
-        children: [
-          // Day of the week header
-          LayoutGrid(
-            columnSizes: [1.fr, 1.fr, 1.fr, 1.fr, 1.fr, 1.fr, 1.fr],
-            rowSizes: const [auto],
-            children: [
-              for (var day in ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'])
-                Center(
-                    child: Text(day,
-                        style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.ternaryColor))),
-            ],
-          ),
-          const SizedBox(height: 14),
-          // Calendar grid
-          LayoutGrid(
-            columnSizes: [1.fr, 1.fr, 1.fr, 1.fr, 1.fr, 1.fr, 1.fr],
-            rowSizes: List.generate(numberOfRows, (index) => auto),
-            children: buildCalendarDays(),
-          ),
-        ],
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _showSmileys = !_showSmileys;
+        });
+      },
+      child: Container(
+        width: 352.7,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          color: Colors.white,
+        ),
+        padding:
+            const EdgeInsets.only(top: 24, bottom: 24, left: 20, right: 20),
+        child: Column(
+          children: [
+            // Day of the week header
+            LayoutGrid(
+              columnSizes: [1.fr, 1.fr, 1.fr, 1.fr, 1.fr, 1.fr, 1.fr],
+              rowSizes: const [auto],
+              children: [
+                for (var day in [
+                  'Sun',
+                  'Mon',
+                  'Tue',
+                  'Wed',
+                  'Thu',
+                  'Fri',
+                  'Sat'
+                ])
+                  Center(
+                      child: Text(day,
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.ternaryColor))),
+              ],
+            ),
+            const SizedBox(height: 14),
+            // Calendar grid
+            LayoutGrid(
+              columnSizes: [1.fr, 1.fr, 1.fr, 1.fr, 1.fr, 1.fr, 1.fr],
+              rowSizes: List.generate(numberOfRows, (index) => auto),
+              children: buildCalendarDays(),
+            ),
+          ],
+        ),
       ),
     );
   }
