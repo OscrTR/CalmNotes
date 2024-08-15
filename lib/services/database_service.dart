@@ -209,10 +209,14 @@ class DatabaseService {
   }
 
   Future<void> setSelectedEmotionsCount(int id) async {
-    final entry = await getEntry(id);
-    final emotionMap = convertStringToMap(entry.emotions!);
-    final emotions = await fetchEmotions();
-    final emotionMapFromDb = {for (var e in emotions) e.name: e};
+    final Entry entry = await getEntry(id);
+    final Map<String, int> emotionMap = convertStringToMap(entry.emotions!);
+
+    final List<Emotion> emotions = await fetchEmotions();
+    final Map<String, Emotion> emotionMapFromDb = {
+      for (var e in emotions) e.name: e
+    };
+
     for (var entry in emotionMap.entries) {
       final name = entry.key;
       final count = entry.value;
@@ -327,8 +331,8 @@ class DatabaseService {
     for (var item in items) {
       if (item.isEmpty) continue;
       final parts = item.split(':');
-      final key = parts[0];
-      final value = int.tryParse(parts[1]) ?? 0;
+      final key = parts[0].trim();
+      final value = int.tryParse(parts[1].trim()) ?? 0;
       map[key] = value;
     }
     return map;

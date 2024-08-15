@@ -47,18 +47,13 @@ class EmotionProvider extends ChangeNotifier {
     _emotions = await _databaseService.fetchEmotions();
     final fetchedEmotionsToDisplay =
         await _databaseService.fetchEmotionsToDisplay();
-    List<Emotion> newEmotionsToDisplay = List.from(fetchedEmotionsToDisplay);
-    List<Emotion> combinedEmotionsToDisplay =
-        combineLists(_emotionsToDisplay, newEmotionsToDisplay);
-
-    _emotionsToDisplay = combinedEmotionsToDisplay;
+    _emotionsToDisplay =
+        combineLists(_emotionsToDisplay, fetchedEmotionsToDisplay);
     notifyListeners();
   }
 
   Future<void> fetchDisplayedEmotions() async {
-    final fetchedEmotionsToDisplay =
-        await _databaseService.fetchEmotionsToDisplay();
-    _emotionsToDisplay = List.from(fetchedEmotionsToDisplay);
+    _emotionsToDisplay = await _databaseService.fetchEmotionsToDisplay();
     notifyListeners();
   }
 
