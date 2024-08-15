@@ -40,39 +40,40 @@ class _EmotionsState extends State<Emotions> {
       spacing: 10,
       children: [
         ..._buildEmotionButtonList(emotionsToDisplay),
-        _buildAddEmotionButton(context),
+        _buildAddEmotionButton(),
       ],
     );
   }
 
   List<Widget> _buildEmotionButtonList(List<Emotion> emotions) {
-    return emotions.map(
-      (emotion) {
-        if (emotion.selectedCount > 0) {
-          return FilledButton(
-            onPressed: () {
-              context.read<EmotionProvider>().incrementEmotion(emotion);
-            },
-            onLongPress: () {
-              context.read<EmotionProvider>().resetSelectedEmotion(emotion);
-            },
-            child: Text('${emotion.name} (${emotion.selectedCount})'),
-          );
-        } else {
-          return OutlinedButton(
-            onPressed: () {
-              context.read<EmotionProvider>().incrementEmotion(emotion);
-            },
-            child: Text(emotion.name),
-          );
-        }
-      },
-    ).toList();
+    return emotions.map((emotion) {
+      return emotion.selectedCount > 0
+          ? _buildFilledEmotionButton(emotion)
+          : _buildOutlinedEmotionButton(emotion);
+    }).toList();
   }
 
-  Widget _buildAddEmotionButton(BuildContext context) {
+  Widget _buildFilledEmotionButton(Emotion emotion) {
+    return FilledButton(
+      onPressed: () =>
+          context.read<EmotionProvider>().incrementEmotion(emotion),
+      onLongPress: () =>
+          context.read<EmotionProvider>().resetSelectedEmotion(emotion),
+      child: Text('${emotion.name} (${emotion.selectedCount})'),
+    );
+  }
+
+  Widget _buildOutlinedEmotionButton(Emotion emotion) {
     return OutlinedButton(
-      onPressed: () => _showAddEmotionDialog(context),
+      onPressed: () =>
+          context.read<EmotionProvider>().incrementEmotion(emotion),
+      child: Text(emotion.name),
+    );
+  }
+
+  Widget _buildAddEmotionButton() {
+    return OutlinedButton(
+      onPressed: () => _showAddEmotionDialog(),
       child: const Icon(
         Icons.add,
         color: CustomColors.primaryColor,
@@ -80,7 +81,7 @@ class _EmotionsState extends State<Emotions> {
     );
   }
 
-  void _showAddEmotionDialog(BuildContext context) {
+  void _showAddEmotionDialog() {
     showDialog<String>(
       context: context,
       builder: (BuildContext context) => AlertDialog(
@@ -103,25 +104,34 @@ class _EmotionsState extends State<Emotions> {
   Widget _buildAddEmotionDialogContent(BuildContext context) {
     final provider = context.watch<EmotionProvider>();
     final emotions = provider.emotions;
+    final displayedEmotions = provider.emotionsToDisplay;
     final double height =
-        emotions.length < 5 ? emotions.length * 48.0 + 66 : 200;
+        (emotions.length - displayedEmotions.length) * 48.0 + 66;
 
-    if (emotions.isEmpty) {
-      return Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(context.tr('emotion_dialog_no_tag')),
-          const SizedBox(height: 10),
-          _buildEmotionCreation(context),
-        ],
-      );
-    }
+    return emotions.isEmpty
+        ? _buildEmptyEmotionsDialogContent(context)
+        : _buildEmotionsListDialogContent(emotions, height, context);
+  }
 
+  Widget _buildEmptyEmotionsDialogContent(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(context.tr('emotion_dialog_no_tag')),
+        const SizedBox(height: 10),
+        _buildEmotionCreation(context),
+      ],
+    );
+  }
+
+  Widget _buildEmotionsListDialogContent(
+      List<Emotion> emotions, double height, BuildContext context) {
     return SizedBox(
       height: height,
       child: SingleChildScrollView(
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             ..._buildEmotionList(emotions, context),
             const SizedBox(height: 10),
@@ -133,28 +143,32 @@ class _EmotionsState extends State<Emotions> {
   }
 
   List<Widget> _buildEmotionList(List<Emotion> emotions, BuildContext context) {
-    return emotions.where((emotion) => emotion.selectedCount == 0).map(
-      (emotion) {
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            OutlinedButton(
-              onPressed: () {
-                context.read<EmotionProvider>().incrementEmotion(emotion);
-                Navigator.pop(context, 'Add emotion');
-              },
-              child: Text(emotion.name),
-            ),
-            _buildDeleteButton(emotion, context),
-          ],
-        );
-      },
-    ).toList();
+    return emotions
+        .where((emotion) => emotion.selectedCount == 0)
+        .map((emotion) {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          _buildAddEmotionButtonInDialog(emotion, context),
+          _buildDeleteButton(emotion),
+        ],
+      );
+    }).toList();
   }
 
-  Widget _buildDeleteButton(Emotion emotion, BuildContext context) {
+  Widget _buildAddEmotionButtonInDialog(Emotion emotion, BuildContext context) {
+    return OutlinedButton(
+      onPressed: () {
+        context.read<EmotionProvider>().incrementEmotion(emotion);
+        Navigator.pop(context, 'Add emotion');
+      },
+      child: Text(emotion.name),
+    );
+  }
+
+  Widget _buildDeleteButton(Emotion emotion) {
     return GestureDetector(
-      onTap: () => _showDeleteEmotionDialog(emotion, context),
+      onTap: () => _showDeleteEmotionDialog(emotion),
       child: Container(
         height: 48,
         width: 48,
@@ -170,7 +184,7 @@ class _EmotionsState extends State<Emotions> {
     );
   }
 
-  void _showDeleteEmotionDialog(Emotion emotion, BuildContext context) {
+  void _showDeleteEmotionDialog(Emotion emotion) {
     showDialog<String>(
       context: context,
       builder: (BuildContext context) => AlertDialog(
@@ -235,7 +249,7 @@ class _EmotionsState extends State<Emotions> {
               if (emotionName.isNotEmpty) {
                 context
                     .read<EmotionProvider>()
-                    .addAndIncrementEmotion(_emotionNameController.text);
+                    .addAndIncrementEmotion(emotionName);
                 FocusScope.of(context).unfocus();
                 _emotionNameController.clear();
                 Navigator.pop(context, 'Create emotion');
