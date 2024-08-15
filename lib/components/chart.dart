@@ -216,8 +216,6 @@ class _ChartState extends State<Chart> {
       return result;
     }
 
-    final gradientColors = createGradientColors(entrySpots);
-
     Map<double, Color> gradientColorsStopsMap = {};
 
     Map<double, Color> createGradientColorStopsMap(List<FlSpot> spotsList) {
@@ -248,26 +246,6 @@ class _ChartState extends State<Chart> {
     }
 
     gradientColorsStopsMap = createGradientColorStopsMap(entrySpots);
-    // print(gradientColorsStopsMap);
-
-    List<double> createColorStops(List<FlSpot> spotsList) {
-      List<double> stops = [];
-
-      double increment = 1 / (gradientColors.length);
-
-      double tempIncrement = 0;
-      for (var spot in spotsList) {
-        if (!spot.y.isNaN) {
-          stops.add(tempIncrement);
-
-          // print(
-          //     'Spot ${spot.x} with value ${spot.y} is at ${tempIncrement} with color ');
-          tempIncrement += increment;
-        }
-      }
-
-      return stops;
-    }
 
     return Column(
       children: [
