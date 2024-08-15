@@ -14,24 +14,24 @@ class CustomSlider extends StatefulWidget {
 class _CustomSliderState extends State<CustomSlider> {
   double _sliderValue = 5;
   final activeTrackGradient = const LinearGradient(
-      colors: [AppColors.color0, AppColors.color5, AppColors.color10]);
+      colors: [CustomColors.color0, CustomColors.color5, CustomColors.color10]);
   final inactiveTrackGradient = const LinearGradient(
-      colors: [AppColors.secondaryColor, AppColors.secondaryColor]);
+      colors: [CustomColors.secondaryColor, CustomColors.secondaryColor]);
   final trackBorder = 1.0;
-  final trackBorderColor = AppColors.primaryColor;
+  final trackBorderColor = CustomColors.primaryColor;
 
   static Map<double, Color> thumbColors = {
-    0: AppColors.color0,
-    1: AppColors.color1,
-    2: AppColors.color2,
-    3: AppColors.color3,
-    4: AppColors.color4,
-    5: AppColors.color5,
-    6: AppColors.color6,
-    7: AppColors.color7,
-    8: AppColors.color8,
-    9: AppColors.color9,
-    10: AppColors.color10,
+    0: CustomColors.color0,
+    1: CustomColors.color1,
+    2: CustomColors.color2,
+    3: CustomColors.color3,
+    4: CustomColors.color4,
+    5: CustomColors.color5,
+    6: CustomColors.color6,
+    7: CustomColors.color7,
+    8: CustomColors.color8,
+    9: CustomColors.color9,
+    10: CustomColors.color10,
   };
 
   @override
@@ -42,7 +42,7 @@ class _CustomSliderState extends State<CustomSlider> {
 
   @override
   Widget build(BuildContext context) {
-    final Color thumbColor = thumbColors[_sliderValue] ?? AppColors.color5;
+    final Color thumbColor = thumbColors[_sliderValue] ?? CustomColors.color5;
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -57,7 +57,7 @@ class _CustomSliderState extends State<CustomSlider> {
               child: SliderTheme(
                 data: SliderTheme.of(context).copyWith(
                   trackHeight: 8.0,
-                  inactiveTrackColor: AppColors.secondaryColor,
+                  inactiveTrackColor: CustomColors.secondaryColor,
                   trackShape: CustomSliderTrackShape(
                     activeTrackGradient: activeTrackGradient,
                     inactiveTrackGradient: inactiveTrackGradient,
@@ -152,7 +152,7 @@ class CustomSliderThumbShape extends RoundSliderThumbShape {
       ..style = PaintingStyle.fill;
 
     final Paint borderPaint = Paint()
-      ..color = AppColors.primaryColor // Border color
+      ..color = CustomColors.primaryColor // Border color
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.0; // Border width
 
@@ -169,7 +169,7 @@ class CustomSliderThumbShape extends RoundSliderThumbShape {
       text: '${(value * 10).round()}', // Format the value
       style: const TextStyle(
         fontSize: 12.0,
-        color: AppColors.backgroundColor,
+        color: CustomColors.backgroundColor,
       ),
     );
 
@@ -195,7 +195,7 @@ class CustomSliderThumbShape extends RoundSliderThumbShape {
 
     // Draw the background rectangle
     final Paint backgroundPaint = Paint()
-      ..color = AppColors.primaryColor // Background color
+      ..color = CustomColors.primaryColor // Background color
       ..style = PaintingStyle.fill;
 
     final Rect backgroundRect = Rect.fromLTWH(

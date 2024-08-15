@@ -20,7 +20,7 @@ class _CustomNavigationBarState extends State<CustomNavigationBar> {
         children: [
           IconButton(
               iconSize: 30,
-              color: AppColors.primaryColor,
+              color: CustomColors.primaryColor,
               onPressed: () => GoRouter.of(context).push('/'),
               icon: const Icon(
                 Symbols.library_books,
@@ -28,14 +28,14 @@ class _CustomNavigationBarState extends State<CustomNavigationBar> {
               )),
           IconButton(
               iconSize: 44,
-              color: AppColors.primaryColor,
+              color: CustomColors.primaryColor,
               onPressed: () {
                 GoRouter.of(context).push('/entry');
               },
               icon: const Icon(Icons.add_circle)),
           IconButton(
               iconSize: 30,
-              color: AppColors.primaryColor,
+              color: CustomColors.primaryColor,
               onPressed: () => GoRouter.of(context).push('/statistics'),
               icon: const Icon(
                 Symbols.analytics,

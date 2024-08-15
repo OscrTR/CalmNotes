@@ -2,36 +2,36 @@ import 'package:calm_notes/colors.dart';
 import 'package:flutter/material.dart';
 
 final ThemeData appTheme = ThemeData(
-    scaffoldBackgroundColor: AppColors.backgroundColor,
+    scaffoldBackgroundColor: CustomColors.backgroundColor,
     colorScheme: const ColorScheme.light(
-      primary: AppColors.primaryColor,
-      onPrimary: AppColors.backgroundColor,
-      surface: AppColors.backgroundColor,
-      onSurface: AppColors.primaryColor,
+      primary: CustomColors.primaryColor,
+      onPrimary: CustomColors.backgroundColor,
+      surface: CustomColors.backgroundColor,
+      onSurface: CustomColors.primaryColor,
     ),
     fontFamily: 'Inter',
     textTheme: const TextTheme(
       bodyMedium: TextStyle(
         fontSize: 14,
-        color: AppColors.primaryColor,
+        color: CustomColors.primaryColor,
       ),
       titleMedium: TextStyle(
         fontSize: 14,
-        color: AppColors.primaryColor,
+        color: CustomColors.primaryColor,
         fontWeight: FontWeight.bold,
       ),
       headlineMedium: TextStyle(
-        color: AppColors.primaryColor,
+        color: CustomColors.primaryColor,
         fontFamily: 'PlayfairDisplay',
         fontSize: 28,
         fontWeight: FontWeight.bold,
       ),
     ),
-    cardTheme: const CardTheme(color: AppColors.color10, elevation: 0),
+    cardTheme: const CardTheme(color: CustomColors.color10, elevation: 0),
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
-        foregroundColor: AppColors.primaryColor,
-        side: const BorderSide(color: AppColors.secondaryColor),
+        foregroundColor: CustomColors.primaryColor,
+        side: const BorderSide(color: CustomColors.secondaryColor),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(5),
         ),
@@ -40,7 +40,7 @@ final ThemeData appTheme = ThemeData(
     ),
     textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-      foregroundColor: AppColors.primaryColor,
+      foregroundColor: CustomColors.primaryColor,
       splashFactory: NoSplash.splashFactory,
       overlayColor: Colors.transparent,
       padding: EdgeInsets.zero,
@@ -49,8 +49,8 @@ final ThemeData appTheme = ThemeData(
     )),
     filledButtonTheme: FilledButtonThemeData(
       style: FilledButton.styleFrom(
-        foregroundColor: AppColors.backgroundColor,
-        backgroundColor: AppColors.primaryColor,
+        foregroundColor: CustomColors.backgroundColor,
+        backgroundColor: CustomColors.primaryColor,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(5),
         ),
@@ -58,14 +58,14 @@ final ThemeData appTheme = ThemeData(
       ),
     ),
     datePickerTheme: DatePickerThemeData(
-      backgroundColor: AppColors.backgroundColor,
-      dividerColor: AppColors.secondaryColor,
+      backgroundColor: CustomColors.backgroundColor,
+      dividerColor: CustomColors.secondaryColor,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
       ),
     ),
     timePickerTheme: TimePickerThemeData(
-      backgroundColor: AppColors.backgroundColor,
+      backgroundColor: CustomColors.backgroundColor,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
       ),

@@ -20,17 +20,17 @@ class _HomePageState extends State<HomePage> {
   Color getCardColor(int mood) {
     // List of colors corresponding to mood
     final colors = [
-      AppColors.color0,
-      AppColors.color1,
-      AppColors.color2,
-      AppColors.color3,
-      AppColors.color4,
-      AppColors.color5,
-      AppColors.color6,
-      AppColors.color7,
-      AppColors.color8,
-      AppColors.color9,
-      AppColors.color10
+      CustomColors.color0,
+      CustomColors.color1,
+      CustomColors.color2,
+      CustomColors.color3,
+      CustomColors.color4,
+      CustomColors.color5,
+      CustomColors.color6,
+      CustomColors.color7,
+      CustomColors.color8,
+      CustomColors.color9,
+      CustomColors.color10
     ];
     return mood >= 0 && mood < colors.length ? colors[mood] : Colors.red;
   }
@@ -118,7 +118,7 @@ class _HomePageState extends State<HomePage> {
                     child: Text(
                       monthKey,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            color: AppColors.ternaryColor,
+                            color: CustomColors.ternaryColor,
                           ),
                     ),
                   ),
@@ -142,7 +142,7 @@ class _HomePageState extends State<HomePage> {
                                 Container(
                                   height: 48,
                                   width: 1,
-                                  color: AppColors.ternaryColor,
+                                  color: CustomColors.ternaryColor,
                                 ),
                                 _buildEntryDetails(entry),
                               ],
@@ -174,7 +174,7 @@ class _HomePageState extends State<HomePage> {
             ),
             IconButton(
               iconSize: 30,
-              color: AppColors.primaryColor,
+              color: CustomColors.primaryColor,
               onPressed: () => GoRouter.of(context).push('/settings'),
               icon: const Icon(
                 Symbols.settings,
@@ -236,7 +236,7 @@ class _HomePageState extends State<HomePage> {
                   entry.title!,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
-                    color: AppColors.primaryColor,
+                    color: CustomColors.primaryColor,
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
                   ),
@@ -254,7 +254,7 @@ class _HomePageState extends State<HomePage> {
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(
               fontSize: 12,
-              color: AppColors.ternaryColor,
+              color: CustomColors.ternaryColor,
             ),
           ),
         ],

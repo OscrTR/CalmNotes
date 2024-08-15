@@ -123,7 +123,7 @@ class _EntryCreationPageState extends State<EntryCreationPage> {
                   width: 20,
                   child: Icon(
                     Icons.close,
-                    color: AppColors.primaryColor,
+                    color: CustomColors.primaryColor,
                   ),
                 ),
               ),

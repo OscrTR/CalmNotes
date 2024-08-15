@@ -192,17 +192,17 @@ class _ChartState extends State<Chart> {
     }
 
     List<Color> moodColors = [
-      AppColors.color0,
-      AppColors.color1,
-      AppColors.color2,
-      AppColors.color3,
-      AppColors.color4,
-      AppColors.color5,
-      AppColors.color6,
-      AppColors.color7,
-      AppColors.color8,
-      AppColors.color9,
-      AppColors.color10,
+      CustomColors.color0,
+      CustomColors.color1,
+      CustomColors.color2,
+      CustomColors.color3,
+      CustomColors.color4,
+      CustomColors.color5,
+      CustomColors.color6,
+      CustomColors.color7,
+      CustomColors.color8,
+      CustomColors.color9,
+      CustomColors.color10,
     ];
 
     List<Color> createGradientColors(List<FlSpot> spotsList) {
@@ -273,7 +273,7 @@ class _ChartState extends State<Chart> {
                             stops: gradientColorsStopsMap.keys.toList())
                         : null,
                     color: createGradientColors(entrySpots).length == 1
-                        ? AppColors.primaryColor
+                        ? CustomColors.primaryColor
                         : null,
                     barWidth: 3,
                     dotData: const FlDotData(
@@ -285,7 +285,7 @@ class _ChartState extends State<Chart> {
                   ),
                 if (factorProvider.selectedFactor != '')
                   LineChartBarData(
-                    color: AppColors.primaryColor.withOpacity(0.5),
+                    color: CustomColors.primaryColor.withOpacity(0.5),
                     spots: convertFactorsListToSpots(
                         createFactorsList(), factorProvider.selectedFactor),
                     barWidth: 3,
@@ -327,8 +327,8 @@ class _ChartState extends State<Chart> {
                               spotsDate[index].substring(8, 10),
                               style: TextStyle(
                                   fontSize: 10,
-                                  color:
-                                      AppColors.primaryColor.withOpacity(0.3)),
+                                  color: CustomColors.primaryColor
+                                      .withOpacity(0.3)),
                             )
                           ],
                         );
@@ -346,40 +346,40 @@ class _ChartState extends State<Chart> {
                       Color color;
                       switch (value.toInt()) {
                         case 0:
-                          color = AppColors.color0;
+                          color = CustomColors.color0;
                           break;
                         case 1:
-                          color = AppColors.color1;
+                          color = CustomColors.color1;
                           break;
                         case 2:
-                          color = AppColors.color2;
+                          color = CustomColors.color2;
                           break;
                         case 3:
-                          color = AppColors.color3;
+                          color = CustomColors.color3;
                           break;
                         case 4:
-                          color = AppColors.color4;
+                          color = CustomColors.color4;
                           break;
                         case 5:
-                          color = AppColors.color5;
+                          color = CustomColors.color5;
                           break;
                         case 6:
-                          color = AppColors.color6;
+                          color = CustomColors.color6;
                           break;
                         case 7:
-                          color = AppColors.color7;
+                          color = CustomColors.color7;
                           break;
                         case 8:
-                          color = AppColors.color8;
+                          color = CustomColors.color8;
                           break;
                         case 9:
-                          color = AppColors.color9;
+                          color = CustomColors.color9;
                           break;
                         case 10:
-                          color = AppColors.color10;
+                          color = CustomColors.color10;
                           break;
                         default:
-                          color = AppColors.primaryColor;
+                          color = CustomColors.primaryColor;
                       }
                       return Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -423,7 +423,7 @@ class _ChartState extends State<Chart> {
                 horizontalInterval: 1,
                 getDrawingHorizontalLine: (value) {
                   return FlLine(
-                    color: AppColors.secondaryColor.withOpacity(0.3),
+                    color: CustomColors.secondaryColor.withOpacity(0.3),
                     strokeWidth: 1,
                   );
                 },
@@ -432,10 +432,10 @@ class _ChartState extends State<Chart> {
                 show: true,
                 border: Border(
                   top: BorderSide(
-                      color: AppColors.secondaryColor.withOpacity(0.3),
+                      color: CustomColors.secondaryColor.withOpacity(0.3),
                       width: 1),
                   bottom: BorderSide(
-                      color: AppColors.secondaryColor.withOpacity(0.3),
+                      color: CustomColors.secondaryColor.withOpacity(0.3),
                       width: 1),
                   left: BorderSide.none,
                   right: BorderSide.none,

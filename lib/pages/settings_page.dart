@@ -148,7 +148,7 @@ void _showLanguageDialog(BuildContext context) {
   showDialog<String>(
     context: context,
     builder: (BuildContext context) => AlertDialog(
-      backgroundColor: AppColors.backgroundColor,
+      backgroundColor: CustomColors.backgroundColor,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(5),
       ),

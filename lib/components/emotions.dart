@@ -75,7 +75,7 @@ class _EmotionsState extends State<Emotions> {
       onPressed: () => _showAddEmotionDialog(context),
       child: const Icon(
         Icons.add,
-        color: AppColors.primaryColor,
+        color: CustomColors.primaryColor,
       ),
     );
   }
@@ -84,7 +84,7 @@ class _EmotionsState extends State<Emotions> {
     showDialog<String>(
       context: context,
       builder: (BuildContext context) => AlertDialog(
-        backgroundColor: AppColors.backgroundColor,
+        backgroundColor: CustomColors.backgroundColor,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(5),
         ),
@@ -163,7 +163,7 @@ class _EmotionsState extends State<Emotions> {
           width: 20,
           child: Icon(
             Symbols.delete,
-            color: AppColors.primaryColor,
+            color: CustomColors.primaryColor,
           ),
         ),
       ),
@@ -174,7 +174,7 @@ class _EmotionsState extends State<Emotions> {
     showDialog<String>(
       context: context,
       builder: (BuildContext context) => AlertDialog(
-        backgroundColor: AppColors.backgroundColor,
+        backgroundColor: CustomColors.backgroundColor,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(5),
         ),
@@ -209,17 +209,17 @@ class _EmotionsState extends State<Emotions> {
             labelStyle: Theme.of(context)
                 .textTheme
                 .bodyMedium
-                ?.copyWith(color: AppColors.ternaryColor),
+                ?.copyWith(color: CustomColors.ternaryColor),
             hintStyle: Theme.of(context).textTheme.bodyMedium,
             enabledBorder: const OutlineInputBorder(
               borderSide: BorderSide(
-                color: AppColors.secondaryColor,
+                color: CustomColors.secondaryColor,
                 width: 1.0,
               ),
             ),
             focusedBorder: const OutlineInputBorder(
               borderSide: BorderSide(
-                color: AppColors.secondaryColor,
+                color: CustomColors.secondaryColor,
                 width: 1.0,
               ),
             ),
@@ -243,7 +243,7 @@ class _EmotionsState extends State<Emotions> {
             },
             icon: const Icon(
               Icons.add,
-              color: AppColors.primaryColor,
+              color: CustomColors.primaryColor,
             ),
           ),
         ),

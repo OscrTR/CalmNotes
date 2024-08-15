@@ -206,7 +206,7 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
                     widthFactor: 0.85,
                     child: Icon(
                       Icons.arrow_back,
-                      color: AppColors.primaryColor,
+                      color: CustomColors.primaryColor,
                     ),
                   ),
                 ),
@@ -218,7 +218,7 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
               onTap: () => showDialog<String>(
                 context: context,
                 builder: (BuildContext context) => AlertDialog(
-                  backgroundColor: AppColors.backgroundColor,
+                  backgroundColor: CustomColors.backgroundColor,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(5),
                   ),
@@ -252,7 +252,7 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
                   width: 20,
                   child: Icon(
                     Symbols.delete,
-                    color: AppColors.primaryColor,
+                    color: CustomColors.primaryColor,
                   ),
                 ),
               ),

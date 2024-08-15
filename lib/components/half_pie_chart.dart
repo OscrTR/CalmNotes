@@ -36,17 +36,17 @@ class _HalfPieChartState extends State<HalfPieChart> {
     Color getColor(int mood) {
       // List of colors corresponding to mood
       final colors = [
-        AppColors.color0,
-        AppColors.color1,
-        AppColors.color2,
-        AppColors.color3,
-        AppColors.color4,
-        AppColors.color5,
-        AppColors.color6,
-        AppColors.color7,
-        AppColors.color8,
-        AppColors.color9,
-        AppColors.color10
+        CustomColors.color0,
+        CustomColors.color1,
+        CustomColors.color2,
+        CustomColors.color3,
+        CustomColors.color4,
+        CustomColors.color5,
+        CustomColors.color6,
+        CustomColors.color7,
+        CustomColors.color8,
+        CustomColors.color9,
+        CustomColors.color10
       ];
       return mood >= 0 && mood < colors.length ? colors[mood] : Colors.red;
     }
@@ -60,7 +60,7 @@ class _HalfPieChartState extends State<HalfPieChart> {
           titleStyle: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: AppColors.primaryColor.withOpacity(0.7)),
+              color: CustomColors.primaryColor.withOpacity(0.7)),
         );
       }).toList();
     }
