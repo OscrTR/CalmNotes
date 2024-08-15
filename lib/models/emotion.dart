@@ -2,7 +2,7 @@ class Emotion {
   final int? id;
   final String name;
   final int lastUse;
-  final int selectedCount;
+  int selectedCount;
 
   Emotion({
     this.id,

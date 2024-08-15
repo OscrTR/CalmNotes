@@ -58,18 +58,20 @@ class EmotionProvider extends ChangeNotifier {
   }
 
   Future<void> addEmotion(String name) async {
-    _databaseService.addEmotion(name);
+    await _databaseService.addEmotion(name);
     await _fetchEmotions();
   }
 
   Future<void> deleteEmotion(int id, String emotionName) async {
-    _databaseService.deleteEmotion(id);
+    await _databaseService.deleteEmotion(id);
     await _fetchEmotions();
   }
 
   void incrementEmotion(Emotion emotion) async {
     await _databaseService.incrementSelectedEmotionCount(emotion.id!);
-    await _fetchEmotions();
+    _emotions.firstWhere((e) => e.id == emotion.id).selectedCount++;
+    _emotionsToDisplay.firstWhere((e) => e.id == emotion.id).selectedCount++;
+    notifyListeners();
   }
 
   void addAndIncrementEmotion(String emotionName) async {
