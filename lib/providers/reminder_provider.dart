@@ -21,12 +21,12 @@ class ReminderProvider with ChangeNotifier {
     final reminder = Reminder(
       time: time,
     );
-    _databaseService.addReminder(reminder);
+    await _databaseService.addReminder(reminder);
     await _fetchReminders();
   }
 
   Future<void> deleteReminder(int id) async {
-    _databaseService.deleteReminder(id);
+    await _databaseService.deleteReminder(id);
     await _fetchReminders();
   }
 }

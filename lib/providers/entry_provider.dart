@@ -25,14 +25,15 @@ class EntryProvider extends ChangeNotifier {
 
   Future<void> _fetchEntries() async {
     _entries = await _databaseService.fetchEntries();
-    _filteredEntries = filterEntriesBetweenDates(_startDate, _endDate);
+    _filteredEntries = _filterEntriesBetweenDates(_startDate, _endDate);
     notifyListeners();
   }
 
   void setStartEndDate(DateTime startDate, DateTime endDate) {
     _startDate = startDate;
     _endDate = endDate;
-    _fetchEntries();
+    _filteredEntries = _filterEntriesBetweenDates(_startDate, _endDate);
+    notifyListeners();
   }
 
   void setDefaultWeekDate() {
@@ -41,35 +42,40 @@ class EntryProvider extends ChangeNotifier {
     _endDate = DateTime.now()
         .subtract(Duration(days: DateTime.now().weekday - 1))
         .add(const Duration(days: 6));
-    _fetchEntries();
+    _filteredEntries = _filterEntriesBetweenDates(_startDate, _endDate);
+    notifyListeners();
   }
 
   void setDefaultMonthDate() {
     DateTime now = DateTime.now();
     _startDate = DateTime(now.year, now.month, 1);
     _endDate = DateTime(now.year, now.month + 1, 0);
-    _fetchEntries();
+    _filteredEntries = _filterEntriesBetweenDates(_startDate, _endDate);
+    notifyListeners();
   }
 
   Future<void> addEntry(Entry entry) async {
     await _databaseService.addEntry(entry);
-    await _fetchEntries();
+    _entries.add(entry);
+    _filteredEntries = _filterEntriesBetweenDates(_startDate, _endDate);
+    notifyListeners();
   }
 
   // Method to update the date range and refresh the filtered entries
   void updateDateRange(DateTime startDate, DateTime endDate) {
     _startDate = startDate;
     _endDate = endDate;
-    _filteredEntries = filterEntriesBetweenDates(_startDate, _endDate);
+    _filteredEntries = _filterEntriesBetweenDates(_startDate, _endDate);
     notifyListeners();
   }
 
   // Method to filter entries between specified dates
-  List<Entry> filterEntriesBetweenDates(DateTime startDate, DateTime endDate) {
+  List<Entry> _filterEntriesBetweenDates(DateTime startDate, DateTime endDate) {
     DateTime startOfDay =
         DateTime(startDate.year, startDate.month, startDate.day);
     DateTime endOfDay = DateTime(
         endDate.year, endDate.month, endDate.day, 23, 59, 59, 999, 999);
+
     return _entries.where((entry) {
       DateTime entryDate =
           _convertStringToDateTime(entry.date); // Convert string to DateTime

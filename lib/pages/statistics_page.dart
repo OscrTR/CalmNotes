@@ -18,12 +18,9 @@ class StatisticsPage extends StatefulWidget {
 
 class _StatisticsPageState extends State<StatisticsPage> {
   String rangeType = 'week';
-  final DateTime _currentWeek = _getCurrentWeek();
-  final DateTime _currentMonth = _getCurrentMonth();
   List<DateTime> _weeks = [];
   List<DateTime> _months = [];
-  DateTime? _selectedWeekDate;
-  DateTime? _selectedMonthDate;
+  DateTime? _selectedStartDate;
   final ScrollController _scrollControllerWeeks = ScrollController();
   final ScrollController _scrollControllerMonths = ScrollController();
 
@@ -32,8 +29,6 @@ class _StatisticsPageState extends State<StatisticsPage> {
     super.initState();
     _weeks = _generateWeeks();
     _months = _generateMonths();
-    _selectedWeekDate = _currentWeek;
-    _selectedMonthDate = _currentMonth;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollToSelectedWeek();
     });
@@ -73,22 +68,6 @@ class _StatisticsPageState extends State<StatisticsPage> {
     }).toList();
   }
 
-  static DateTime _getCurrentWeek() {
-    DateTime now = DateTime.now();
-    int weekday = now.weekday;
-    DateTime startOfWeek = now.subtract(Duration(days: weekday - 1));
-    // Normalize to midnight to avoid time component issues
-    return DateTime(startOfWeek.year, startOfWeek.month, startOfWeek.day);
-  }
-
-  static DateTime _getCurrentMonth() {
-    DateTime now = DateTime.now();
-    // Get the first day of the current month
-    DateTime startOfMonth = DateTime(now.year, now.month, 1);
-    // Normalize to midnight to avoid time component issues
-    return DateTime(startOfMonth.year, startOfMonth.month, startOfMonth.day);
-  }
-
   List<DateTime> _generateWeeks() {
     List<DateTime> weeks = [];
     DateTime currentDate = DateTime(DateTime.now().year, 1, 1);
@@ -118,12 +97,12 @@ class _StatisticsPageState extends State<StatisticsPage> {
   void _scrollToSelectedWeek() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_weeks.isNotEmpty && rangeType == 'week') {
-        if (_selectedWeekDate == null) return;
+        if (_selectedStartDate == null) return;
 
         final index = _weeks.indexWhere((date) =>
-            date.year == _selectedWeekDate!.year &&
-            date.month == _selectedWeekDate!.month &&
-            date.day == _selectedWeekDate!.day);
+            date.year == _selectedStartDate!.year &&
+            date.month == _selectedStartDate!.month &&
+            date.day == _selectedStartDate!.day);
 
         if (index == -1) return;
 
@@ -145,11 +124,11 @@ class _StatisticsPageState extends State<StatisticsPage> {
   void _scrollToSelectedMonth() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_months.isNotEmpty && rangeType == 'month') {
-        if (_selectedMonthDate == null) return;
+        if (_selectedStartDate == null) return;
 
         final index = _months.indexWhere((date) =>
-            date.year == _selectedMonthDate!.year &&
-            date.month == _selectedMonthDate!.month);
+            date.year == _selectedStartDate!.year &&
+            date.month == _selectedStartDate!.month);
 
         if (index == -1) return;
 
@@ -206,6 +185,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
   Widget build(BuildContext context) {
     final provider = context.watch<EntryProvider>();
     final entries = provider.filteredEntries;
+    _selectedStartDate = provider.startDate;
 
     final factorProvider = context.watch<FactorProvider>();
 
@@ -272,9 +252,9 @@ class _StatisticsPageState extends State<StatisticsPage> {
                       final String capitalizedweekLabel =
                           weekLabel[0].toUpperCase() + weekLabel.substring(1);
                       bool isSelectedWeek =
-                          date.year == _selectedWeekDate?.year &&
-                              date.month == _selectedWeekDate?.month &&
-                              date.day == _selectedWeekDate?.day;
+                          date.year == _selectedStartDate?.year &&
+                              date.month == _selectedStartDate?.month &&
+                              date.day == _selectedStartDate?.day;
 
                       return Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 4.0),
@@ -298,7 +278,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
                                 ),
                                 onPressed: () {
                                   setState(() {
-                                    _selectedWeekDate = date;
+                                    _selectedStartDate = date;
                                   });
                                   provider.setStartEndDate(
                                       date,
@@ -327,8 +307,8 @@ class _StatisticsPageState extends State<StatisticsPage> {
                       final String capitalizedMonthLabel =
                           monthLabel[0].toUpperCase() + monthLabel.substring(1);
                       bool isSelectedMonth =
-                          date.year == _selectedMonthDate?.year &&
-                              date.month == _selectedMonthDate?.month;
+                          date.year == _selectedStartDate?.year &&
+                              date.month == _selectedStartDate?.month;
 
                       return Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 4.0),
@@ -352,7 +332,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
                                 ),
                                 onPressed: () {
                                   setState(() {
-                                    _selectedMonthDate = date;
+                                    _selectedStartDate = date;
                                   });
                                   final DateTime startDate = date;
                                   final DateTime endDate = DateTime(
