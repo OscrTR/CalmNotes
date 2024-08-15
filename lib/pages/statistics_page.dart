@@ -9,14 +9,14 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class ScreenStatistics extends StatefulWidget {
-  const ScreenStatistics({super.key});
+class StatisticsPage extends StatefulWidget {
+  const StatisticsPage({super.key});
 
   @override
-  State<ScreenStatistics> createState() => _ScreenStatisticsState();
+  State<StatisticsPage> createState() => _StatisticsPageState();
 }
 
-class _ScreenStatisticsState extends State<ScreenStatistics> {
+class _StatisticsPageState extends State<StatisticsPage> {
   String rangeType = 'week';
   final DateTime _currentWeek = _getCurrentWeek();
   final DateTime _currentMonth = _getCurrentMonth();
@@ -352,14 +352,14 @@ class _ScreenStatisticsState extends State<ScreenStatistics> {
                                 ),
                                 onPressed: () {
                                   setState(() {
-                                    _selectedWeekDate = date;
+                                    _selectedMonthDate = date;
                                   });
-                                  provider.setStartEndDate(
-                                      date,
-                                      date
-                                          .add(const Duration(days: 7))
-                                          .subtract(
-                                              const Duration(seconds: 1)));
+                                  final DateTime startDate = date;
+                                  final DateTime endDate = DateTime(
+                                          date.year, date.month + 1, date.day)
+                                      .subtract(const Duration(days: 1));
+
+                                  provider.setStartEndDate(startDate, endDate);
                                 },
                                 child: Text(capitalizedMonthLabel),
                               ),
