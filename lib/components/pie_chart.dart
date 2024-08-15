@@ -4,14 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:provider/provider.dart';
 
-class HalfPieChart extends StatefulWidget {
-  const HalfPieChart({super.key});
+class CustomPieChart extends StatefulWidget {
+  const CustomPieChart({super.key});
 
   @override
-  State<HalfPieChart> createState() => _HalfPieChartState();
+  State<CustomPieChart> createState() => _CustomPieChartState();
 }
 
-class _HalfPieChartState extends State<HalfPieChart> {
+class _CustomPieChartState extends State<CustomPieChart> {
   bool _showMood = false;
   @override
   Widget build(BuildContext context) {

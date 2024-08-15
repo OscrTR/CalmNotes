@@ -1,7 +1,7 @@
 import 'package:calm_notes/colors.dart';
 import 'package:calm_notes/components/calendar.dart';
 import 'package:calm_notes/components/chart.dart';
-import 'package:calm_notes/components/half_pie_chart.dart';
+import 'package:calm_notes/components/pie_chart.dart';
 import 'package:calm_notes/models/entry.dart';
 import 'package:calm_notes/providers/entry_provider.dart';
 import 'package:calm_notes/providers/factor_provider.dart';
@@ -408,7 +408,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
           Text(context.tr('statistics_mood_distribution'),
               style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: 20),
-          const HalfPieChart(),
+          const CustomPieChart(),
         ],
       ),
     );
