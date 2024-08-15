@@ -1,3 +1,4 @@
+import 'package:calm_notes/colors.dart';
 import 'package:calm_notes/main.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:calm_notes/pages/entry_create.page.dart';
@@ -11,10 +12,10 @@ class NotificationService {
         NotificationChannel(
           channelGroupKey: 'reminders',
           channelKey: 'reminders',
-          channelName: 'Basic notifications',
-          channelDescription: 'Notification channel for basic tests',
-          defaultColor: const Color(0xFF9D50DD),
-          ledColor: Colors.white,
+          channelName: 'Reminders notifications',
+          channelDescription: 'Notification channel for reminderts',
+          defaultColor: CustomColors.color10,
+          ledColor: CustomColors.color10,
           importance: NotificationImportance.Max,
           channelShowBadge: true,
           onlyAlertOnce: true,
@@ -25,10 +26,10 @@ class NotificationService {
       channelGroups: [
         NotificationChannelGroup(
           channelGroupKey: 'reminders_group',
-          channelGroupName: 'Group 1',
+          channelGroupName: 'Reminders',
         )
       ],
-      debug: true,
+      debug: false,
     );
 
     await AwesomeNotifications().isNotificationAllowed().then(
