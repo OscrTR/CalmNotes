@@ -18,3 +18,17 @@ class CustomColors {
   static const Color color9 = Color(0xffdcf0c9);
   static const Color color10 = Color(0xffc9eec0);
 }
+
+List<Color> moodColors = [
+  CustomColors.color0,
+  CustomColors.color1,
+  CustomColors.color2,
+  CustomColors.color3,
+  CustomColors.color4,
+  CustomColors.color5,
+  CustomColors.color6,
+  CustomColors.color7,
+  CustomColors.color8,
+  CustomColors.color9,
+  CustomColors.color10,
+];

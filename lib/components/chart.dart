@@ -191,20 +191,6 @@ class _ChartState extends State<Chart> {
       return onlyNaN;
     }
 
-    List<Color> moodColors = [
-      CustomColors.color0,
-      CustomColors.color1,
-      CustomColors.color2,
-      CustomColors.color3,
-      CustomColors.color4,
-      CustomColors.color5,
-      CustomColors.color6,
-      CustomColors.color7,
-      CustomColors.color8,
-      CustomColors.color9,
-      CustomColors.color10,
-    ];
-
     List<Color> createGradientColors(List<FlSpot> spotsList) {
       List<Color> result = [];
       for (var spot in spotsList) {
@@ -343,44 +329,8 @@ class _ChartState extends State<Chart> {
                     showTitles: true,
                     reservedSize: 40,
                     getTitlesWidget: (value, meta) {
-                      Color color;
-                      switch (value.toInt()) {
-                        case 0:
-                          color = CustomColors.color0;
-                          break;
-                        case 1:
-                          color = CustomColors.color1;
-                          break;
-                        case 2:
-                          color = CustomColors.color2;
-                          break;
-                        case 3:
-                          color = CustomColors.color3;
-                          break;
-                        case 4:
-                          color = CustomColors.color4;
-                          break;
-                        case 5:
-                          color = CustomColors.color5;
-                          break;
-                        case 6:
-                          color = CustomColors.color6;
-                          break;
-                        case 7:
-                          color = CustomColors.color7;
-                          break;
-                        case 8:
-                          color = CustomColors.color8;
-                          break;
-                        case 9:
-                          color = CustomColors.color9;
-                          break;
-                        case 10:
-                          color = CustomColors.color10;
-                          break;
-                        default:
-                          color = CustomColors.primaryColor;
-                      }
+                      Color color = moodColors[value.toInt()];
+
                       return Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [

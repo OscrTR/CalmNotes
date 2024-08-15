@@ -33,28 +33,10 @@ class _HalfPieChartState extends State<HalfPieChart> {
 
     getMoodSumList();
 
-    Color getColor(int mood) {
-      // List of colors corresponding to mood
-      final colors = [
-        CustomColors.color0,
-        CustomColors.color1,
-        CustomColors.color2,
-        CustomColors.color3,
-        CustomColors.color4,
-        CustomColors.color5,
-        CustomColors.color6,
-        CustomColors.color7,
-        CustomColors.color8,
-        CustomColors.color9,
-        CustomColors.color10
-      ];
-      return mood >= 0 && mood < colors.length ? colors[mood] : Colors.red;
-    }
-
     List<PieChartSectionData> showingSections() {
       return moodSumMap.entries.map((entry) {
         return PieChartSectionData(
-          color: getColor(entry.key),
+          color: moodColors[entry.key],
           value: entry.value.toDouble(),
           title: _showMood ? '${entry.key}' : '',
           titleStyle: TextStyle(

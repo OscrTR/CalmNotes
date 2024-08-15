@@ -20,20 +20,6 @@ class _CustomSliderState extends State<CustomSlider> {
   final trackBorder = 1.0;
   final trackBorderColor = CustomColors.primaryColor;
 
-  static Map<double, Color> thumbColors = {
-    0: CustomColors.color0,
-    1: CustomColors.color1,
-    2: CustomColors.color2,
-    3: CustomColors.color3,
-    4: CustomColors.color4,
-    5: CustomColors.color5,
-    6: CustomColors.color6,
-    7: CustomColors.color7,
-    8: CustomColors.color8,
-    9: CustomColors.color9,
-    10: CustomColors.color10,
-  };
-
   @override
   void initState() {
     super.initState();
@@ -42,7 +28,7 @@ class _CustomSliderState extends State<CustomSlider> {
 
   @override
   Widget build(BuildContext context) {
-    final Color thumbColor = thumbColors[_sliderValue] ?? CustomColors.color5;
+    final Color thumbColor = moodColors[_sliderValue.toInt()];
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [

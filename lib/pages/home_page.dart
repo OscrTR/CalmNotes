@@ -17,24 +17,6 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final DatabaseService _databaseService = DatabaseService.instance;
 
-  Color getCardColor(int mood) {
-    // List of colors corresponding to mood
-    final colors = [
-      CustomColors.color0,
-      CustomColors.color1,
-      CustomColors.color2,
-      CustomColors.color3,
-      CustomColors.color4,
-      CustomColors.color5,
-      CustomColors.color6,
-      CustomColors.color7,
-      CustomColors.color8,
-      CustomColors.color9,
-      CustomColors.color10
-    ];
-    return mood >= 0 && mood < colors.length ? colors[mood] : Colors.red;
-  }
-
   DateTime? getDateTime(String date) {
     try {
       final parts = date.split('|');
@@ -125,7 +107,7 @@ class _HomePageState extends State<HomePage> {
                   ...monthEntries.map(
                     (entry) {
                       return Card(
-                        color: getCardColor(entry.mood),
+                        color: moodColors[entry.mood],
                         margin: const EdgeInsets.symmetric(
                             vertical: 5, horizontal: 0),
                         child: ListTile(
