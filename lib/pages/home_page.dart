@@ -97,65 +97,64 @@ class _HomePageState extends State<HomePage> {
           }
 
           final groupedEntries = groupEntriesByMonthYear(entries);
+          List<String> monthKeys = groupedEntries.keys.toList();
 
-          return ListView(
-            children: [
-              _buildHeader(context),
-              ...groupedEntries.keys.map(
-                (monthYear) {
-                  final entriesForMonth = groupedEntries[monthYear]!;
+          return ListView.builder(
+            itemCount: monthKeys.length + 1,
+            itemBuilder: (context, index) {
+              if (index == 0) {
+                return _buildHeader(context);
+              }
+              String monthKey = monthKeys[index - 1];
+              List<Entry> monthEntries = groupedEntries[monthKey]!;
 
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 24),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 10, horizontal: 0),
-                        child: Text(
-                          monthYear,
-                          style:
-                              Theme.of(context).textTheme.titleMedium?.copyWith(
-                                    color: AppColors.ternaryColor,
-                                  ),
-                        ),
-                      ),
-                      ...entriesForMonth.map(
-                        (entry) {
-                          return Card(
-                            color: getCardColor(entry.mood),
-                            margin: const EdgeInsets.symmetric(
-                                vertical: 5, horizontal: 0),
-                            child: ListTile(
-                              contentPadding: EdgeInsets.zero,
-                              onTap: () => GoRouter.of(context)
-                                  .push('/entry/${entry.id}'),
-                              title: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 10, horizontal: 15),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    _buildEntryDate(entry.date),
-                                    Container(
-                                      height: 48,
-                                      width: 1,
-                                      color: AppColors.ternaryColor,
-                                    ),
-                                    _buildEntryDetails(entry),
-                                  ],
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 24),
+                  Padding(
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
+                    child: Text(
+                      monthKey,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            color: AppColors.ternaryColor,
+                          ),
+                    ),
+                  ),
+                  ...monthEntries.map(
+                    (entry) {
+                      return Card(
+                        color: getCardColor(entry.mood),
+                        margin: const EdgeInsets.symmetric(
+                            vertical: 5, horizontal: 0),
+                        child: ListTile(
+                          contentPadding: EdgeInsets.zero,
+                          onTap: () =>
+                              GoRouter.of(context).push('/entry/${entry.id}'),
+                          title: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 15),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                _buildEntryDate(entry.date),
+                                Container(
+                                  height: 48,
+                                  width: 1,
+                                  color: AppColors.ternaryColor,
                                 ),
-                              ),
+                                _buildEntryDetails(entry),
+                              ],
                             ),
-                          );
-                        },
-                      ),
-                    ],
-                  );
-                },
-              ),
-            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              );
+            },
           );
         },
       ),
