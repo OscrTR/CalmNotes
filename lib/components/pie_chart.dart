@@ -13,39 +13,12 @@ class CustomPieChart extends StatefulWidget {
 
 class _CustomPieChartState extends State<CustomPieChart> {
   bool _showMood = false;
+
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<EntryProvider>();
-    final entries = provider.filteredEntries;
-
-    List moodSumList = [];
-    Map<int, int> moodSumMap = {};
-
-    void getMoodSumList() {
-      for (var i = 0; i < 11; i++) {
-        int result = entries.where((element) => element.mood == i).length;
-        if (result > 0) {
-          moodSumList.add(result);
-          moodSumMap.putIfAbsent(i, () => result);
-        }
-      }
-    }
-
-    getMoodSumList();
-
-    List<PieChartSectionData> showingSections() {
-      return moodSumMap.entries.map((entry) {
-        return PieChartSectionData(
-          color: moodColors[entry.key],
-          value: entry.value.toDouble(),
-          title: _showMood ? '${entry.key}' : '',
-          titleStyle: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: CustomColors.primaryColor.withOpacity(0.7)),
-        );
-      }).toList();
-    }
+    final moodData =
+        provider.getMoodDistribution(); // Get the mood data from the provider
 
     return GestureDetector(
       onTap: () {
@@ -65,10 +38,25 @@ class _CustomPieChartState extends State<CustomPieChart> {
           PieChartData(
             sectionsSpace: 2,
             centerSpaceRadius: 70,
-            sections: showingSections(),
+            sections: _buildSections(moodData),
           ),
         ),
       ),
     );
+  }
+
+  List<PieChartSectionData> _buildSections(Map<int, int> moodSumMap) {
+    return moodSumMap.entries.map((entry) {
+      return PieChartSectionData(
+        color: moodColors[entry.key],
+        value: entry.value.toDouble(),
+        title: _showMood ? '${entry.key}' : '',
+        titleStyle: TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+          color: CustomColors.primaryColor.withOpacity(0.7),
+        ),
+      );
+    }).toList();
   }
 }

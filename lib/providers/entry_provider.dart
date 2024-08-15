@@ -85,6 +85,19 @@ class EntryProvider extends ChangeNotifier {
     }).toList();
   }
 
+  Map<int, int> getMoodDistribution() {
+    Map<int, int> moodSumMap = {};
+
+    for (var i = 0; i < 11; i++) {
+      int count = _entries.where((entry) => entry.mood == i).length;
+      if (count > 0) {
+        moodSumMap[i] = count;
+      }
+    }
+
+    return moodSumMap;
+  }
+
   // Helper method to convert a date string to DateTime
   DateTime _convertStringToDateTime(String dateString) {
     return DateTime.parse(dateString.replaceFirst('|', 'T'));
