@@ -209,24 +209,60 @@ class _ChartState extends State<Chart> {
       List<Color> result = [];
       for (var spot in spotsList) {
         if (!spot.y.isNaN) {
-          result.add(moodColors[spot.y.toInt()]);
+          result.add(moodColors[spot.y.round()]);
         }
       }
+
       return result;
     }
 
     final gradientColors = createGradientColors(entrySpots);
 
+    Map<double, Color> gradientColorsStopsMap = {};
+
+    Map<double, Color> createGradientColorStopsMap(List<FlSpot> spotsList) {
+      if (spotsList.isEmpty) return {};
+      List<FlSpot> nonNullSpots =
+          spotsList.where((spot) => !(spot.x.isNaN || spot.y.isNaN)).toList();
+
+      if (nonNullSpots.isEmpty) return {};
+
+      // Create a map to store the color stops
+      Map<double, Color> result = {};
+
+      // Get the minimum and maximum x values to normalize the x positions
+      double minX = nonNullSpots.first.x;
+      double maxX = nonNullSpots.last.x;
+      double rangeX = maxX - minX;
+
+      for (var spot in nonNullSpots) {
+        // Normalize the x position to a value between 0 and 1
+        double normalizedX = (spot.x - minX) / rangeX;
+        // Get the corresponding color
+        Color color = moodColors[spot.y.round()];
+        // Add the normalized position and color to the map
+        result[normalizedX] = color;
+      }
+
+      return result;
+    }
+
+    gradientColorsStopsMap = createGradientColorStopsMap(entrySpots);
+    // print(gradientColorsStopsMap);
+
     List<double> createColorStops(List<FlSpot> spotsList) {
       List<double> stops = [];
 
-      double increment = 1 / (gradientColors.length - 1);
+      double increment = 1 / (gradientColors.length);
 
-      int colorIndex = 0;
-      for (var i = 0; i < spotsList.length; i++) {
-        if (!spotsList[i].y.isNaN) {
-          stops.add(colorIndex * increment);
-          colorIndex += 1;
+      double tempIncrement = 0;
+      for (var spot in spotsList) {
+        if (!spot.y.isNaN) {
+          stops.add(tempIncrement);
+
+          // print(
+          //     'Spot ${spot.x} with value ${spot.y} is at ${tempIncrement} with color ');
+          tempIncrement += increment;
         }
       }
 
@@ -255,8 +291,8 @@ class _ChartState extends State<Chart> {
                     isCurved: true,
                     gradient: createGradientColors(entrySpots).length > 1
                         ? LinearGradient(
-                            colors: createGradientColors(entrySpots),
-                            stops: createColorStops(entrySpots))
+                            colors: gradientColorsStopsMap.values.toList(),
+                            stops: gradientColorsStopsMap.keys.toList())
                         : null,
                     color: createGradientColors(entrySpots).length == 1
                         ? AppColors.primaryColor
