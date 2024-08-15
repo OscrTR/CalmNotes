@@ -27,52 +27,56 @@ class _TagsState extends State<Tags> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildtagButtons(context),
+        _buildTagButtons(context),
       ],
     );
   }
 
-  Widget _buildtagButtons(BuildContext context) {
+  Widget _buildTagButtons(BuildContext context) {
     final provider = context.watch<TagProvider>();
     final tagsToDisplay = provider.tagsToDisplay;
 
     return Wrap(
       spacing: 10,
       children: [
-        ..._buildtagButtonList(tagsToDisplay),
-        _buildAddtagButton(context),
+        ..._buildTagButtonList(tagsToDisplay),
+        _buildAddTagButton(context),
       ],
     );
   }
 
-  List<Widget> _buildtagButtonList(List<Tag> tags) {
-    return tags.map(
-      (tag) {
-        if (tag.selectedCount > 0) {
-          return FilledButton(
-            onPressed: () {
-              context.read<TagProvider>().incrementTag(tag);
-            },
-            onLongPress: () {
-              context.read<TagProvider>().resetSelectedTag(tag);
-            },
-            child: Text('${tag.name} (${tag.selectedCount})'),
-          );
-        } else {
-          return OutlinedButton(
-            onPressed: () {
-              context.read<TagProvider>().incrementTag(tag);
-            },
-            child: Text(tag.name),
-          );
-        }
-      },
-    ).toList();
+  List<Widget> _buildTagButtonList(List<Tag> tags) {
+    return tags.map((tag) {
+      return tag.selectedCount > 0
+          ? _buildFilledTagButton(tag, context)
+          : _buildOutlinedTagButton(tag, context);
+    }).toList();
   }
 
-  Widget _buildAddtagButton(BuildContext context) {
+  Widget _buildFilledTagButton(Tag tag, BuildContext context) {
+    return FilledButton(
+      onPressed: () {
+        context.read<TagProvider>().incrementTag(tag);
+      },
+      onLongPress: () {
+        context.read<TagProvider>().resetSelectedTag(tag);
+      },
+      child: Text('${tag.name} (${tag.selectedCount})'),
+    );
+  }
+
+  Widget _buildOutlinedTagButton(Tag tag, BuildContext context) {
     return OutlinedButton(
-      onPressed: () => _showAddtagDialog(context),
+      onPressed: () {
+        context.read<TagProvider>().incrementTag(tag);
+      },
+      child: Text(tag.name),
+    );
+  }
+
+  Widget _buildAddTagButton(BuildContext context) {
+    return OutlinedButton(
+      onPressed: () => _showAddTagDialog(context),
       child: const Icon(
         Icons.add,
         color: CustomColors.primaryColor,
@@ -80,7 +84,7 @@ class _TagsState extends State<Tags> {
     );
   }
 
-  void _showAddtagDialog(BuildContext context) {
+  void _showAddTagDialog(BuildContext context) {
     showDialog<String>(
       context: context,
       builder: (BuildContext context) => AlertDialog(
@@ -89,7 +93,7 @@ class _TagsState extends State<Tags> {
           borderRadius: BorderRadius.circular(5),
         ),
         title: Text(context.tr('tag_dialog_title')),
-        content: _buildAddtagDialogContent(context),
+        content: _buildAddTagDialogContent(context),
         actions: <Widget>[
           TextButton(
             onPressed: () => Navigator.pop(context, 'Cancel'),
@@ -100,60 +104,59 @@ class _TagsState extends State<Tags> {
     );
   }
 
-  Widget _buildAddtagDialogContent(BuildContext context) {
+  Widget _buildAddTagDialogContent(BuildContext context) {
     final provider = context.watch<TagProvider>();
     final tags = provider.tags;
     final double height = tags.length < 5 ? tags.length * 48.0 + 66 : 200;
 
-    if (tags.isEmpty) {
-      return Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(context.tr('tag_dialog_no_tag')),
-          const SizedBox(height: 10),
-          _buildtagCreation(context),
-        ],
-      );
-    }
+    return tags.isEmpty
+        ? _buildNoTagsContent(context)
+        : _buildTagListContent(tags, context, height);
+  }
 
+  Widget _buildNoTagsContent(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(context.tr('tag_dialog_no_tag')),
+        const SizedBox(height: 10),
+        _buildTagCreationField(context),
+      ],
+    );
+  }
+
+  Widget _buildTagListContent(
+      List<Tag> tags, BuildContext context, double height) {
     return SizedBox(
       height: height,
       child: SingleChildScrollView(
         child: Column(
           children: [
-            ..._buildtagList(tags, context),
+            ..._buildTagList(tags, context),
             const SizedBox(height: 10),
-            _buildtagCreation(context),
+            _buildTagCreationField(context),
           ],
         ),
       ),
     );
   }
 
-  List<Widget> _buildtagList(List<Tag> tags, BuildContext context) {
-    return tags.where((tag) => tag.selectedCount == 0).map(
-      (tag) {
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            OutlinedButton(
-              onPressed: () {
-                context.read<TagProvider>().incrementTag(tag);
-                Navigator.pop(context, 'Add tag');
-              },
-              child: Text(tag.name),
-            ),
-            _buildDeleteButton(tag, context),
-          ],
-        );
-      },
-    ).toList();
+  List<Widget> _buildTagList(List<Tag> tags, BuildContext context) {
+    return tags.where((tag) => tag.selectedCount == 0).map((tag) {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          _buildOutlinedTagButton(tag, context),
+          _buildDeleteButton(tag, context),
+        ],
+      );
+    }).toList();
   }
 
   Widget _buildDeleteButton(Tag tag, BuildContext context) {
     return GestureDetector(
-      onTap: () => _showDeletetagDialog(tag, context),
+      onTap: () => _showDeleteTagDialog(tag, context),
       child: Container(
         height: 48,
         width: 48,
@@ -169,7 +172,7 @@ class _TagsState extends State<Tags> {
     );
   }
 
-  void _showDeletetagDialog(Tag tag, BuildContext context) {
+  void _showDeleteTagDialog(Tag tag, BuildContext context) {
     showDialog<String>(
       context: context,
       builder: (BuildContext context) => AlertDialog(
@@ -196,7 +199,7 @@ class _TagsState extends State<Tags> {
     );
   }
 
-  Widget _buildtagCreation(BuildContext context) {
+  Widget _buildTagCreationField(BuildContext context) {
     return Stack(
       children: [
         TextField(
@@ -230,9 +233,7 @@ class _TagsState extends State<Tags> {
             onPressed: () {
               final tagName = _tagNameController.text.trim();
               if (tagName.isNotEmpty) {
-                context
-                    .read<TagProvider>()
-                    .addAndIncrementTag(_tagNameController.text);
+                context.read<TagProvider>().addAndIncrementTag(tagName);
                 FocusScope.of(context).unfocus();
                 _tagNameController.clear();
                 Navigator.pop(context, 'Create tag');
