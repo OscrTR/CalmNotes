@@ -14,7 +14,7 @@ class TagProvider extends ChangeNotifier {
     _fetchTags();
   }
 
-  List<Tag> combineLists(List<Tag> list1, List<Tag> list2) {
+  List<Tag> _combineLists(List<Tag> list1, List<Tag> list2) {
     // Create a map from list2 for quick lookup by id
     Map<int, Tag> map2 = {for (var e in list2) e.id!: e};
 
@@ -44,29 +44,27 @@ class TagProvider extends ChangeNotifier {
   }
 
   Future<void> _fetchTags() async {
-    _tags = await _databaseService.fetchTags();
-    final fetchedTagsToDisplay = await _databaseService.fetchTagsToDisplay();
-    List<Tag> newTagsToDisplay = List.from(fetchedTagsToDisplay);
-    List<Tag> combinedTagsToDisplay =
-        combineLists(_tagsToDisplay, newTagsToDisplay);
+    // Fetch tags and tagsToDisplay in parallel
+    final results = await Future.wait(
+        [_databaseService.fetchTags(), _databaseService.fetchTagsToDisplay()]);
 
-    _tagsToDisplay = combinedTagsToDisplay;
+    _tags = results[0];
+    _tagsToDisplay = _combineLists(_tagsToDisplay, results[1]);
     notifyListeners();
   }
 
   Future<void> fetchDisplayedTags() async {
-    final fetchedTagsToDisplay = await _databaseService.fetchTagsToDisplay();
-    _tagsToDisplay = List.from(fetchedTagsToDisplay);
+    _tagsToDisplay = await _databaseService.fetchTagsToDisplay();
     notifyListeners();
   }
 
   Future<void> addTag(String name) async {
-    _databaseService.addTag(name);
+    await _databaseService.addTag(name);
     await _fetchTags();
   }
 
   Future<void> deleteTag(int id, String tagName) async {
-    _databaseService.deleteTag(id);
+    await _databaseService.deleteTag(id);
     await _fetchTags();
   }
 
@@ -76,7 +74,7 @@ class TagProvider extends ChangeNotifier {
   }
 
   void addAndIncrementTag(String tagName) async {
-    int tagId = await _databaseService.addTag(tagName);
+    final int tagId = await _databaseService.addTag(tagName);
     await _databaseService.incrementSelectedTagCount(tagId);
     await _fetchTags();
   }
