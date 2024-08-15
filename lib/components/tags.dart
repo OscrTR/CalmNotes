@@ -46,10 +46,11 @@ class _TagsState extends State<Tags> {
   }
 
   List<Widget> _buildTagButtonList(List<Tag> tags) {
+    const bool popOnClick = false;
     return tags.map((tag) {
       return tag.selectedCount > 0
           ? _buildFilledTagButton(tag, context)
-          : _buildOutlinedTagButton(tag, context);
+          : _buildOutlinedTagButton(tag, context, popOnClick);
     }).toList();
   }
 
@@ -65,10 +66,14 @@ class _TagsState extends State<Tags> {
     );
   }
 
-  Widget _buildOutlinedTagButton(Tag tag, BuildContext context) {
+  Widget _buildOutlinedTagButton(
+      Tag tag, BuildContext context, bool popOnClick) {
     return OutlinedButton(
       onPressed: () {
         context.read<TagProvider>().incrementTag(tag);
+        if (popOnClick) {
+          Navigator.pop(context, 'Tag added');
+        }
       },
       child: Text(tag.name),
     );
@@ -143,11 +148,12 @@ class _TagsState extends State<Tags> {
   }
 
   List<Widget> _buildTagList(List<Tag> tags, BuildContext context) {
+    const bool popOnClick = true;
     return tags.where((tag) => tag.selectedCount == 0).map((tag) {
       return Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          _buildOutlinedTagButton(tag, context),
+          _buildOutlinedTagButton(tag, context, popOnClick),
           _buildDeleteButton(tag, context),
         ],
       );
