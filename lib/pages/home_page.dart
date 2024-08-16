@@ -17,21 +17,10 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final DatabaseService _databaseService = DatabaseService.instance;
 
-  DateTime? getDateTime(String date) {
-    try {
-      final parts = date.split('|');
-      final dateTime = DateFormat('yyyy-MM-dd').parse(parts[0]);
-      final time = DateFormat('HH:mm').parse(parts[1]);
-      return DateTime(
-          dateTime.year, dateTime.month, dateTime.day, time.hour, time.minute);
-    } catch (e) {
-      return null;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final Locale currentLocale = context.locale;
+
     return Scaffold(
       body: FutureBuilder<List<Entry>>(
         future: _databaseService.fetchEntries(),
@@ -56,29 +45,8 @@ class _HomePageState extends State<HomePage> {
                 ]);
           }
 
-          Map<String, List<Entry>> groupEntriesByMonthYear(
-              List<Entry> entries) {
-            final Map<String, List<Entry>> groupedEntries = {};
-
-            for (var entry in entries) {
-              final DateTime date = getDateTime(entry.date)!;
-              final String monthYear =
-                  DateFormat('MMMM yyyy', currentLocale.toString())
-                      .format(date);
-              final String capitalizedMonthYear =
-                  monthYear[0].toUpperCase() + monthYear.substring(1);
-
-              if (groupedEntries[capitalizedMonthYear] == null) {
-                groupedEntries[capitalizedMonthYear] = [];
-              }
-
-              groupedEntries[capitalizedMonthYear]!.add(entry);
-            }
-
-            return groupedEntries;
-          }
-
-          final groupedEntries = groupEntriesByMonthYear(entries);
+          final groupedEntries =
+              groupEntriesByMonthYear(entries, currentLocale);
           List<String> monthKeys = groupedEntries.keys.toList();
 
           return ListView.builder(
@@ -90,52 +58,7 @@ class _HomePageState extends State<HomePage> {
               String monthKey = monthKeys[index - 1];
               List<Entry> monthEntries = groupedEntries[monthKey]!;
 
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 24),
-                  Padding(
-                    padding:
-                        const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
-                    child: Text(
-                      monthKey,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            color: CustomColors.ternaryColor,
-                          ),
-                    ),
-                  ),
-                  ...monthEntries.map(
-                    (entry) {
-                      return Card(
-                        color: moodColors[entry.mood],
-                        margin: const EdgeInsets.symmetric(
-                            vertical: 5, horizontal: 0),
-                        child: ListTile(
-                          contentPadding: EdgeInsets.zero,
-                          onTap: () =>
-                              GoRouter.of(context).push('/entry/${entry.id}'),
-                          title: Padding(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 10, horizontal: 15),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                _buildEntryDate(entry.date),
-                                Container(
-                                  height: 48,
-                                  width: 1,
-                                  color: CustomColors.ternaryColor,
-                                ),
-                                _buildEntryDetails(entry),
-                              ],
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ],
-              );
+              return _buildMonthEntries(context, monthKey, monthEntries);
             },
           );
         },
@@ -173,8 +96,57 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  Widget _buildMonthEntries(
+      BuildContext context, String monthKey, List<Entry> monthEntries) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 24),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
+          child: Text(
+            monthKey,
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: CustomColors.ternaryColor,
+                ),
+          ),
+        ),
+        ...monthEntries.map((entry) => _buildEntryCard(context, entry)),
+      ],
+    );
+  }
+
+  Widget _buildEntryCard(BuildContext context, Entry entry) {
+    return Card(
+      color: moodColors[entry.mood],
+      margin: const EdgeInsets.symmetric(vertical: 5),
+      child: ListTile(
+        contentPadding: EdgeInsets.zero,
+        onTap: () => GoRouter.of(context).push('/entry/${entry.id}'),
+        title: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _buildEntryDate(entry.date),
+              Container(
+                height: 48,
+                width: 1,
+                color: CustomColors.ternaryColor,
+              ),
+              _buildEntryDetails(entry),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildEntryDate(String date) {
-    final dateTime = getDateTime(date)!;
+    final dateTime = getDateTime(date);
+    if (dateTime == null) {
+      return const SizedBox.shrink(); // Handle invalid date scenario
+    }
     final Locale currentLocale = context.locale;
     String dateString =
         DateFormat('MMM', currentLocale.toString()).format(dateTime);
@@ -215,7 +187,7 @@ class _HomePageState extends State<HomePage> {
             children: [
               Expanded(
                 child: Text(
-                  entry.title!,
+                  entry.title ?? '',
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     color: CustomColors.primaryColor,
@@ -232,7 +204,7 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
           Text(
-            entry.description!,
+            entry.description ?? '',
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(
               fontSize: 12,
@@ -242,5 +214,31 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
     );
+  }
+
+  DateTime getDateTime(String date) {
+    final parts = date.split('|');
+    final dateTime = DateFormat('yyyy-MM-dd').parse(parts[0]);
+    final time = DateFormat('HH:mm').parse(parts[1]);
+    return DateTime(
+        dateTime.year, dateTime.month, dateTime.day, time.hour, time.minute);
+  }
+
+  Map<String, List<Entry>> groupEntriesByMonthYear(
+      List<Entry> entries, Locale currentLocale) {
+    final Map<String, List<Entry>> groupedEntries = {};
+
+    for (var entry in entries) {
+      final DateTime date = getDateTime(entry.date);
+
+      final String monthYear =
+          DateFormat('MMMM yyyy', currentLocale.toString()).format(date);
+      final String capitalizedMonthYear =
+          monthYear[0].toUpperCase() + monthYear.substring(1);
+
+      groupedEntries.putIfAbsent(capitalizedMonthYear, () => []).add(entry);
+    }
+
+    return groupedEntries;
   }
 }
