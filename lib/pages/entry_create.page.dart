@@ -35,38 +35,6 @@ class _EntryCreationPageState extends State<EntryCreationPage> {
     super.dispose();
   }
 
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: _selectedDate,
-      firstDate: DateTime(2023),
-      lastDate: DateTime(2043),
-    );
-    if (picked != null && picked != _selectedDate) {
-      setState(() {
-        _selectedDate = picked;
-      });
-    }
-  }
-
-  Future<void> _selectTime(BuildContext context) async {
-    final TimeOfDay? picked = await showTimePicker(
-      context: context,
-      initialTime: _selectedTime,
-      builder: (BuildContext context, Widget? child) {
-        return MediaQuery(
-          data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
-          child: child!,
-        );
-      },
-    );
-    if (picked != null && picked != _selectedTime) {
-      setState(() {
-        _selectedTime = picked;
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -76,11 +44,7 @@ class _EntryCreationPageState extends State<EntryCreationPage> {
           children: [
             _buildHeader(context),
             const SizedBox(height: 24),
-            CustomSlider(onChanged: (double newValue) {
-              setState(() {
-                _selectedMood = newValue.toInt();
-              });
-            }),
+            _buildMoodSlider(),
             const SizedBox(height: 14),
             const Emotions(),
             const SizedBox(height: 24),
@@ -97,59 +61,74 @@ class _EntryCreationPageState extends State<EntryCreationPage> {
     );
   }
 
+  Widget _buildMoodSlider() {
+    return CustomSlider(
+      onChanged: (double newValue) {
+        setState(() {
+          _selectedMood = newValue.toInt();
+        });
+      },
+    );
+  }
+
   Widget _buildHeader(BuildContext context) {
-    final Locale currentLocale = context.locale;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(context.tr('create_page_title'),
-                style: Theme.of(context).textTheme.headlineMedium),
-            GestureDetector(
-              onTap: () {
-                GoRouter.of(context).push('/');
-                Provider.of<EmotionProvider>(context, listen: false)
-                    .resetEmotions();
-                Provider.of<TagProvider>(context, listen: false).resetTags();
-              },
-              child: Container(
-                height: 48,
-                width: 48,
-                alignment: Alignment.centerRight,
-                child: const SizedBox(
-                  width: 20,
-                  child: Icon(
-                    Icons.close,
-                    color: CustomColors.primaryColor,
-                  ),
-                ),
-              ),
-            ),
-          ],
+        _buildTitleRow(context),
+        const SizedBox(height: 10),
+        _buildDateTimePickerRow(context),
+      ],
+    );
+  }
+
+  Widget _buildTitleRow(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          context.tr('create_page_title'),
+          style: Theme.of(context).textTheme.headlineMedium,
         ),
-        Row(
-          children: [
-            TextButton(
-              onPressed: () => _selectDate(context),
-              child: Text(
-                DateFormat('d MMMM yyyy', currentLocale.toString())
-                    .format(_selectedDate),
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
+        GestureDetector(
+          onTap: () => _cancelEntryCreation(context),
+          child: Container(
+            height: 48,
+            width: 48,
+            alignment: Alignment.center,
+            child: const Icon(
+              Icons.close,
+              color: CustomColors.primaryColor,
+              size: 24,
             ),
-            const Text(' - '),
-            TextButton(
-              onPressed: () => _selectTime(context),
-              child: Text(
-                MaterialLocalizations.of(context).formatTimeOfDay(_selectedTime,
-                    alwaysUse24HourFormat: true),
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDateTimePickerRow(BuildContext context) {
+    final Locale currentLocale = context.locale;
+    return Row(
+      children: [
+        TextButton(
+          onPressed: () => _selectDate(context),
+          child: Text(
+            DateFormat('d MMMM yyyy', currentLocale.toString())
+                .format(_selectedDate),
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+        ),
+        const Text(' - '),
+        TextButton(
+          onPressed: () => _selectTime(context),
+          child: Text(
+            MaterialLocalizations.of(context).formatTimeOfDay(
+              _selectedTime,
+              alwaysUse24HourFormat: true,
             ),
-          ],
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
         ),
       ],
     );
@@ -197,53 +176,11 @@ class _EntryCreationPageState extends State<EntryCreationPage> {
     );
   }
 
-  String convertEmotionsToString(List<Emotion> emotions) {
-    final filteredEmotions =
-        emotions.where((emotion) => emotion.selectedCount > 0);
-
-    final emotionStrings = filteredEmotions
-        .map((emotion) => '${emotion.name} : ${emotion.selectedCount}');
-
-    return emotionStrings.join(', ');
-  }
-
-  String convertTagsToString(List<Tag> tags) {
-    final filteredEmotions = tags.where((tag) => tag.selectedCount > 0);
-
-    final emotionStrings =
-        filteredEmotions.map((tag) => '${tag.name} : ${tag.selectedCount}');
-
-    return emotionStrings.join(', ');
-  }
-
   Widget _buildSaveButton(BuildContext context) {
     return Align(
-      alignment: Alignment.bottomCenter,
+      alignment: Alignment.center,
       child: FilledButton(
-        onPressed: () {
-          final emotionProvider =
-              Provider.of<EmotionProvider>(context, listen: false);
-          final emotionCounts =
-              convertEmotionsToString(emotionProvider.emotionsToDisplay);
-
-          final tagProvider = Provider.of<TagProvider>(context, listen: false);
-          final tagCounts = convertTagsToString(tagProvider.tagsToDisplay);
-
-          final entry = Entry(
-            date:
-                '${_selectedDate.toString().split(' ')[0]}|${MaterialLocalizations.of(context).formatTimeOfDay(_selectedTime, alwaysUse24HourFormat: true)}',
-            mood: _selectedMood,
-            emotions: emotionCounts,
-            title: _titleController.text,
-            description: _descriptionController.text,
-            tags: tagCounts,
-          );
-
-          Provider.of<EntryProvider>(context, listen: false).addEntry(entry);
-          GoRouter.of(context).push('/');
-          emotionProvider.resetEmotions();
-          tagProvider.resetTags();
-        },
+        onPressed: () => _saveEntry(context),
         style: ButtonStyle(
           padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
             const EdgeInsets.symmetric(horizontal: 60, vertical: 12),
@@ -252,5 +189,82 @@ class _EntryCreationPageState extends State<EntryCreationPage> {
         child: Text(context.tr('create_save')),
       ),
     );
+  }
+
+  void _cancelEntryCreation(BuildContext context) {
+    GoRouter.of(context).push('/');
+    Provider.of<EmotionProvider>(context, listen: false).resetEmotions();
+    Provider.of<TagProvider>(context, listen: false).resetTags();
+  }
+
+  void _saveEntry(BuildContext context) {
+    final emotionProvider =
+        Provider.of<EmotionProvider>(context, listen: false);
+    final tagProvider = Provider.of<TagProvider>(context, listen: false);
+
+    final entry = Entry(
+      date: _formatDateTime(context),
+      mood: _selectedMood,
+      emotions: _convertEmotionsToString(emotionProvider.emotionsToDisplay),
+      title: _titleController.text,
+      description: _descriptionController.text,
+      tags: _convertTagsToString(tagProvider.tagsToDisplay),
+    );
+
+    Provider.of<EntryProvider>(context, listen: false).addEntry(entry);
+    GoRouter.of(context).push('/');
+    emotionProvider.resetEmotions();
+    tagProvider.resetTags();
+  }
+
+  String _formatDateTime(BuildContext context) {
+    return '${_selectedDate.toString().split(' ')[0]}|'
+        '${MaterialLocalizations.of(context).formatTimeOfDay(_selectedTime, alwaysUse24HourFormat: true)}';
+  }
+
+  String _convertEmotionsToString(List<Emotion> emotions) {
+    return emotions
+        .where((emotion) => emotion.selectedCount > 0)
+        .map((emotion) => '${emotion.name} : ${emotion.selectedCount}')
+        .join(', ');
+  }
+
+  String _convertTagsToString(List<Tag> tags) {
+    return tags
+        .where((tag) => tag.selectedCount > 0)
+        .map((tag) => '${tag.name} : ${tag.selectedCount}')
+        .join(', ');
+  }
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate,
+      firstDate: DateTime(2023),
+      lastDate: DateTime(2043),
+    );
+    if (picked != null && picked != _selectedDate) {
+      setState(() {
+        _selectedDate = picked;
+      });
+    }
+  }
+
+  Future<void> _selectTime(BuildContext context) async {
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: _selectedTime,
+      builder: (BuildContext context, Widget? child) {
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+          child: child!,
+        );
+      },
+    );
+    if (picked != null && picked != _selectedTime) {
+      setState(() {
+        _selectedTime = picked;
+      });
+    }
   }
 }
