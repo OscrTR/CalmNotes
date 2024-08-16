@@ -31,6 +31,11 @@ class _ChartState extends State<Chart> {
     final List<FlSpot> entrySpots =
         _convertEntriesToSpots(orderedEntries, spotsDate);
 
+    final List<FlSpot> factorSpots = factorProvider.selectedFactor.isNotEmpty
+        ? _convertFactorsToSpots(
+            entries, factorProvider.selectedFactor, spotsDate)
+        : [];
+
     final Map<double, Color> gradientColorsStopsMap =
         _createGradientColorStopsMap(entrySpots);
 
@@ -49,76 +54,94 @@ class _ChartState extends State<Chart> {
             LineChartData(
               minY: 0,
               maxY: 10,
-              lineBarsData: [
-                if (!isOnlyNaN(entrySpots))
-                  LineChartBarData(
-                    spots: entrySpots,
-                    isCurved: true,
-                    gradient: _createGradientColors(entrySpots).length > 1
-                        ? LinearGradient(
-                            colors: gradientColorsStopsMap.values.toList(),
-                            stops: gradientColorsStopsMap.keys.toList())
-                        : null,
-                    color: _createGradientColors(entrySpots).length == 1
-                        ? CustomColors.primaryColor
-                        : null,
-                    barWidth: 3,
-                    dotData: const FlDotData(show: false),
-                    belowBarData: BarAreaData(show: false),
-                  ),
-                if (factorProvider.selectedFactor.isNotEmpty &&
-                    !isOnlyNaN(_convertFactorsListToSpots(
-                        createFactorsList(entries),
-                        factorProvider.selectedFactor,
-                        spotsDate)))
-                  LineChartBarData(
-                    color: CustomColors.primaryColor.withOpacity(0.5),
-                    spots: _convertFactorsListToSpots(
-                        createFactorsList(entries),
-                        factorProvider.selectedFactor,
-                        spotsDate),
-                    barWidth: 3,
-                    dotData: const FlDotData(show: true),
-                    belowBarData: BarAreaData(show: false),
-                  ),
-                LineChartBarData(
-                  color: Colors.transparent,
-                  spots: List.generate(
-                      spotsDate.length, (index) => FlSpot(index.toDouble(), 0)),
-                  barWidth: 0,
-                  dotData: const FlDotData(show: false),
-                  belowBarData: BarAreaData(show: false),
-                ),
-              ],
+              lineBarsData: _buildLineBarsData(
+                  entrySpots,
+                  gradientColorsStopsMap,
+                  factorProvider,
+                  entries,
+                  spotsDate,
+                  factorSpots),
               lineTouchData: const LineTouchData(enabled: false),
               titlesData: _buildTitlesData(spotsDate),
-              gridData: FlGridData(
-                show: true,
-                drawVerticalLine: false,
-                drawHorizontalLine: true,
-                horizontalInterval: 1,
-                getDrawingHorizontalLine: (value) => FlLine(
-                  color: CustomColors.secondaryColor.withOpacity(0.3),
-                  strokeWidth: 1,
-                ),
-              ),
-              borderData: FlBorderData(
-                show: true,
-                border: Border(
-                  top: BorderSide(
-                      color: CustomColors.secondaryColor.withOpacity(0.3),
-                      width: 1),
-                  bottom: BorderSide(
-                      color: CustomColors.secondaryColor.withOpacity(0.3),
-                      width: 1),
-                  left: BorderSide.none,
-                  right: BorderSide.none,
-                ),
-              ),
+              gridData: _buildGridData(),
+              borderData: _buildBorderData(),
             ),
           ),
         ),
       ],
+    );
+  }
+
+  List<LineChartBarData> _buildLineBarsData(
+      List<FlSpot> entrySpots,
+      Map<double, Color> gradientColorsStopsMap,
+      factorProvider,
+      entries,
+      spotsDate,
+      factorSpots) {
+    return [
+      if (!isOnlyNaN(entrySpots))
+        _createLineChartBarData(
+          spots: entrySpots,
+          gradientColors: _createGradientColors(entrySpots),
+          dotColor: CustomColors.primaryColor,
+          opacity: 1.0,
+          isFactor: false,
+        ),
+      if (factorSpots.isNotEmpty && !isOnlyNaN(factorSpots))
+        _createLineChartBarData(
+          spots: factorSpots,
+          gradientColors: [],
+          dotColor: CustomColors.primaryColor.withOpacity(0.3),
+          opacity: 0.5,
+          isFactor: true,
+        ),
+      _createLineChartBarData(
+        spots: List.generate(
+            spotsDate.length, (index) => FlSpot(index.toDouble(), 0)),
+        gradientColors: [],
+        dotColor: Colors.transparent,
+        opacity: 0.0,
+        isFactor: false,
+      ),
+    ];
+  }
+
+  LineChartBarData _createLineChartBarData({
+    required List<FlSpot> spots,
+    required List<Color> gradientColors,
+    required Color dotColor,
+    required double opacity,
+    required bool isFactor,
+  }) {
+    return LineChartBarData(
+      spots: spots,
+      isCurved: true,
+      gradient: gradientColors.length > 1
+          ? LinearGradient(colors: gradientColors)
+          : null,
+      color: gradientColors.isEmpty ? dotColor : null,
+      barWidth: 3,
+      dotData: FlDotData(
+        show: true,
+        getDotPainter:
+            (FlSpot spot, double xPercentage, LineChartBarData bar, int index) {
+          final bool shouldShowDot = index > 0 &&
+              bar.spots[index - 1].y.isNaN &&
+              index < bar.spots.length - 1 &&
+              bar.spots[index + 1].y.isNaN;
+
+          return FlDotCirclePainter(
+            radius: shouldShowDot ? 4 : 0,
+            color: shouldShowDot
+                ? !isFactor
+                    ? moodColors[spot.y.round()]
+                    : dotColor
+                : Colors.transparent,
+          );
+        },
+      ),
+      belowBarData: BarAreaData(show: false),
     );
   }
 
@@ -127,25 +150,7 @@ class _ChartState extends State<Chart> {
       bottomTitles: AxisTitles(
         sideTitles: SideTitles(
           showTitles: true,
-          getTitlesWidget: (value, meta) {
-            int index = value.toInt();
-            int modulo = spotsDate.length > 15 ? 2 : 1;
-            if (index >= 0 && index < spotsDate.length && value % modulo == 0) {
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const SizedBox(height: 8),
-                  Text(
-                    spotsDate[index].substring(8, 10),
-                    style: TextStyle(
-                        fontSize: 10,
-                        color: CustomColors.primaryColor.withOpacity(0.3)),
-                  )
-                ],
-              );
-            }
-            return const Text('');
-          },
+          getTitlesWidget: (value, meta) => _buildBottomTitle(value, spotsDate),
           interval: 1,
         ),
       ),
@@ -153,42 +158,76 @@ class _ChartState extends State<Chart> {
         sideTitles: SideTitles(
           showTitles: true,
           reservedSize: 40,
-          getTitlesWidget: (value, meta) {
-            Color color = moodColors[value.toInt()];
-
-            return Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const SizedBox(
-                  width: 8,
-                ),
-                Center(
-                  child: Text(
-                    value.toInt().toString(),
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleMedium
-                        ?.copyWith(color: color),
-                  ),
-                ),
-                const SizedBox(
-                  width: 8,
-                ),
-              ],
-            );
-          },
+          getTitlesWidget: (value, meta) => _buildLeftTitle(value),
           interval: 1,
         ),
       ),
-      rightTitles: const AxisTitles(
-        sideTitles: SideTitles(
-          showTitles: false,
+      rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+      topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+    );
+  }
+
+  Widget _buildBottomTitle(double value, List<String> spotsDate) {
+    final int index = value.toInt();
+    final int modulo = spotsDate.length > 15 ? 2 : 1;
+    if (index >= 0 && index < spotsDate.length && value % modulo == 0) {
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const SizedBox(height: 8),
+          Text(
+            spotsDate[index].substring(8, 10),
+            style: TextStyle(
+                fontSize: 10,
+                color: CustomColors.primaryColor.withOpacity(0.3)),
+          ),
+        ],
+      );
+    }
+    return const Text('');
+  }
+
+  Widget _buildLeftTitle(double value) {
+    final Color color = moodColors[value.toInt()];
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        const SizedBox(width: 8),
+        Center(
+          child: Text(
+            value.toInt().toString(),
+            style:
+                Theme.of(context).textTheme.titleMedium?.copyWith(color: color),
+          ),
         ),
+        const SizedBox(width: 8),
+      ],
+    );
+  }
+
+  FlGridData _buildGridData() {
+    return FlGridData(
+      show: true,
+      drawVerticalLine: false,
+      drawHorizontalLine: true,
+      horizontalInterval: 1,
+      getDrawingHorizontalLine: (value) => FlLine(
+        color: CustomColors.secondaryColor.withOpacity(0.3),
+        strokeWidth: 1,
       ),
-      topTitles: const AxisTitles(
-        sideTitles: SideTitles(
-          showTitles: false,
-        ),
+    );
+  }
+
+  FlBorderData _buildBorderData() {
+    return FlBorderData(
+      show: true,
+      border: Border(
+        top: BorderSide(
+            color: CustomColors.secondaryColor.withOpacity(0.3), width: 1),
+        bottom: BorderSide(
+            color: CustomColors.secondaryColor.withOpacity(0.3), width: 1),
+        left: BorderSide.none,
+        right: BorderSide.none,
       ),
     );
   }
@@ -232,7 +271,7 @@ class _ChartState extends State<Chart> {
     return spots.every((spot) => spot.y.isNaN);
   }
 
-  List<Factor> createFactorsList(List<Entry> entries) {
+  List<Factor> _createFactorsList(List<Entry> entries) {
     final List<Factor> tempFactorsList = [];
 
     for (var entry in entries) {
@@ -279,8 +318,9 @@ class _ChartState extends State<Chart> {
     }).toList();
   }
 
-  List<FlSpot> _convertFactorsListToSpots(
-      List<Factor> factorsList, String factorName, List<String> spotsDate) {
+  List<FlSpot> _convertFactorsToSpots(
+      List<Entry> entries, String factorName, List<String> spotsDate) {
+    final factorsList = _createFactorsList(entries);
     final List<FlSpot> spots = [];
 
     double? findFactorValue(
