@@ -32,7 +32,7 @@ class _ChartState extends State<Chart> {
         _convertEntriesToSpots(orderedEntries, spotsDate);
 
     final Map<double, Color> gradientColorsStopsMap =
-        createGradientColorStopsMap(entrySpots);
+        _createGradientColorStopsMap(entrySpots);
 
     return Column(
       children: [
@@ -54,12 +54,12 @@ class _ChartState extends State<Chart> {
                   LineChartBarData(
                     spots: entrySpots,
                     isCurved: true,
-                    gradient: createGradientColors(entrySpots).length > 1
+                    gradient: _createGradientColors(entrySpots).length > 1
                         ? LinearGradient(
                             colors: gradientColorsStopsMap.values.toList(),
                             stops: gradientColorsStopsMap.keys.toList())
                         : null,
-                    color: createGradientColors(entrySpots).length == 1
+                    color: _createGradientColors(entrySpots).length == 1
                         ? CustomColors.primaryColor
                         : null,
                     barWidth: 3,
@@ -69,8 +69,10 @@ class _ChartState extends State<Chart> {
                 if (factorProvider.selectedFactor.isNotEmpty)
                   LineChartBarData(
                     color: CustomColors.primaryColor.withOpacity(0.5),
-                    spots: convertFactorsListToSpots(createFactorsList(entries),
-                        factorProvider.selectedFactor, spotsDate),
+                    spots: _convertFactorsListToSpots(
+                        createFactorsList(entries),
+                        factorProvider.selectedFactor,
+                        spotsDate),
                     barWidth: 3,
                     dotData: const FlDotData(show: true),
                     belowBarData: BarAreaData(show: false),
@@ -249,50 +251,35 @@ class _ChartState extends State<Chart> {
       for (var factor in factorsList.where((f) => f.isNotEmpty)) {
         final parts = factor.split(':').map((e) => e.trim()).toList();
         tempFactorsList.add(
-            Factor(date: date, name: parts[0], value: int.parse(parts[1])));
+            Factor(date: date, name: parts[0], value: double.parse(parts[1])));
       }
     }
 
-    Map<String, FactorSummary> summaryMap = {};
-    // Iterate over each factor to populate the summaryMap
+    final Map<String, FactorSummary> summaryMap = {};
     for (var factor in tempFactorsList) {
-      // Create a unique key for each (date, name) combination
-      String key = '${factor.date},${factor.name}';
-
-      if (!summaryMap.containsKey(key)) {
-        summaryMap[key] = FactorSummary(
-          sum: 0,
-          count: 0,
-        );
-      }
-
-      var summary = summaryMap[key]!;
-      summary.sum += factor.value;
-      summary.count += 1;
+      final key = '${factor.date},${factor.name}';
+      summaryMap.update(
+          key,
+          (summary) => summary
+            ..sum += factor.value.toInt()
+            ..count += 1,
+          ifAbsent: () => FactorSummary(sum: factor.value, count: 1));
     }
-    // Create a new list of factors with the average values
-    List<Factor> averageFactors = summaryMap.entries.map((entry) {
-      var keyParts = entry.key.split(',');
-      var date = DateTime.parse(keyParts[0]);
-      var name = keyParts[1];
-      var summary = entry.value;
 
+    return summaryMap.entries.map((entry) {
+      final keyParts = entry.key.split(',');
       return Factor(
-        date: date,
-        name: name,
-        value: summary.sum ~/ summary.count,
-      );
+          date: DateTime.parse(keyParts[0]),
+          name: keyParts[1],
+          value: entry.value.sum / entry.value.count);
     }).toList();
-
-    return averageFactors;
   }
 
-  List<FlSpot> convertFactorsListToSpots(
+  List<FlSpot> _convertFactorsListToSpots(
       List<Factor> factorsList, String factorName, List<String> spotsDate) {
-    List<FlSpot> spots = [];
-    int index = 0;
+    final List<FlSpot> spots = [];
 
-    int? getValueForDateAndFactor(
+    double? findFactorValue(
         List<Factor> factors, DateTime date, String factorName) {
       for (var factor in factors) {
         if (factor.date == date && factor.name == factorName) {
@@ -302,59 +289,41 @@ class _ChartState extends State<Chart> {
       return null;
     }
 
-    for (var date in spotsDate) {
-      DateTime factorDate = DateTime.parse(date);
-      // Si date contien un facteur avec le nom, ajouter un spot avec la valeur
-      int? factorValue =
-          getValueForDateAndFactor(factorsList, factorDate, factorName);
-      if (factorValue != null) {
-        spots.add(FlSpot(index.toDouble(), factorValue.toDouble()));
-      } else {
-        spots.add(FlSpot.nullSpot);
-      }
-      index++;
+    FlSpot createSpot(int index, double? factorValue) {
+      return factorValue != null
+          ? FlSpot(index.toDouble(), factorValue.toDouble())
+          : FlSpot.nullSpot;
+    }
+
+    for (int i = 0; i < spotsDate.length; i++) {
+      DateTime factorDate = DateTime.parse(spotsDate[i]);
+      double? factorValue =
+          findFactorValue(factorsList, factorDate, factorName);
+      spots.add(createSpot(i, factorValue));
     }
 
     return spots;
   }
 
-  List<Color> createGradientColors(List<FlSpot> spotsList) {
-    List<Color> result = [];
-    for (var spot in spotsList) {
-      if (!spot.y.isNaN) {
-        result.add(moodColors[spot.y.round()]);
-      }
-    }
-
-    return result;
+  List<Color> _createGradientColors(List<FlSpot> spotsList) {
+    return spotsList
+        .where((spot) => !spot.y.isNaN)
+        .map((spot) => moodColors[spot.y.round()])
+        .toList();
   }
 
-  Map<double, Color> gradientColorsStopsMap = {};
-
-  Map<double, Color> createGradientColorStopsMap(List<FlSpot> spotsList) {
-    if (spotsList.isEmpty) return {};
-    List<FlSpot> nonNullSpots =
+  Map<double, Color> _createGradientColorStopsMap(List<FlSpot> spotsList) {
+    final nonNullSpots =
         spotsList.where((spot) => !(spot.x.isNaN || spot.y.isNaN)).toList();
-
     if (nonNullSpots.isEmpty) return {};
 
-    // Create a map to store the color stops
-    Map<double, Color> result = {};
+    final minX = nonNullSpots.first.x;
+    final maxX = nonNullSpots.last.x;
+    final rangeX = maxX - minX;
 
-    // Get the minimum and maximum x values to normalize the x positions
-    double minX = nonNullSpots.first.x;
-    double maxX = nonNullSpots.last.x;
-    double rangeX = maxX - minX;
-
-    for (var spot in nonNullSpots) {
-      // Normalize the x position to a value between 0 and 1
-      double normalizedX = (spot.x - minX) / rangeX;
-      // Get the corresponding color
-      Color color = moodColors[spot.y.round()];
-      // Add the normalized position and color to the map
-      result[normalizedX] = color;
-    }
-
-    return result;
+    return {
+      for (var spot in nonNullSpots)
+        (spot.x - minX) / rangeX: moodColors[spot.y.round()]
+    };
   }
 }

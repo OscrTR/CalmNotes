@@ -1,7 +1,7 @@
 class Factor {
   final DateTime date;
   final String name;
-  final int value;
+  final double value;
 
   Factor({
     required this.date,
@@ -11,8 +11,8 @@ class Factor {
 }
 
 class FactorSummary {
-  int sum;
-  int count;
+  double sum;
+  double count;
 
   FactorSummary({
     required this.sum,
