@@ -18,220 +18,21 @@ class Chart extends StatefulWidget {
 class _ChartState extends State<Chart> {
   @override
   Widget build(BuildContext context) {
-    final provider = context.watch<EntryProvider>();
-    final entries = provider.filteredEntries;
-    final orderedEntries = entries.reversed.toList();
-    List<String> spotsDate = [];
-    final startDate = provider.startDate;
-    final endDate = provider.endDate;
+    final entryProvider = context.watch<EntryProvider>();
     final factorProvider = context.watch<FactorProvider>();
 
-    List<Factor> createFactorsList() {
-      List<Factor> tempFactorsList = [];
+    final List<Entry> entries = entryProvider.filteredEntries;
+    final List<Entry> orderedEntries = entries.reversed.toList();
+    final DateTime startDate = entryProvider.startDate;
+    final DateTime endDate = entryProvider.endDate;
 
-      for (var entry in entries) {
-        DateTime date = DateTime.parse(entry.date.split('|')[0]);
-        List<String> emotionsList = [];
-        List<String> tagsList = [];
-        List<String> factorsList = [];
+    final List<String> spotsDate = _generateFullDateRange(startDate, endDate);
 
-        emotionsList = entry.emotions!.replaceAll(' ', '').split(',');
-        tagsList = entry.tags!.replaceAll(' ', '').split(',');
-        for (var emotion in emotionsList) {
-          if (emotion != '') {
-            factorsList.add(emotion);
-          }
-        }
-        for (var tag in tagsList) {
-          if (tag != '') {
-            factorsList.add(tag);
-          }
-        }
-        for (var factor in factorsList) {
-          if (factor != '') {
-            Factor newFactor = Factor(
-                date: date,
-                name: factor.split(':')[0],
-                value: int.parse(factor.split(':')[1]));
-            tempFactorsList.add(newFactor);
-          }
-        }
-      }
-      Map<String, FactorSummary> summaryMap = {};
-      // Iterate over each factor to populate the summaryMap
-      for (var factor in tempFactorsList) {
-        // Create a unique key for each (date, name) combination
-        String key = '${factor.date},${factor.name}';
+    final List<FlSpot> entrySpots =
+        _convertEntriesToSpots(orderedEntries, spotsDate);
 
-        if (!summaryMap.containsKey(key)) {
-          summaryMap[key] = FactorSummary(
-            sum: 0,
-            count: 0,
-          );
-        }
-
-        var summary = summaryMap[key]!;
-        summary.sum += factor.value;
-        summary.count += 1;
-      }
-      // Create a new list of factors with the average values
-      List<Factor> averageFactors = summaryMap.entries.map((entry) {
-        var keyParts = entry.key.split(',');
-        var date = DateTime.parse(keyParts[0]);
-        var name = keyParts[1];
-        var summary = entry.value;
-
-        return Factor(
-          date: date,
-          name: name,
-          value: summary.sum ~/ summary.count,
-        );
-      }).toList();
-
-      return averageFactors;
-    }
-
-    List<FlSpot> convertFactorsListToSpots(
-        List<Factor> factorsList, String factorName) {
-      List<FlSpot> spots = [];
-      int index = 0;
-
-      int? getValueForDateAndFactor(
-          List<Factor> factors, DateTime date, String factorName) {
-        for (var factor in factors) {
-          if (factor.date == date && factor.name == factorName) {
-            return factor.value;
-          }
-        }
-        return null;
-      }
-
-      for (var date in spotsDate) {
-        DateTime factorDate = DateTime.parse(date);
-        // Si date contien un facteur avec le nom, ajouter un spot avec la valeur
-        int? factorValue =
-            getValueForDateAndFactor(factorsList, factorDate, factorName);
-        if (factorValue != null) {
-          spots.add(FlSpot(index.toDouble(), factorValue.toDouble()));
-        } else {
-          spots.add(FlSpot.nullSpot);
-        }
-        index++;
-      }
-
-      return spots;
-    }
-
-    List<String> generateFullDateRange() {
-      List<String> dateRange = [];
-      for (var date = startDate;
-          date.isBefore(endDate) || date.isAtSameMomentAs(endDate);
-          date = date.add(const Duration(days: 1))) {
-        dateRange.add(DateFormat('yyyy-MM-dd').format(date));
-      }
-      return dateRange;
-    }
-
-    spotsDate = generateFullDateRange();
-
-    List<FlSpot> getInvisibleSpots() {
-      return List.generate(
-        spotsDate.length,
-        (index) => FlSpot(index.toDouble(), 0),
-      );
-    }
-
-    // Function to convert entries to FlSpots with gaps for missing dates
-    List<FlSpot> convertEntriesToSpots(List<Entry> entries) {
-      Map<String, double> moodTotalMap = {};
-      Map<String, int> moodCountMap = {};
-
-      // Populate the moodMap with entries
-      for (var entry in entries) {
-        String date = entry.date.substring(0, 10);
-        // Accumulate the mood values for each date
-        if (moodTotalMap.containsKey(date)) {
-          moodTotalMap[date] = moodTotalMap[date]! + entry.mood.toDouble();
-          moodCountMap[date] = moodCountMap[date]! + 1;
-        } else {
-          moodTotalMap[date] = entry.mood.toDouble();
-          moodCountMap[date] = 1;
-        }
-      }
-      Map<String, double> moodAverageMap = {};
-
-      for (var date in moodTotalMap.keys) {
-        moodAverageMap[date] = moodTotalMap[date]! / moodCountMap[date]!;
-      }
-
-      List<FlSpot> spots = [];
-      int index = 0;
-
-      for (var date in spotsDate) {
-        if (moodAverageMap.containsKey(date)) {
-          spots.add(FlSpot(index.toDouble(), moodAverageMap[date]!));
-        } else {
-          spots.add(FlSpot.nullSpot);
-        }
-        index++;
-      }
-
-      return spots;
-    }
-
-    final entrySpots = convertEntriesToSpots(orderedEntries);
-
-    bool isOnlyNaN(List<FlSpot> spots) {
-      bool onlyNaN = true;
-      for (var spot in spots) {
-        if (!spot.y.isNaN) {
-          onlyNaN = false;
-        }
-      }
-      return onlyNaN;
-    }
-
-    List<Color> createGradientColors(List<FlSpot> spotsList) {
-      List<Color> result = [];
-      for (var spot in spotsList) {
-        if (!spot.y.isNaN) {
-          result.add(moodColors[spot.y.round()]);
-        }
-      }
-
-      return result;
-    }
-
-    Map<double, Color> gradientColorsStopsMap = {};
-
-    Map<double, Color> createGradientColorStopsMap(List<FlSpot> spotsList) {
-      if (spotsList.isEmpty) return {};
-      List<FlSpot> nonNullSpots =
-          spotsList.where((spot) => !(spot.x.isNaN || spot.y.isNaN)).toList();
-
-      if (nonNullSpots.isEmpty) return {};
-
-      // Create a map to store the color stops
-      Map<double, Color> result = {};
-
-      // Get the minimum and maximum x values to normalize the x positions
-      double minX = nonNullSpots.first.x;
-      double maxX = nonNullSpots.last.x;
-      double rangeX = maxX - minX;
-
-      for (var spot in nonNullSpots) {
-        // Normalize the x position to a value between 0 and 1
-        double normalizedX = (spot.x - minX) / rangeX;
-        // Get the corresponding color
-        Color color = moodColors[spot.y.round()];
-        // Add the normalized position and color to the map
-        result[normalizedX] = color;
-      }
-
-      return result;
-    }
-
-    gradientColorsStopsMap = createGradientColorStopsMap(entrySpots);
+    final Map<double, Color> gradientColorsStopsMap =
+        createGradientColorStopsMap(entrySpots);
 
     return Column(
       children: [
@@ -262,121 +63,38 @@ class _ChartState extends State<Chart> {
                         ? CustomColors.primaryColor
                         : null,
                     barWidth: 3,
-                    dotData: const FlDotData(
-                      show: false,
-                    ),
-                    belowBarData: BarAreaData(
-                      show: false,
-                    ),
+                    dotData: const FlDotData(show: false),
+                    belowBarData: BarAreaData(show: false),
                   ),
-                if (factorProvider.selectedFactor != '')
+                if (factorProvider.selectedFactor.isNotEmpty)
                   LineChartBarData(
                     color: CustomColors.primaryColor.withOpacity(0.5),
-                    spots: convertFactorsListToSpots(
-                        createFactorsList(), factorProvider.selectedFactor),
+                    spots: convertFactorsListToSpots(createFactorsList(entries),
+                        factorProvider.selectedFactor, spotsDate),
                     barWidth: 3,
-                    dotData: const FlDotData(
-                      show: true,
-                    ),
-                    belowBarData: BarAreaData(
-                      show: false,
-                    ),
+                    dotData: const FlDotData(show: true),
+                    belowBarData: BarAreaData(show: false),
                   ),
                 LineChartBarData(
                   color: Colors.transparent,
-                  spots: getInvisibleSpots(),
+                  spots: List.generate(
+                      spotsDate.length, (index) => FlSpot(index.toDouble(), 0)),
                   barWidth: 0,
-                  dotData: const FlDotData(
-                    show: false,
-                  ),
-                  belowBarData: BarAreaData(
-                    show: false,
-                  ),
+                  dotData: const FlDotData(show: false),
+                  belowBarData: BarAreaData(show: false),
                 ),
               ],
               lineTouchData: const LineTouchData(enabled: false),
-              titlesData: FlTitlesData(
-                bottomTitles: AxisTitles(
-                  sideTitles: SideTitles(
-                    showTitles: true,
-                    getTitlesWidget: (value, meta) {
-                      int index = value.toInt();
-                      int modulo = spotsDate.length > 15 ? 2 : 1;
-                      if (index >= 0 &&
-                          index < spotsDate.length &&
-                          value % modulo == 0) {
-                        return Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const SizedBox(height: 8),
-                            Text(
-                              spotsDate[index].substring(8, 10),
-                              style: TextStyle(
-                                  fontSize: 10,
-                                  color: CustomColors.primaryColor
-                                      .withOpacity(0.3)),
-                            )
-                          ],
-                        );
-                      }
-                      return const Text('');
-                    },
-                    interval: 1,
-                  ),
-                ),
-                leftTitles: AxisTitles(
-                  sideTitles: SideTitles(
-                    showTitles: true,
-                    reservedSize: 40,
-                    getTitlesWidget: (value, meta) {
-                      Color color = moodColors[value.toInt()];
-
-                      return Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const SizedBox(
-                            width: 8,
-                          ),
-                          Center(
-                            child: Text(
-                              value.toInt().toString(),
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleMedium
-                                  ?.copyWith(color: color),
-                            ),
-                          ),
-                          const SizedBox(
-                            width: 8,
-                          ),
-                        ],
-                      );
-                    },
-                    interval: 1,
-                  ),
-                ),
-                rightTitles: const AxisTitles(
-                  sideTitles: SideTitles(
-                    showTitles: false,
-                  ),
-                ),
-                topTitles: const AxisTitles(
-                  sideTitles: SideTitles(
-                    showTitles: false,
-                  ),
-                ),
-              ),
+              titlesData: _buildTitlesData(spotsDate),
               gridData: FlGridData(
                 show: true,
                 drawVerticalLine: false,
                 drawHorizontalLine: true,
                 horizontalInterval: 1,
-                getDrawingHorizontalLine: (value) {
-                  return FlLine(
-                    color: CustomColors.secondaryColor.withOpacity(0.3),
-                    strokeWidth: 1,
-                  );
-                },
+                getDrawingHorizontalLine: (value) => FlLine(
+                  color: CustomColors.secondaryColor.withOpacity(0.3),
+                  strokeWidth: 1,
+                ),
               ),
               borderData: FlBorderData(
                 show: true,
@@ -396,5 +114,247 @@ class _ChartState extends State<Chart> {
         ),
       ],
     );
+  }
+
+  FlTitlesData _buildTitlesData(List<String> spotsDate) {
+    return FlTitlesData(
+      bottomTitles: AxisTitles(
+        sideTitles: SideTitles(
+          showTitles: true,
+          getTitlesWidget: (value, meta) {
+            int index = value.toInt();
+            int modulo = spotsDate.length > 15 ? 2 : 1;
+            if (index >= 0 && index < spotsDate.length && value % modulo == 0) {
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const SizedBox(height: 8),
+                  Text(
+                    spotsDate[index].substring(8, 10),
+                    style: TextStyle(
+                        fontSize: 10,
+                        color: CustomColors.primaryColor.withOpacity(0.3)),
+                  )
+                ],
+              );
+            }
+            return const Text('');
+          },
+          interval: 1,
+        ),
+      ),
+      leftTitles: AxisTitles(
+        sideTitles: SideTitles(
+          showTitles: true,
+          reservedSize: 40,
+          getTitlesWidget: (value, meta) {
+            Color color = moodColors[value.toInt()];
+
+            return Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const SizedBox(
+                  width: 8,
+                ),
+                Center(
+                  child: Text(
+                    value.toInt().toString(),
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleMedium
+                        ?.copyWith(color: color),
+                  ),
+                ),
+                const SizedBox(
+                  width: 8,
+                ),
+              ],
+            );
+          },
+          interval: 1,
+        ),
+      ),
+      rightTitles: const AxisTitles(
+        sideTitles: SideTitles(
+          showTitles: false,
+        ),
+      ),
+      topTitles: const AxisTitles(
+        sideTitles: SideTitles(
+          showTitles: false,
+        ),
+      ),
+    );
+  }
+
+  // Generate the full date range between startDate and endDate
+  List<String> _generateFullDateRange(DateTime startDate, DateTime endDate) {
+    return List.generate(
+      endDate.difference(startDate).inDays + 1,
+      (i) => DateFormat('yyyy-MM-dd').format(startDate.add(Duration(days: i))),
+    );
+  }
+
+  // Function to convert entries to FlSpots with gaps for missing dates
+  List<FlSpot> _convertEntriesToSpots(
+      List<Entry> entries, List<String> spotsDate) {
+    final Map<String, double> moodTotalMap = {};
+    final Map<String, int> moodCountMap = {};
+
+    // Populate the moodMap with entries
+    for (var entry in entries) {
+      final String date = entry.date.substring(0, 10);
+      // Accumulate the mood values for each date
+      moodTotalMap.update(date, (val) => val + entry.mood.toDouble(),
+          ifAbsent: () => entry.mood.toDouble());
+      moodCountMap.update(date, (val) => val + 1, ifAbsent: () => 1);
+    }
+
+    final List<FlSpot> spots = [];
+    for (var i = 0; i < spotsDate.length; i++) {
+      final date = spotsDate[i];
+      spots.add(moodTotalMap.containsKey(date)
+          ? FlSpot(i.toDouble(), moodTotalMap[date]! / moodCountMap[date]!)
+          : FlSpot.nullSpot);
+    }
+
+    return spots;
+  }
+
+// Check if all spots contain NaN values
+  bool isOnlyNaN(List<FlSpot> spots) {
+    return spots.every((spot) => spot.y.isNaN);
+  }
+
+  List<Factor> createFactorsList(List<Entry> entries) {
+    final List<Factor> tempFactorsList = [];
+
+    for (var entry in entries) {
+      final DateTime date = DateTime.parse(entry.date.split('|')[0]);
+      final List<String> factorsList = [
+        ...entry.emotions
+                ?.split(',')
+                .map((emotion) => emotion.trim())
+                .where((emotion) => emotion.isNotEmpty)
+                .toList() ??
+            [],
+        ...entry.tags
+                ?.split(',')
+                .map((tag) => tag.trim())
+                .where((tag) => tag.isNotEmpty)
+                .toList() ??
+            [],
+      ];
+
+      for (var factor in factorsList.where((f) => f.isNotEmpty)) {
+        final parts = factor.split(':').map((e) => e.trim()).toList();
+        tempFactorsList.add(
+            Factor(date: date, name: parts[0], value: int.parse(parts[1])));
+      }
+    }
+
+    Map<String, FactorSummary> summaryMap = {};
+    // Iterate over each factor to populate the summaryMap
+    for (var factor in tempFactorsList) {
+      // Create a unique key for each (date, name) combination
+      String key = '${factor.date},${factor.name}';
+
+      if (!summaryMap.containsKey(key)) {
+        summaryMap[key] = FactorSummary(
+          sum: 0,
+          count: 0,
+        );
+      }
+
+      var summary = summaryMap[key]!;
+      summary.sum += factor.value;
+      summary.count += 1;
+    }
+    // Create a new list of factors with the average values
+    List<Factor> averageFactors = summaryMap.entries.map((entry) {
+      var keyParts = entry.key.split(',');
+      var date = DateTime.parse(keyParts[0]);
+      var name = keyParts[1];
+      var summary = entry.value;
+
+      return Factor(
+        date: date,
+        name: name,
+        value: summary.sum ~/ summary.count,
+      );
+    }).toList();
+
+    return averageFactors;
+  }
+
+  List<FlSpot> convertFactorsListToSpots(
+      List<Factor> factorsList, String factorName, List<String> spotsDate) {
+    List<FlSpot> spots = [];
+    int index = 0;
+
+    int? getValueForDateAndFactor(
+        List<Factor> factors, DateTime date, String factorName) {
+      for (var factor in factors) {
+        if (factor.date == date && factor.name == factorName) {
+          return factor.value;
+        }
+      }
+      return null;
+    }
+
+    for (var date in spotsDate) {
+      DateTime factorDate = DateTime.parse(date);
+      // Si date contien un facteur avec le nom, ajouter un spot avec la valeur
+      int? factorValue =
+          getValueForDateAndFactor(factorsList, factorDate, factorName);
+      if (factorValue != null) {
+        spots.add(FlSpot(index.toDouble(), factorValue.toDouble()));
+      } else {
+        spots.add(FlSpot.nullSpot);
+      }
+      index++;
+    }
+
+    return spots;
+  }
+
+  List<Color> createGradientColors(List<FlSpot> spotsList) {
+    List<Color> result = [];
+    for (var spot in spotsList) {
+      if (!spot.y.isNaN) {
+        result.add(moodColors[spot.y.round()]);
+      }
+    }
+
+    return result;
+  }
+
+  Map<double, Color> gradientColorsStopsMap = {};
+
+  Map<double, Color> createGradientColorStopsMap(List<FlSpot> spotsList) {
+    if (spotsList.isEmpty) return {};
+    List<FlSpot> nonNullSpots =
+        spotsList.where((spot) => !(spot.x.isNaN || spot.y.isNaN)).toList();
+
+    if (nonNullSpots.isEmpty) return {};
+
+    // Create a map to store the color stops
+    Map<double, Color> result = {};
+
+    // Get the minimum and maximum x values to normalize the x positions
+    double minX = nonNullSpots.first.x;
+    double maxX = nonNullSpots.last.x;
+    double rangeX = maxX - minX;
+
+    for (var spot in nonNullSpots) {
+      // Normalize the x position to a value between 0 and 1
+      double normalizedX = (spot.x - minX) / rangeX;
+      // Get the corresponding color
+      Color color = moodColors[spot.y.round()];
+      // Add the normalized position and color to the map
+      result[normalizedX] = color;
+    }
+
+    return result;
   }
 }
