@@ -5,7 +5,12 @@ import 'package:flutter_svg/svg.dart';
 class CustomSlider extends StatefulWidget {
   final double? initialValue;
   final ValueChanged<double>? onChanged;
-  const CustomSlider({super.key, this.onChanged, this.initialValue});
+
+  const CustomSlider({
+    super.key,
+    this.onChanged,
+    this.initialValue,
+  });
 
   @override
   State<CustomSlider> createState() => _CustomSliderState();
@@ -13,12 +18,12 @@ class CustomSlider extends StatefulWidget {
 
 class _CustomSliderState extends State<CustomSlider> {
   double _sliderValue = 5;
-  final activeTrackGradient = const LinearGradient(
-      colors: [CustomColors.color0, CustomColors.color5, CustomColors.color10]);
-  final inactiveTrackGradient = const LinearGradient(
-      colors: [CustomColors.secondaryColor, CustomColors.secondaryColor]);
-  final trackBorder = 1.0;
-  final trackBorderColor = CustomColors.primaryColor;
+  final Gradient _activeTrackGradient = const LinearGradient(
+    colors: [CustomColors.color0, CustomColors.color5, CustomColors.color10],
+  );
+  final Gradient _inactiveTrackGradient = const LinearGradient(
+    colors: [CustomColors.secondaryColor, CustomColors.secondaryColor],
+  );
 
   @override
   void initState() {
@@ -29,6 +34,7 @@ class _CustomSliderState extends State<CustomSlider> {
   @override
   Widget build(BuildContext context) {
     final Color thumbColor = moodColors[_sliderValue.toInt()];
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -39,41 +45,7 @@ class _CustomSliderState extends State<CustomSlider> {
               height: 22,
               width: 22,
             ),
-            Expanded(
-              child: SliderTheme(
-                data: SliderTheme.of(context).copyWith(
-                  trackHeight: 8.0,
-                  inactiveTrackColor: CustomColors.secondaryColor,
-                  trackShape: CustomSliderTrackShape(
-                    activeTrackGradient: activeTrackGradient,
-                    inactiveTrackGradient: inactiveTrackGradient,
-                    trackBorder: trackBorder,
-                    trackBorderColor: trackBorderColor,
-                  ),
-                  thumbShape:
-                      const CustomSliderThumbShape(enabledThumbRadius: 12.0),
-                  thumbColor: thumbColor,
-                  inactiveTickMarkColor: Colors.transparent,
-                  activeTickMarkColor: Colors.transparent,
-                  showValueIndicator: ShowValueIndicator.never,
-                ),
-                child: Slider(
-                  value: _sliderValue,
-                  min: 0,
-                  max: 10,
-                  divisions: 10,
-                  label: _sliderValue.toStringAsFixed(1),
-                  onChanged: (double value) {
-                    setState(() {
-                      _sliderValue = value;
-                    });
-                    if (widget.onChanged != null) {
-                      widget.onChanged!(value);
-                    }
-                  },
-                ),
-              ),
-            ),
+            Expanded(child: _buildSlider(thumbColor)),
             SvgPicture.asset(
               'assets/images/mood10.svg',
               height: 22,
@@ -84,22 +56,55 @@ class _CustomSliderState extends State<CustomSlider> {
       ],
     );
   }
+
+  SliderTheme _buildSlider(Color thumbColor) {
+    return SliderTheme(
+      data: SliderTheme.of(context).copyWith(
+        trackHeight: 8.0,
+        inactiveTrackColor: CustomColors.secondaryColor,
+        trackShape: CustomSliderTrackShape(
+          activeTrackGradient: _activeTrackGradient,
+          inactiveTrackGradient: _inactiveTrackGradient,
+          trackBorder: 1,
+          trackBorderColor: CustomColors.primaryColor,
+        ),
+        thumbShape: const CustomSliderThumbShape(enabledThumbRadius: 12.0),
+        thumbColor: thumbColor,
+        inactiveTickMarkColor: Colors.transparent,
+        activeTickMarkColor: Colors.transparent,
+        showValueIndicator: ShowValueIndicator.never,
+      ),
+      child: Slider(
+        value: _sliderValue,
+        min: 0,
+        max: 10,
+        divisions: 10,
+        label: _sliderValue.toStringAsFixed(1),
+        onChanged: (double value) {
+          setState(() {
+            _sliderValue = value;
+          });
+          widget.onChanged?.call(value);
+        },
+      ),
+    );
+  }
 }
 
 class CustomSliderThumbShape extends RoundSliderThumbShape {
-  @override
-  final double enabledThumbRadius;
+  final double _enabledThumbRadius;
 
   const CustomSliderThumbShape({
-    this.enabledThumbRadius = 10.0,
-  });
+    double enabledThumbRadius = 12.0,
+  }) : _enabledThumbRadius = enabledThumbRadius;
 
   double get _disabledThumbRadius => disabledThumbRadius ?? enabledThumbRadius;
 
   @override
   Size getPreferredSize(bool isEnabled, bool isDiscrete) {
-    return Size.fromRadius(
-        isEnabled ? enabledThumbRadius : _disabledThumbRadius);
+    return Size.fromRadius(isEnabled
+        ? _enabledThumbRadius
+        : disabledThumbRadius ?? _enabledThumbRadius);
   }
 
   @override
@@ -138,9 +143,9 @@ class CustomSliderThumbShape extends RoundSliderThumbShape {
       ..style = PaintingStyle.fill;
 
     final Paint borderPaint = Paint()
-      ..color = CustomColors.primaryColor // Border color
+      ..color = CustomColors.primaryColor
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.0; // Border width
+      ..strokeWidth = 1.0;
 
     final Path path = Path()
       ..addOval(Rect.fromCenter(
@@ -151,45 +156,29 @@ class CustomSliderThumbShape extends RoundSliderThumbShape {
     canvas.drawCircle(center, radius, borderPaint);
 
     // TextPainter to draw the value above the thumb
-    final TextSpan span = TextSpan(
-      text: '${(value * 10).round()}', // Format the value
-      style: const TextStyle(
-        fontSize: 12.0,
-        color: CustomColors.backgroundColor,
-      ),
-    );
-
     final TextPainter textPainter = TextPainter(
-      text: span,
+      text: TextSpan(
+        text: '${(value * 10).round()}',
+        style: const TextStyle(
+            fontSize: 12.0, color: CustomColors.backgroundColor),
+      ),
       textAlign: TextAlign.center,
       textDirection: textDirection,
-    );
-
-    textPainter.layout();
-
-    const double backgroundWidth = 40;
-    const double backgroundHeight = 24;
+    )..layout();
 
     // Background rectangle position
-    final Offset backgroundOffset = center -
-        Offset(
-          backgroundWidth / 2,
-          radius +
-              backgroundHeight +
-              9, // Offset to place background above thumb
-        );
-
-    // Draw the background rectangle
-    final Paint backgroundPaint = Paint()
-      ..color = CustomColors.primaryColor // Background color
-      ..style = PaintingStyle.fill;
-
+    final Offset backgroundOffset = center - Offset(20, radius + 34.5);
     final Rect backgroundRect = Rect.fromLTWH(
       backgroundOffset.dx,
       backgroundOffset.dy,
-      backgroundWidth,
-      backgroundHeight,
+      40,
+      24,
     );
+
+    // Draw the background rectangle
+    final Paint backgroundPaint = Paint()
+      ..color = CustomColors.primaryColor
+      ..style = PaintingStyle.fill;
 
     canvas.drawRRect(
       RRect.fromRectAndRadius(backgroundRect, const Radius.circular(5)),
@@ -200,7 +189,7 @@ class CustomSliderThumbShape extends RoundSliderThumbShape {
     final Offset textOffset = center -
         Offset(
           textPainter.width / 2,
-          21 + textPainter.height + 4, // Offset to place text above the thumb
+          21 + textPainter.height + 4,
         );
 
     // Paint the text on the canvas
@@ -210,17 +199,17 @@ class CustomSliderThumbShape extends RoundSliderThumbShape {
 
 class CustomSliderTrackShape extends SliderTrackShape
     with BaseSliderTrackShape {
+  final Gradient activeTrackGradient;
+  final Gradient? inactiveTrackGradient;
+  final double? trackBorder;
+  final Color? trackBorderColor;
+
   CustomSliderTrackShape({
     required this.activeTrackGradient,
     this.inactiveTrackGradient,
     this.trackBorder,
     this.trackBorderColor,
   });
-
-  final Gradient activeTrackGradient;
-  final Gradient? inactiveTrackGradient;
-  final double? trackBorder;
-  final Color? trackBorderColor;
 
   @override
   void paint(
