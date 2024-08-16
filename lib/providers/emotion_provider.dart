@@ -68,6 +68,10 @@ class EmotionProvider extends ChangeNotifier {
   }
 
   void incrementEmotion(Emotion emotion) async {
+    if (emotion.id == null) {
+      print('Emotion ID is null. Cannot increment.');
+      return;
+    }
     await _databaseService.incrementSelectedEmotionCount(emotion.id!);
     _emotions.firstWhere((e) => e.id == emotion.id).selectedCount++;
     _emotionsToDisplay.firstWhere((e) => e.id == emotion.id).selectedCount++;

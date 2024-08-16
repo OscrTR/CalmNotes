@@ -1,3 +1,4 @@
+import 'package:calm_notes/components/entry_details_widget.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -6,6 +7,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:calm_notes/colors.dart';
 import 'package:calm_notes/models/entry.dart';
 import 'package:calm_notes/services/database_service.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -22,46 +24,49 @@ class _HomePageState extends State<HomePage> {
     final Locale currentLocale = context.locale;
 
     return Scaffold(
-      body: FutureBuilder<List<Entry>>(
-        future: _databaseService.fetchEntries(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
+      body: Padding(
+        padding: const EdgeInsets.only(top: 20, bottom: 0, left: 20, right: 20),
+        child: FutureBuilder<List<Entry>>(
+          future: _databaseService.fetchEntries(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
 
-          if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          }
+            if (snapshot.hasError) {
+              return Center(child: Text('Error: ${snapshot.error}'));
+            }
 
-          final entries = snapshot.data;
+            final entries = snapshot.data;
 
-          if (entries == null || entries.isEmpty) {
-            return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildHeader(context),
-                  const SizedBox(height: 24),
-                  Text(context.tr('home_no_entry'))
-                ]);
-          }
+            if (entries == null || entries.isEmpty) {
+              return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildHeader(context),
+                    const SizedBox(height: 24),
+                    Text(context.tr('home_no_entry'))
+                  ]);
+            }
 
-          final groupedEntries =
-              groupEntriesByMonthYear(entries, currentLocale);
-          List<String> monthKeys = groupedEntries.keys.toList();
+            final groupedEntries =
+                groupEntriesByMonthYear(entries, currentLocale);
+            List<String> monthKeys = groupedEntries.keys.toList();
 
-          return ListView.builder(
-            itemCount: monthKeys.length + 1,
-            itemBuilder: (context, index) {
-              if (index == 0) {
-                return _buildHeader(context);
-              }
-              String monthKey = monthKeys[index - 1];
-              List<Entry> monthEntries = groupedEntries[monthKey]!;
+            return ListView.builder(
+              itemCount: monthKeys.length + 1,
+              itemBuilder: (context, index) {
+                if (index == 0) {
+                  return _buildHeader(context);
+                }
+                String monthKey = monthKeys[index - 1];
+                List<Entry> monthEntries = groupedEntries[monthKey]!;
 
-              return _buildMonthEntries(context, monthKey, monthEntries);
-            },
-          );
-        },
+                return _buildMonthEntries(context, monthKey, monthEntries);
+              },
+            );
+          },
+        ),
       ),
     );
   }
@@ -122,7 +127,15 @@ class _HomePageState extends State<HomePage> {
       margin: const EdgeInsets.symmetric(vertical: 5),
       child: ListTile(
         contentPadding: EdgeInsets.zero,
-        onTap: () => GoRouter.of(context).push('/entry/${entry.id}'),
+        onTap: () {
+          showBarModalBottomSheet(
+            context: context,
+            useRootNavigator: true,
+            expand: true,
+            backgroundColor: CustomColors.backgroundColor,
+            builder: (context) => EntryDetails(entry: entry),
+          );
+        },
         title: Padding(
           padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
           child: Row(
@@ -144,9 +157,6 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildEntryDate(String date) {
     final dateTime = getDateTime(date);
-    if (dateTime == null) {
-      return const SizedBox.shrink(); // Handle invalid date scenario
-    }
     final Locale currentLocale = context.locale;
     String dateString =
         DateFormat('MMM', currentLocale.toString()).format(dateTime);

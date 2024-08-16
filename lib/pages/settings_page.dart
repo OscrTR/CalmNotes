@@ -20,19 +20,22 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Text(
-            context.tr('settings_title'),
-            style: Theme.of(context).textTheme.headlineMedium,
-          ),
-          const SizedBox(height: 24),
-          _buildRemindersSection(context),
-          const SizedBox(height: 24),
-          _buildLanguageSection(context),
-        ],
+      body: Padding(
+        padding: const EdgeInsets.only(top: 20, bottom: 0, left: 20, right: 20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Text(
+              context.tr('settings_title'),
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
+            const SizedBox(height: 24),
+            _buildRemindersSection(context),
+            const SizedBox(height: 24),
+            _buildLanguageSection(context),
+          ],
+        ),
       ),
     );
   }

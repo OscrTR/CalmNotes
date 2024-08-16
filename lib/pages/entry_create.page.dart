@@ -38,24 +38,27 @@ class _EntryCreationPageState extends State<EntryCreationPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildHeader(context),
-            const SizedBox(height: 24),
-            _buildMoodSlider(),
-            const SizedBox(height: 14),
-            const Emotions(),
-            const SizedBox(height: 24),
-            _buildTitleField(context),
-            const SizedBox(height: 10),
-            _buildDescriptionField(context),
-            const SizedBox(height: 24),
-            _buildTagsSection(context),
-            const SizedBox(height: 24),
-            _buildSaveButton(context),
-          ],
+      body: Padding(
+        padding: const EdgeInsets.only(top: 20, bottom: 0, left: 20, right: 20),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildHeader(context),
+              const SizedBox(height: 24),
+              _buildMoodSlider(),
+              const SizedBox(height: 14),
+              const Emotions(),
+              const SizedBox(height: 24),
+              _buildTitleField(context),
+              const SizedBox(height: 10),
+              _buildDescriptionField(context),
+              const SizedBox(height: 24),
+              _buildTagsSection(context),
+              const SizedBox(height: 24),
+              _buildSaveButton(context),
+            ],
+          ),
         ),
       ),
     );

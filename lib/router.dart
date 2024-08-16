@@ -56,33 +56,13 @@ final router = GoRouter(
               },
             ),
           ),
-          GoRoute(
-            path: '/entry/:entryId',
-            pageBuilder: (context, state) => CustomTransitionPage(
-              child: EntryDetailPage(
-                  entryId: int.parse(state.pathParameters['entryId']!)),
-              transitionsBuilder:
-                  (context, animation, secondaryAnimation, child) {
-                // No transition
-                return child;
-              },
-            ),
-          ),
         ],
         builder: (context, state, child) {
-          final RegExp entryPattern = RegExp(r'^/entry($|/.*)');
           return Scaffold(
               body: SafeArea(
-                child: Padding(
-                  padding: const EdgeInsets.only(
-                      left: 20.0, top: 20.0, right: 20.0, bottom: 0.0),
-                  child: child,
-                ),
+                child: child,
               ),
-              bottomNavigationBar: !entryPattern
-                      .hasMatch(GoRouterState.of(context).uri.toString())
-                  ? const CustomNavigationBar()
-                  : null);
+              bottomNavigationBar: const CustomNavigationBar());
         })
   ],
 );

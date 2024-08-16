@@ -1,30 +1,30 @@
 import 'package:calm_notes/colors.dart';
 import 'package:calm_notes/components/emotions.dart';
+import 'package:calm_notes/components/slider.dart';
+import 'package:calm_notes/components/tags.dart';
 import 'package:calm_notes/models/emotion.dart';
 import 'package:calm_notes/models/entry.dart';
 import 'package:calm_notes/models/tag.dart';
 import 'package:calm_notes/providers/emotion_provider.dart';
+import 'package:calm_notes/providers/entry_provider.dart';
 import 'package:calm_notes/providers/tag_provider.dart';
-import 'package:calm_notes/components/slider.dart';
-import 'package:calm_notes/components/tags.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:calm_notes/services/database_service.dart';
-import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 
-class EntryDetailPage extends StatefulWidget {
-  final int entryId;
-  const EntryDetailPage({super.key, required this.entryId});
+class EntryDetails extends StatefulWidget {
+  final Entry entry;
+  const EntryDetails({
+    super.key,
+    required this.entry,
+  });
 
   @override
-  State<EntryDetailPage> createState() => _EntryDetailPageState();
+  State<EntryDetails> createState() => _EntryDetailsState();
 }
 
-class _EntryDetailPageState extends State<EntryDetailPage> {
-  final DatabaseService _databaseService = DatabaseService.instance;
-
+class _EntryDetailsState extends State<EntryDetails> {
   DateTime _selectedDate = DateTime.now();
   TimeOfDay _selectedTime = TimeOfDay.now();
   int? _selectedMood;
@@ -47,25 +47,24 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildHeader(context),
-            const SizedBox(height: 24),
-            if (_selectedMood != null) ...[
-              CustomSlider(
-                initialValue: _selectedMood!.toDouble(),
-                onChanged: (double newValue) {
-                  setState(() {
-                    _selectedMood = newValue.toInt();
-                  });
-                },
-              ),
-              const SizedBox(height: 14),
-              const Emotions(),
-            ],
+    return Padding(
+      padding: const EdgeInsets.only(top: 20, bottom: 0, left: 20, right: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildHeader(context),
+          const SizedBox(height: 24),
+          if (_selectedMood != null) ...[
+            CustomSlider(
+              initialValue: _selectedMood!.toDouble(),
+              onChanged: (double newValue) {
+                setState(() {
+                  _selectedMood = newValue.toInt();
+                });
+              },
+            ),
+            const SizedBox(height: 14),
+            const Emotions(),
             const SizedBox(height: 24),
             _buildTitleField(context),
             const SizedBox(height: 10),
@@ -75,7 +74,7 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
             const SizedBox(height: 24),
             _buildSaveButton(context),
           ],
-        ),
+        ],
       ),
     );
   }
@@ -229,7 +228,7 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
   }
 
   void _navigateBack(BuildContext context) {
-    GoRouter.of(context).push('/');
+    Navigator.pop(context, 'Previous page');
     Provider.of<EmotionProvider>(context, listen: false).resetEmotions();
     Provider.of<TagProvider>(context, listen: false).resetTags();
   }
@@ -259,15 +258,16 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
   }
 
   void _deleteEntry(BuildContext context) {
-    _databaseService.deleteEntry(widget.entryId);
+    // _databaseService.deleteEntry(widget.entry.id!);
     Navigator.pop(context, 'Delete');
     _navigateBack(context);
   }
 
   void _saveEntry(BuildContext context) {
+    final EntryProvider entryProvider = context.watch<EntryProvider>();
     if (_selectedMood != null) {
       final entry = Entry(
-        id: widget.entryId,
+        id: widget.entry.id,
         date: _formatDateTime(context),
         mood: _selectedMood!,
         emotions: _convertEmotionsToString(
@@ -279,7 +279,7 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
             Provider.of<TagProvider>(context, listen: false).tagsToDisplay),
       );
 
-      _databaseService.updateEntry(entry);
+      entryProvider.addEntry(entry);
       _navigateBack(context);
     }
   }
@@ -302,46 +302,21 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
         .join(', ');
   }
 
-  String convertEmotionsToString(List<Emotion> emotions) {
-    final filteredEmotions =
-        emotions.where((emotion) => emotion.selectedCount > 0);
-
-    final emotionStrings = filteredEmotions
-        .map((emotion) => '${emotion.name} : ${emotion.selectedCount}');
-
-    return emotionStrings.join(', ');
-  }
-
-  String convertTagsToString(List<Tag> tags) {
-    final filteredEmotions = tags.where((tag) => tag.selectedCount > 0);
-
-    final emotionStrings =
-        filteredEmotions.map((tag) => '${tag.name} : ${tag.selectedCount}');
-
-    return emotionStrings.join(', ');
-  }
-
   Future<void> _loadEntryData() async {
-    try {
-      final entry = await _databaseService.getEntry(widget.entryId);
-      setState(() {
-        _selectedMood = entry.mood;
-        _selectedDate = _parseDate(entry.date);
-        _selectedTime = _parseTime(entry.date);
-        _titleController.text = entry.title ?? '';
-        _descriptionController.text = entry.description ?? '';
-      });
+    setState(() {
+      _selectedMood = widget.entry.mood;
+      _selectedDate = _parseDate(widget.entry.date);
+      _selectedTime = _parseTime(widget.entry.date);
+      _titleController.text = widget.entry.title ?? '';
+      _descriptionController.text = widget.entry.description ?? '';
+    });
 
-      Future.microtask(() {
-        Provider.of<EmotionProvider>(context, listen: false)
-            .setEmotions(widget.entryId);
-        Provider.of<TagProvider>(context, listen: false)
-            .setTags(widget.entryId);
-      });
-    } catch (e) {
-      // Handle error appropriately
-      print("Error loading entry data: $e");
-    }
+    Future.microtask(() {
+      Provider.of<EmotionProvider>(context, listen: false)
+          .setEmotions(widget.entry.id!);
+      Provider.of<TagProvider>(context, listen: false)
+          .setTags(widget.entry.id!);
+    });
   }
 
   DateTime _parseDate(String date) {
