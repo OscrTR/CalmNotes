@@ -66,7 +66,11 @@ class _ChartState extends State<Chart> {
                     dotData: const FlDotData(show: false),
                     belowBarData: BarAreaData(show: false),
                   ),
-                if (factorProvider.selectedFactor.isNotEmpty)
+                if (factorProvider.selectedFactor.isNotEmpty &&
+                    !isOnlyNaN(_convertFactorsListToSpots(
+                        createFactorsList(entries),
+                        factorProvider.selectedFactor,
+                        spotsDate)))
                   LineChartBarData(
                     color: CustomColors.primaryColor.withOpacity(0.5),
                     spots: _convertFactorsListToSpots(
