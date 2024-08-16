@@ -1,5 +1,4 @@
 import 'package:calm_notes/components/navigation_bar.dart';
-import 'package:calm_notes/pages/entry_detail_page.dart';
 import 'package:calm_notes/pages/entry_create.page.dart';
 import 'package:calm_notes/pages/home_page.dart';
 import 'package:calm_notes/pages/settings_page.dart';
