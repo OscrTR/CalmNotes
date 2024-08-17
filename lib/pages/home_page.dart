@@ -1,4 +1,4 @@
-import 'package:calm_notes/components/entry_details_widget.dart';
+import 'package:calm_notes/widgets/entry_details_widget.dart';
 import 'package:calm_notes/providers/entry_provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';

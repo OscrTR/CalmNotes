@@ -1,26 +1,26 @@
 import 'package:calm_notes/colors.dart';
 import 'package:calm_notes/widgets/emotions.dart';
+import 'package:calm_notes/widgets/slider.dart';
+import 'package:calm_notes/widgets/tags.dart';
 import 'package:calm_notes/models/emotion.dart';
 import 'package:calm_notes/models/entry.dart';
 import 'package:calm_notes/models/tag.dart';
 import 'package:calm_notes/providers/emotion_provider.dart';
 import 'package:calm_notes/providers/entry_provider.dart';
 import 'package:calm_notes/providers/tag_provider.dart';
-import 'package:calm_notes/widgets/slider.dart';
-import 'package:calm_notes/widgets/tags.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
-class EntryCreationPage extends StatefulWidget {
-  const EntryCreationPage({super.key});
+class EntryCreate extends StatefulWidget {
+  const EntryCreate({super.key});
 
   @override
-  State<EntryCreationPage> createState() => _EntryCreationPageState();
+  State<EntryCreate> createState() => _EntryCreateState();
 }
 
-class _EntryCreationPageState extends State<EntryCreationPage> {
+class _EntryCreateState extends State<EntryCreate> {
   DateTime _selectedDate = DateTime.now();
   TimeOfDay _selectedTime = TimeOfDay.now();
   int _selectedMood = 5;
@@ -39,7 +39,7 @@ class _EntryCreationPageState extends State<EntryCreationPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Padding(
-        padding: const EdgeInsets.only(top: 20, bottom: 0, left: 20, right: 20),
+        padding: const EdgeInsets.all(20),
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -89,20 +89,29 @@ class _EntryCreationPageState extends State<EntryCreationPage> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          context.tr('create_page_title'),
-          style: Theme.of(context).textTheme.headlineMedium,
+        Padding(
+          padding: const EdgeInsets.only(bottom: 6),
+          child: Text(
+            context.tr('create_page_title'),
+            style:
+                Theme.of(context).textTheme.headlineMedium?.copyWith(height: 1),
+          ),
         ),
         GestureDetector(
           onTap: () => _cancelEntryCreation(context),
           child: Container(
             height: 48,
             width: 48,
-            alignment: Alignment.center,
-            child: const Icon(
-              Icons.close,
-              color: CustomColors.primaryColor,
-              size: 24,
+            alignment: Alignment.centerRight,
+            child: const ClipRect(
+              child: Align(
+                alignment: Alignment.centerRight,
+                widthFactor: 0.85,
+                child: Icon(
+                  Icons.close,
+                  color: CustomColors.primaryColor,
+                ),
+              ),
             ),
           ),
         ),
@@ -195,9 +204,9 @@ class _EntryCreationPageState extends State<EntryCreationPage> {
   }
 
   void _cancelEntryCreation(BuildContext context) {
-    GoRouter.of(context).push('/');
     Provider.of<EmotionProvider>(context, listen: false).resetEmotions();
     Provider.of<TagProvider>(context, listen: false).resetTags();
+    Navigator.pop(context, 'Cancel');
   }
 
   void _saveEntry(BuildContext context) {
@@ -215,7 +224,7 @@ class _EntryCreationPageState extends State<EntryCreationPage> {
     );
 
     Provider.of<EntryProvider>(context, listen: false).addEntry(entry);
-    GoRouter.of(context).push('/');
+    Navigator.pop(context, 'Create entry');
     emotionProvider.resetEmotions();
     tagProvider.resetTags();
   }

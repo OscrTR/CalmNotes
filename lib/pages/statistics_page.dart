@@ -1,7 +1,7 @@
 import 'package:calm_notes/colors.dart';
-import 'package:calm_notes/components/calendar.dart';
-import 'package:calm_notes/components/chart.dart';
-import 'package:calm_notes/components/pie_chart.dart';
+import 'package:calm_notes/widgets/calendar.dart';
+import 'package:calm_notes/widgets/chart.dart';
+import 'package:calm_notes/widgets/pie_chart.dart';
 import 'package:calm_notes/models/entry.dart';
 import 'package:calm_notes/providers/entry_provider.dart';
 import 'package:calm_notes/providers/factor_provider.dart';

@@ -1,7 +1,7 @@
 import 'package:calm_notes/colors.dart';
-import 'package:calm_notes/components/emotions.dart';
-import 'package:calm_notes/components/slider.dart';
-import 'package:calm_notes/components/tags.dart';
+import 'package:calm_notes/widgets/emotions.dart';
+import 'package:calm_notes/widgets/slider.dart';
+import 'package:calm_notes/widgets/tags.dart';
 import 'package:calm_notes/models/emotion.dart';
 import 'package:calm_notes/models/entry.dart';
 import 'package:calm_notes/models/tag.dart';
