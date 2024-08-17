@@ -1,4 +1,5 @@
 import 'package:calm_notes/components/entry_details_widget.dart';
+import 'package:calm_notes/providers/entry_provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -6,8 +7,8 @@ import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:calm_notes/colors.dart';
 import 'package:calm_notes/models/entry.dart';
-import 'package:calm_notes/services/database_service.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -17,8 +18,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final DatabaseService _databaseService = DatabaseService.instance;
-
   @override
   Widget build(BuildContext context) {
     final Locale currentLocale = context.locale;
@@ -26,20 +25,19 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.only(top: 20, bottom: 0, left: 20, right: 20),
-        child: FutureBuilder<List<Entry>>(
-          future: _databaseService.fetchEntries(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
+        child: Consumer<EntryProvider>(
+          builder: (context, entryProvider, child) {
+            if (entryProvider.isLoading) {
               return const Center(child: CircularProgressIndicator());
             }
 
-            if (snapshot.hasError) {
-              return Center(child: Text('Error: ${snapshot.error}'));
+            if (entryProvider.error != null) {
+              return Center(child: Text('Error: ${entryProvider.error}'));
             }
 
-            final entries = snapshot.data;
+            final entries = entryProvider.entries;
 
-            if (entries == null || entries.isEmpty) {
+            if (entries.isEmpty) {
               return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
