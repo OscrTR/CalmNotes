@@ -131,7 +131,17 @@ class _HomePageState extends State<HomePage> {
             useRootNavigator: true,
             expand: true,
             backgroundColor: CustomColors.backgroundColor,
-            builder: (context) => EntryDetails(entry: entry),
+            builder: (context) {
+              return SizedBox(
+                height: MediaQuery.of(context)
+                    .size
+                    .height, // Takes up the full height
+                child: SingleChildScrollView(
+                  controller: ModalScrollController.of(context),
+                  child: EntryDetails(entry: entry),
+                ),
+              );
+            },
           );
         },
         title: Padding(

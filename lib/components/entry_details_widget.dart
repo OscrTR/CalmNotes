@@ -48,7 +48,7 @@ class _EntryDetailsState extends State<EntryDetails> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(top: 20, bottom: 0, left: 20, right: 20),
+      padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
