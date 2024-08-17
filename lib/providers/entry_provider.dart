@@ -61,6 +61,20 @@ class EntryProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void updateEntryInList(List<Entry> entries, Entry entry) {
+    int entryIndex = entries.indexWhere((e) => e.id == entry.id);
+    if (entryIndex != -1) {
+      entries[entryIndex] = entry;
+    }
+  }
+
+  Future<void> updateEntry(Entry entry) async {
+    await _databaseService.updateEntry(entry);
+    updateEntryInList(_entries, entry);
+    _filteredEntries = _filterEntriesBetweenDates(_startDate, _endDate);
+    notifyListeners();
+  }
+
   // Method to update the date range and refresh the filtered entries
   void updateDateRange(DateTime startDate, DateTime endDate) {
     _startDate = startDate;

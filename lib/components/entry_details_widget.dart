@@ -264,7 +264,8 @@ class _EntryDetailsState extends State<EntryDetails> {
   }
 
   void _saveEntry(BuildContext context) {
-    final EntryProvider entryProvider = context.watch<EntryProvider>();
+    final EntryProvider entryProvider =
+        Provider.of<EntryProvider>(context, listen: false);
     if (_selectedMood != null) {
       final entry = Entry(
         id: widget.entry.id,
@@ -279,7 +280,7 @@ class _EntryDetailsState extends State<EntryDetails> {
             Provider.of<TagProvider>(context, listen: false).tagsToDisplay),
       );
 
-      entryProvider.addEntry(entry);
+      entryProvider.updateEntry(entry);
       _navigateBack(context);
     }
   }
