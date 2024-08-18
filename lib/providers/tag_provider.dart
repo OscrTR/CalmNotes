@@ -68,23 +68,23 @@ class TagProvider extends ChangeNotifier {
     await _fetchTags();
   }
 
-  void incrementTag(Tag tag) async {
+  Future<void> incrementTag(Tag tag) async {
     await _databaseService.incrementSelectedTagCount(tag.id!);
     await _fetchTags();
   }
 
-  void addAndIncrementTag(String tagName) async {
+  Future<void> addAndIncrementTag(String tagName) async {
     final int tagId = await _databaseService.addTag(tagName);
     await _databaseService.incrementSelectedTagCount(tagId);
     await _fetchTags();
   }
 
-  void resetSelectedTag(Tag tag) async {
+  Future<void> resetSelectedTag(Tag tag) async {
     await _databaseService.resetSelectedTagCount(tag.id!);
     await _fetchTags();
   }
 
-  void resetTags() async {
+  Future<void> resetTags() async {
     await _databaseService.resetSelectedTagsCount();
     await _fetchTags();
   }

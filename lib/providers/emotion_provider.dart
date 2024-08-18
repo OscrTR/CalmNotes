@@ -14,7 +14,7 @@ class EmotionProvider extends ChangeNotifier {
     _fetchEmotions();
   }
 
-  List<Emotion> combineLists(List<Emotion> list1, List<Emotion> list2) {
+  List<Emotion> mergeEmotionLists(List<Emotion> list1, List<Emotion> list2) {
     // Create a map from list2 for quick lookup by id
     Map<int, Emotion> map2 = {for (var e in list2) e.id!: e};
 
@@ -44,11 +44,13 @@ class EmotionProvider extends ChangeNotifier {
   }
 
   Future<void> _fetchEmotions() async {
-    _emotions = await _databaseService.fetchEmotions();
+    final fetchedEmotions = await _databaseService.fetchEmotions();
     final fetchedEmotionsToDisplay =
         await _databaseService.fetchEmotionsToDisplay();
+
+    _emotions = fetchedEmotions;
     _emotionsToDisplay =
-        combineLists(_emotionsToDisplay, fetchedEmotionsToDisplay);
+        mergeEmotionLists(_emotionsToDisplay, fetchedEmotionsToDisplay);
     notifyListeners();
   }
 
@@ -58,32 +60,32 @@ class EmotionProvider extends ChangeNotifier {
   }
 
   Future<void> addEmotion(String name) async {
-    _databaseService.addEmotion(name);
+    await _databaseService.addEmotion(name);
     await _fetchEmotions();
   }
 
   Future<void> deleteEmotion(Emotion emotion) async {
-    _databaseService.deleteEmotion(emotion.id!);
+    await _databaseService.deleteEmotion(emotion.id!);
     await _fetchEmotions();
   }
 
-  void incrementEmotion(Emotion emotion) async {
+  Future<void> incrementEmotion(Emotion emotion) async {
     await _databaseService.incrementSelectedEmotionCount(emotion.id!);
     await _fetchEmotions();
   }
 
-  void addAndIncrementEmotion(String emotionName) async {
-    int emotionId = await _databaseService.addEmotion(emotionName);
+  Future<void> addAndIncrementEmotion(String emotionName) async {
+    final int emotionId = await _databaseService.addEmotion(emotionName);
     await _databaseService.incrementSelectedEmotionCount(emotionId);
     await _fetchEmotions();
   }
 
-  void resetSelectedEmotion(Emotion emotion) async {
+  Future<void> resetSelectedEmotion(Emotion emotion) async {
     await _databaseService.resetSelectedEmotionCount(emotion.id!);
     await _fetchEmotions();
   }
 
-  void resetEmotions() async {
+  Future<void> resetEmotions() async {
     await _databaseService.resetSelectedEmotionsCount();
     await _fetchEmotions();
   }
