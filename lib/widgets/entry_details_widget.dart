@@ -15,9 +15,11 @@ import 'package:provider/provider.dart';
 
 class EntryDetails extends StatefulWidget {
   final Entry entry;
+  final BuildContext context;
   const EntryDetails({
     super.key,
     required this.entry,
+    required this.context,
   });
 
   @override

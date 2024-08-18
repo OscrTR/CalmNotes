@@ -9,6 +9,7 @@ import 'package:calm_notes/colors.dart';
 import 'package:calm_notes/models/entry.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:provider/provider.dart';
+import 'package:wolt_modal_sheet/wolt_modal_sheet.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -126,23 +127,16 @@ class _HomePageState extends State<HomePage> {
       child: ListTile(
         contentPadding: EdgeInsets.zero,
         onTap: () {
-          showBarModalBottomSheet(
-            context: context,
-            useRootNavigator: true,
-            expand: true,
-            backgroundColor: CustomColors.backgroundColor,
-            builder: (context) {
-              return SizedBox(
-                height: MediaQuery.of(context)
-                    .size
-                    .height, // Takes up the full height
-                child: SingleChildScrollView(
-                  controller: ModalScrollController.of(context),
-                  child: EntryDetails(entry: entry),
-                ),
-              );
-            },
-          );
+          WoltModalSheet.show(
+              useRootNavigator: true,
+              context: context,
+              pageListBuilder: (context) => [
+                    WoltModalSheetPage(
+                      hasTopBarLayer: false,
+                      forceMaxHeight: true,
+                      child: EntryDetails(entry: entry, context: context),
+                    )
+                  ]);
         },
         title: Padding(
           padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),

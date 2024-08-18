@@ -1,5 +1,4 @@
 import 'package:calm_notes/widgets/navigation_bar.dart';
-import 'package:calm_notes/pages/entry_create.page.dart';
 import 'package:calm_notes/pages/home_page.dart';
 import 'package:calm_notes/pages/settings_page.dart';
 import 'package:calm_notes/pages/statistics_page.dart';
@@ -37,17 +36,6 @@ final router = GoRouter(
             path: '/settings',
             pageBuilder: (context, state) => CustomTransitionPage(
               child: const SettingsPage(),
-              transitionsBuilder:
-                  (context, animation, secondaryAnimation, child) {
-                // No transition
-                return child;
-              },
-            ),
-          ),
-          GoRoute(
-            path: '/entry',
-            pageBuilder: (context, state) => CustomTransitionPage(
-              child: const EntryCreationPage(),
               transitionsBuilder:
                   (context, animation, secondaryAnimation, child) {
                 // No transition

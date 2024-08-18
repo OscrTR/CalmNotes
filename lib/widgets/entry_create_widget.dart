@@ -10,7 +10,6 @@ import 'package:calm_notes/providers/entry_provider.dart';
 import 'package:calm_notes/providers/tag_provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 class EntryCreate extends StatefulWidget {
@@ -37,31 +36,49 @@ class _EntryCreateState extends State<EntryCreate> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildHeader(context),
-              const SizedBox(height: 24),
-              _buildMoodSlider(),
-              const SizedBox(height: 14),
-              const Emotions(),
-              const SizedBox(height: 24),
-              _buildTitleField(context),
-              const SizedBox(height: 10),
-              _buildDescriptionField(context),
-              const SizedBox(height: 24),
-              _buildTagsSection(context),
-              const SizedBox(height: 24),
-              _buildSaveButton(context),
-            ],
-          ),
-        ),
-      ),
-    );
+    return Container(
+        decoration: const BoxDecoration(
+            color: CustomColors.backgroundColor,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+        child: Stack(
+          children: [
+            Positioned(
+                top: 10,
+                right: 0,
+                left: 0,
+                child: Center(
+                  child: Container(
+                    width: 40,
+                    height: 5,
+                    decoration: BoxDecoration(
+                      color: CustomColors.secondaryColor,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                )),
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildHeader(context),
+                  const SizedBox(height: 24),
+                  _buildMoodSlider(),
+                  const SizedBox(height: 14),
+                  const Emotions(),
+                  const SizedBox(height: 24),
+                  _buildTitleField(context),
+                  const SizedBox(height: 10),
+                  _buildDescriptionField(context),
+                  const SizedBox(height: 24),
+                  _buildTagsSection(context),
+                  const SizedBox(height: 24),
+                  _buildSaveButton(context)
+                ],
+              ),
+            ),
+          ],
+        ));
   }
 
   Widget _buildMoodSlider() {
