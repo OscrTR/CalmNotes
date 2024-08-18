@@ -2,6 +2,7 @@ import 'package:calm_notes/widgets/navigation_bar.dart';
 import 'package:calm_notes/pages/home_page.dart';
 import 'package:calm_notes/pages/settings_page.dart';
 import 'package:calm_notes/pages/statistics_page.dart';
+import 'package:calm_notes/widgets/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -9,10 +10,16 @@ import 'package:go_router/go_router.dart';
 final router = GoRouter(
   initialLocation: '/',
   routes: [
+    GoRoute(
+      path: '/',
+      builder: (BuildContext context, GoRouterState state) {
+        return const SplashScreen();
+      },
+    ),
     ShellRoute(
         routes: [
           GoRoute(
-            path: '/',
+            path: '/home',
             pageBuilder: (context, state) => CustomTransitionPage(
               key: state.pageKey,
               child: const HomePage(),
