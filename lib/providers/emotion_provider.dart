@@ -14,102 +14,82 @@ class EmotionProvider extends ChangeNotifier {
     _fetchEmotions();
   }
 
-  Future<void> _fetchEmotions() async {
-    _emotions = await _databaseService.fetchEmotions();
-    _emotionsToDisplay = await _fetchAndCombineEmotionsToDisplay();
-    notifyListeners();
-  }
+  List<Emotion> combineLists(List<Emotion> list1, List<Emotion> list2) {
+    // Create a map from list2 for quick lookup by id
+    Map<int, Emotion> map2 = {for (var e in list2) e.id!: e};
 
-  Future<List<Emotion>> _fetchAndCombineEmotionsToDisplay() async {
-    final fetchedEmotionsToDisplay =
-        await _databaseService.fetchEmotionsToDisplay();
-    return _combineLists(_emotionsToDisplay, fetchedEmotionsToDisplay);
-  }
+    // Create a new list with updated values from list2
+    List<Emotion> updatedList = list1
+        .map((emotion) {
+          if (map2.containsKey(emotion.id)) {
+            // Update the emotion from list1 with values from list2
+            return emotion.updateFrom(map2[emotion.id]!);
+          }
+          // If not in list2, exclude this emotion
+          return null;
+        })
+        .whereType<Emotion>()
+        .toList();
 
-  List<Emotion> _combineLists(List<Emotion> list1, List<Emotion> list2) {
-    final map2 = {for (var e in list2) e.id!: e};
+    // Add new elements from list2 that were not in list1
+    List<Emotion> newElements = map2.entries
+        .where((entry) => !list1.any((e) => e.id == entry.key))
+        .map((entry) => entry.value)
+        .toList();
 
-    final updatedList = [
-      for (var emotion in list1)
-        if (map2.containsKey(emotion.id))
-          emotion.updateFrom(map2.remove(emotion.id)!)
-    ];
-
-    updatedList.addAll(map2.values);
+    // Combine the updated list1 with new elements from list2
+    updatedList.addAll(newElements);
 
     return updatedList;
   }
 
-  Future<void> _updateEmotionsAfterChange() async {
+  Future<void> _fetchEmotions() async {
     _emotions = await _databaseService.fetchEmotions();
-    _emotionsToDisplay = await _fetchAndCombineEmotionsToDisplay();
+    final fetchedEmotionsToDisplay =
+        await _databaseService.fetchEmotionsToDisplay();
+    _emotionsToDisplay =
+        combineLists(_emotionsToDisplay, fetchedEmotionsToDisplay);
+    notifyListeners();
+  }
+
+  Future<void> fetchDisplayedEmotions() async {
+    _emotionsToDisplay = await _databaseService.fetchEmotionsToDisplay();
     notifyListeners();
   }
 
   Future<void> addEmotion(String name) async {
-    await _databaseService.addEmotion(name);
-    await _updateEmotionsAfterChange();
+    _databaseService.addEmotion(name);
+    await _fetchEmotions();
   }
 
-  Future<void> deleteEmotion(int id) async {
-    await _databaseService.deleteEmotion(id);
-    await _updateEmotionsAfterChange();
+  Future<void> deleteEmotion(Emotion emotion) async {
+    _databaseService.deleteEmotion(emotion.id!);
+    await _fetchEmotions();
   }
 
-  Future<void> incrementEmotion(Emotion emotion) async {
-    if (emotion.id == null) {
-      print('Emotion ID is null. Cannot increment.');
-      return;
-    }
+  void incrementEmotion(Emotion emotion) async {
     await _databaseService.incrementSelectedEmotionCount(emotion.id!);
-    _updateEmotionInList(emotion.id!, (e) => e.selectedCount++);
-    notifyListeners();
+    await _fetchEmotions();
   }
 
-  Future<void> addAndIncrementEmotion(String emotionName) async {
+  void addAndIncrementEmotion(String emotionName) async {
     int emotionId = await _databaseService.addEmotion(emotionName);
     await _databaseService.incrementSelectedEmotionCount(emotionId);
-    await _updateEmotionsAfterChange();
+    await _fetchEmotions();
   }
 
-  Future<void> resetSelectedEmotion(Emotion emotion) async {
+  void resetSelectedEmotion(Emotion emotion) async {
     await _databaseService.resetSelectedEmotionCount(emotion.id!);
-    await _updateEmotionsAfterChange();
+    await _fetchEmotions();
   }
 
-  Future<void> resetEmotions() async {
+  void resetEmotions() async {
     await _databaseService.resetSelectedEmotionsCount();
-    await _updateEmotionsAfterChange();
+    await _fetchEmotions();
   }
 
   Future<void> setEmotions(int id) async {
     await _databaseService.setSelectedEmotionsCount(id);
-    await _updateEmotionsAfterChange();
-  }
-
-  void _updateEmotionInList(int emotionId, void Function(Emotion) update) {
-    // Handle _emotions list
-    final emotion = _emotions.firstWhere(
-      (e) => e.id == emotionId,
-      orElse: () => throw StateError('Emotion not found in _emotions list'),
-    );
-    update(emotion);
-
-    final selectedEmotions =
-        emotions.where((e) => e.selectedCount > 0).toList();
-
-    if (selectedEmotions.length >= 3) {
-      _emotionsToDisplay = selectedEmotions;
-      return;
-    }
-
-    final unselectedEmotions =
-        emotions.where((e) => e.selectedCount == 0).toList();
-    final minRequired = 3 - selectedEmotions.length;
-
-    _emotionsToDisplay =
-        selectedEmotions + unselectedEmotions.take(minRequired).toList();
-
-    notifyListeners();
+    await _fetchEmotions();
   }
 }

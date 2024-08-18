@@ -201,7 +201,7 @@ class _EmotionsState extends State<Emotions> {
           ),
           TextButton(
             onPressed: () {
-              context.read<EmotionProvider>().deleteEmotion(emotion.id!);
+              context.read<EmotionProvider>().deleteEmotion(emotion);
               Navigator.pop(context, 'Delete');
             },
             child: Text(context.tr('emotion_dialog_delete_dialog_delete')),
