@@ -1,3 +1,5 @@
+import 'package:calm_notes/providers/emotion_provider.dart';
+import 'package:calm_notes/providers/tag_provider.dart';
 import 'package:calm_notes/widgets/entry_details_widget.dart';
 import 'package:calm_notes/providers/entry_provider.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -124,8 +126,8 @@ class _HomePageState extends State<HomePage> {
       margin: const EdgeInsets.symmetric(vertical: 5),
       child: ListTile(
         contentPadding: EdgeInsets.zero,
-        onTap: () {
-          showModalBottomSheet(
+        onTap: () async {
+          await showModalBottomSheet(
             context: context,
             useRootNavigator: true,
             isScrollControlled: true,
@@ -153,6 +155,7 @@ class _HomePageState extends State<HomePage> {
                   });
             },
           );
+          Future.microtask(() => onModalSheetClosed(context));
         },
         title: Padding(
           padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
@@ -270,5 +273,10 @@ class _HomePageState extends State<HomePage> {
     }
 
     return groupedEntries;
+  }
+
+  void onModalSheetClosed(BuildContext context) {
+    Provider.of<EmotionProvider>(context, listen: false).resetEmotions();
+    Provider.of<TagProvider>(context, listen: false).resetTags();
   }
 }

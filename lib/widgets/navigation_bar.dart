@@ -1,8 +1,11 @@
 import 'package:calm_notes/colors.dart';
+import 'package:calm_notes/providers/emotion_provider.dart';
+import 'package:calm_notes/providers/tag_provider.dart';
 import 'package:calm_notes/widgets/entry_create_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
+import 'package:provider/provider.dart';
 
 class CustomNavigationBar extends StatelessWidget {
   const CustomNavigationBar({super.key});
@@ -19,36 +22,38 @@ class CustomNavigationBar extends StatelessWidget {
           iconSize: 30,
           action: () => GoRouter.of(context).push('/')),
       _NavItem(
-        icon: const Icon(Icons.add_circle),
-        route: '/entry',
-        iconSize: 44,
-        action: () => showModalBottomSheet(
-          context: context,
-          useRootNavigator: true,
-          isScrollControlled: true,
-          backgroundColor: Colors.transparent,
-          builder: (context) {
-            return DraggableScrollableSheet(
-                initialChildSize: 0.9,
-                maxChildSize: 0.9,
-                minChildSize: 0.5,
-                snap: true,
-                snapSizes: const [0.9],
-                builder: (context, scrollController) {
-                  return Container(
-                    decoration: const BoxDecoration(
-                        color: CustomColors.backgroundColor,
-                        borderRadius:
-                            BorderRadius.vertical(top: Radius.circular(20))),
-                    child: SingleChildScrollView(
-                        clipBehavior: Clip.none,
-                        controller: scrollController,
-                        child: const EntryCreate()),
-                  );
-                });
-          },
-        ),
-      ),
+          icon: const Icon(Icons.add_circle),
+          route: '/entry',
+          iconSize: 44,
+          action: () async {
+            await showModalBottomSheet(
+              context: context,
+              useRootNavigator: true,
+              isScrollControlled: true,
+              backgroundColor: Colors.transparent,
+              builder: (context) {
+                return DraggableScrollableSheet(
+                    initialChildSize: 0.9,
+                    maxChildSize: 0.9,
+                    minChildSize: 0.5,
+                    snap: true,
+                    snapSizes: const [0.9],
+                    builder: (context, scrollController) {
+                      return Container(
+                        decoration: const BoxDecoration(
+                            color: CustomColors.backgroundColor,
+                            borderRadius: BorderRadius.vertical(
+                                top: Radius.circular(20))),
+                        child: SingleChildScrollView(
+                            clipBehavior: Clip.none,
+                            controller: scrollController,
+                            child: const EntryCreate()),
+                      );
+                    });
+              },
+            );
+            Future.microtask(() => onModalSheetClosed(context));
+          }),
       _NavItem(
           icon: const Icon(
             Symbols.analytics,
@@ -76,6 +81,11 @@ class CustomNavigationBar extends StatelessWidget {
       icon: item.icon,
     );
   }
+}
+
+void onModalSheetClosed(BuildContext context) {
+  Provider.of<EmotionProvider>(context, listen: false).resetEmotions();
+  Provider.of<TagProvider>(context, listen: false).resetTags();
 }
 
 class _NavItem {

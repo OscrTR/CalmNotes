@@ -190,8 +190,8 @@ class DatabaseService {
     }
     final unselectedEmotions =
         emotions.where((e) => e.selectedCount == 0).toList();
-    final required = 3 - selectedEmotions.length;
-    return selectedEmotions + unselectedEmotions.take(required).toList();
+    final minRequired = 3 - selectedEmotions.length;
+    return selectedEmotions + unselectedEmotions.take(minRequired).toList();
   }
 
   Future<void> resetSelectedEmotionsCount() async {
