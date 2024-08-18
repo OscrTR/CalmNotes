@@ -15,11 +15,9 @@ import 'package:provider/provider.dart';
 
 class EntryDetails extends StatefulWidget {
   final Entry entry;
-  final BuildContext context;
   const EntryDetails({
     super.key,
     required this.entry,
-    required this.context,
   });
 
   @override
@@ -49,33 +47,56 @@ class _EntryDetailsState extends State<EntryDetails> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    return Container(
+      decoration: const BoxDecoration(
+          color: CustomColors.backgroundColor,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      child: Stack(
         children: [
-          _buildHeader(context),
-          const SizedBox(height: 24),
-          if (_selectedMood != null) ...[
-            CustomSlider(
-              initialValue: _selectedMood!.toDouble(),
-              onChanged: (double newValue) {
-                setState(() {
-                  _selectedMood = newValue.toInt();
-                });
-              },
+          Positioned(
+              top: 10,
+              right: 0,
+              left: 0,
+              child: Center(
+                child: Container(
+                  width: 40,
+                  height: 5,
+                  decoration: BoxDecoration(
+                    color: CustomColors.secondaryColor,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              )),
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildHeader(context),
+                const SizedBox(height: 24),
+                if (_selectedMood != null) ...[
+                  CustomSlider(
+                    initialValue: _selectedMood!.toDouble(),
+                    onChanged: (double newValue) {
+                      setState(() {
+                        _selectedMood = newValue.toInt();
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 14),
+                  const Emotions(),
+                  const SizedBox(height: 24),
+                  _buildTitleField(context),
+                  const SizedBox(height: 10),
+                  _buildDescriptionField(context),
+                  const SizedBox(height: 24),
+                  _buildTagsSection(context),
+                  const SizedBox(height: 24),
+                  _buildSaveButton(context),
+                ],
+              ],
             ),
-            const SizedBox(height: 14),
-            const Emotions(),
-            const SizedBox(height: 24),
-            _buildTitleField(context),
-            const SizedBox(height: 10),
-            _buildDescriptionField(context),
-            const SizedBox(height: 24),
-            _buildTagsSection(context),
-            const SizedBox(height: 24),
-            _buildSaveButton(context),
-          ],
+          )
         ],
       ),
     );

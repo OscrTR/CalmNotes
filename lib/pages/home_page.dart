@@ -7,9 +7,7 @@ import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:calm_notes/colors.dart';
 import 'package:calm_notes/models/entry.dart';
-import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:provider/provider.dart';
-import 'package:wolt_modal_sheet/wolt_modal_sheet.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -127,16 +125,34 @@ class _HomePageState extends State<HomePage> {
       child: ListTile(
         contentPadding: EdgeInsets.zero,
         onTap: () {
-          WoltModalSheet.show(
-              useRootNavigator: true,
-              context: context,
-              pageListBuilder: (context) => [
-                    WoltModalSheetPage(
-                      hasTopBarLayer: false,
-                      forceMaxHeight: true,
-                      child: EntryDetails(entry: entry, context: context),
-                    )
-                  ]);
+          showModalBottomSheet(
+            context: context,
+            useRootNavigator: true,
+            isScrollControlled: true,
+            backgroundColor: Colors.transparent,
+            builder: (context) {
+              return DraggableScrollableSheet(
+                  initialChildSize: 0.9,
+                  maxChildSize: 0.9,
+                  minChildSize: 0.5,
+                  snap: true,
+                  snapSizes: const [0.9],
+                  builder: (context, scrollController) {
+                    return Container(
+                      decoration: const BoxDecoration(
+                          color: CustomColors.backgroundColor,
+                          borderRadius:
+                              BorderRadius.vertical(top: Radius.circular(20))),
+                      child: SingleChildScrollView(
+                          clipBehavior: Clip.none,
+                          controller: scrollController,
+                          child: EntryDetails(
+                            entry: entry,
+                          )),
+                    );
+                  });
+            },
+          );
         },
         title: Padding(
           padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
