@@ -20,7 +20,11 @@ class CustomNavigationBar extends StatelessWidget {
           ),
           route: '/',
           iconSize: 30,
-          action: () => GoRouter.of(context).push('/')),
+          action: () {
+            if (GoRouterState.of(context).uri.toString() != '/') {
+              GoRouter.of(context).push('/');
+            }
+          }),
       _NavItem(
           icon: const Icon(Icons.add_circle),
           route: '/entry',
@@ -55,13 +59,18 @@ class CustomNavigationBar extends StatelessWidget {
             Future.microtask(() => onModalSheetClosed(context));
           }),
       _NavItem(
-          icon: const Icon(
-            Symbols.analytics,
-            weight: 300,
-          ),
-          route: '/statistics',
-          iconSize: 30,
-          action: () => GoRouter.of(context).push('/statistics')),
+        icon: const Icon(
+          Symbols.analytics,
+          weight: 300,
+        ),
+        route: '/statistics',
+        iconSize: 30,
+        action: () {
+          if (GoRouterState.of(context).uri.toString() != '/statistics') {
+            GoRouter.of(context).push('/statistics');
+          }
+        },
+      ),
     ];
 
     return SizedBox(
