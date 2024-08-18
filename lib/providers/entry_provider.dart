@@ -74,6 +74,13 @@ class EntryProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> deleteEntry(int id) async {
+    await _databaseService.deleteEntry(id);
+    _entries.removeWhere((e) => e.id == id);
+    _filteredEntries = _filterEntriesBetweenDates(_startDate, _endDate);
+    notifyListeners();
+  }
+
   void updateEntryInList(List<Entry> entries, Entry entry) {
     int entryIndex = entries.indexWhere((e) => e.id == entry.id);
     if (entryIndex != -1) {

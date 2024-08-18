@@ -254,6 +254,8 @@ class _HomePageState extends State<HomePage> {
 
   Map<String, List<Entry>> groupEntriesByMonthYear(
       List<Entry> entries, Locale currentLocale) {
+    // Sort entries by date in descending order
+    entries.sort((a, b) => getDateTime(b.date).compareTo(getDateTime(a.date)));
     final Map<String, List<Entry>> groupedEntries = {};
 
     for (var entry in entries) {

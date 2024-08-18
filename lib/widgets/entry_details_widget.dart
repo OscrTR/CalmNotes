@@ -281,7 +281,8 @@ class _EntryDetailsState extends State<EntryDetails> {
   }
 
   void _deleteEntry(BuildContext context) {
-    // _databaseService.deleteEntry(widget.entry.id!);
+    Provider.of<EntryProvider>(context, listen: false)
+        .deleteEntry(widget.entry.id!);
     Navigator.pop(context, 'Delete');
     _navigateBack(context);
   }
