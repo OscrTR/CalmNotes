@@ -4,7 +4,7 @@ import 'package:calm_notes/providers/tag_provider.dart';
 import 'package:calm_notes/widgets/entry_create_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:material_symbols_icons/material_symbols_icons.dart';
+import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 
 class CustomNavigationBar extends StatelessWidget {
@@ -12,82 +12,64 @@ class CustomNavigationBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final List<_NavItem> navItems = [
-      _NavItem(
-          icon: const Icon(
-            Symbols.library_books,
-            weight: 300,
-          ),
-          route: '/home',
-          iconSize: 30,
-          action: () {
-            if (GoRouterState.of(context).uri.toString() != '/home') {
-              GoRouter.of(context).push('/home');
-            }
-          }),
-      _NavItem(
-          icon: const Icon(Icons.add_circle),
-          route: '/entry',
-          iconSize: 44,
-          action: () async {
-            await showModalBottomSheet(
-              context: context,
-              useRootNavigator: true,
-              isScrollControlled: true,
-              backgroundColor: Colors.transparent,
-              builder: (context) {
-                return DraggableScrollableSheet(
-                    initialChildSize: 0.9,
-                    maxChildSize: 0.9,
-                    minChildSize: 0.5,
-                    snap: true,
-                    snapSizes: const [0.9],
-                    builder: (context, scrollController) {
-                      return Container(
-                        decoration: const BoxDecoration(
-                            color: CustomColors.backgroundColor,
-                            borderRadius: BorderRadius.vertical(
-                                top: Radius.circular(20))),
-                        child: SingleChildScrollView(
-                            clipBehavior: Clip.none,
-                            controller: scrollController,
-                            child: const EntryCreate()),
-                      );
-                    });
-              },
-            );
-            Future.microtask(() => onModalSheetClosed(context));
-          }),
-      _NavItem(
-        icon: const Icon(
-          Symbols.analytics,
-          weight: 300,
-        ),
-        route: '/statistics',
-        iconSize: 30,
-        action: () {
-          if (GoRouterState.of(context).uri.toString() != '/statistics') {
-            GoRouter.of(context).push('/statistics');
-          }
-        },
-      ),
-    ];
-
     return SizedBox(
       height: 80,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: navItems.map((item) => _buildNavItem(context, item)).toList(),
+        children: [
+          LottieIconButton(
+            lottieAsset: 'assets/lottie/entries_animation.json',
+            iconSize: 30,
+            customAction: () {
+              if (GoRouterState.of(context).uri.toString() != '/home') {
+                GoRouter.of(context).push('/home');
+              }
+            },
+          ),
+          LottieIconButton(
+            lottieAsset: 'assets/lottie/add_button_animation.json',
+            iconSize: 50,
+            customAction: () async {
+              await showModalBottomSheet(
+                context: context,
+                useRootNavigator: true,
+                isScrollControlled: true,
+                backgroundColor: Colors.transparent,
+                builder: (context) {
+                  return DraggableScrollableSheet(
+                      initialChildSize: 0.9,
+                      maxChildSize: 0.9,
+                      minChildSize: 0.5,
+                      snap: true,
+                      snapSizes: const [0.9],
+                      builder: (context, scrollController) {
+                        return Container(
+                          decoration: const BoxDecoration(
+                              color: CustomColors.backgroundColor,
+                              borderRadius: BorderRadius.vertical(
+                                  top: Radius.circular(20))),
+                          child: SingleChildScrollView(
+                              clipBehavior: Clip.none,
+                              controller: scrollController,
+                              child: const EntryCreate()),
+                        );
+                      });
+                },
+              );
+              Future.microtask(() => onModalSheetClosed(context));
+            },
+          ),
+          LottieIconButton(
+            lottieAsset: 'assets/lottie/analytics_animation.json',
+            iconSize: 30,
+            customAction: () {
+              if (GoRouterState.of(context).uri.toString() != '/statistics') {
+                GoRouter.of(context).push('/statistics');
+              }
+            },
+          ),
+        ],
       ),
-    );
-  }
-
-  Widget _buildNavItem(BuildContext context, _NavItem item) {
-    return IconButton(
-      iconSize: item.iconSize,
-      color: CustomColors.primaryColor,
-      onPressed: item.action,
-      icon: item.icon,
     );
   }
 }
@@ -97,16 +79,56 @@ void onModalSheetClosed(BuildContext context) {
   Provider.of<TagProvider>(context, listen: false).resetTags();
 }
 
-class _NavItem {
-  final Icon icon;
-  final String route;
+class LottieIconButton extends StatefulWidget {
+  final String lottieAsset;
   final double iconSize;
-  final VoidCallback action;
+  final VoidCallback? customAction;
 
-  _NavItem({
-    required this.icon,
-    required this.route,
+  const LottieIconButton({
+    super.key,
+    required this.lottieAsset,
     required this.iconSize,
-    required this.action,
+    this.customAction,
   });
+
+  @override
+  LottieIconButtonState createState() => LottieIconButtonState();
+}
+
+class LottieIconButtonState extends State<LottieIconButton>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        _controller.forward(from: 0.0);
+        if (widget.customAction != null) {
+          widget.customAction!();
+        }
+      },
+      child: Lottie.asset(
+        widget.lottieAsset,
+        controller: _controller,
+        width: widget.iconSize,
+        height: widget.iconSize,
+        onLoaded: (composition) {
+          _controller.duration = composition.duration;
+        },
+      ),
+    );
+  }
 }

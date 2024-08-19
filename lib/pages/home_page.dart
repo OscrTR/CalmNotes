@@ -77,9 +77,9 @@ class _HomePageState extends State<HomePage> {
               iconSize: 30,
               color: CustomColors.primaryColor,
               onPressed: () => GoRouter.of(context).push('/settings'),
-              icon: const Icon(
-                Symbols.settings,
-                weight: 300,
+              icon: SvgPicture.asset(
+                height: 30.0,
+                'assets/icons/settings_icon.svg',
               ),
             ),
           ],
