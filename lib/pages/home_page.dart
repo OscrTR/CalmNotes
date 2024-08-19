@@ -28,14 +28,6 @@ class _HomePageState extends State<HomePage> {
         padding: const EdgeInsets.only(top: 20, bottom: 0, left: 20, right: 20),
         child: Consumer<EntryProvider>(
           builder: (context, entryProvider, child) {
-            if (entryProvider.isLoading) {
-              return const Center(child: CircularProgressIndicator());
-            }
-
-            if (entryProvider.error != null) {
-              return Center(child: Text('Error: ${entryProvider.error}'));
-            }
-
             final entries = entryProvider.entries;
 
             if (entries.isEmpty) {

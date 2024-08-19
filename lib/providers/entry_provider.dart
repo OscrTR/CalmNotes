@@ -6,7 +6,6 @@ class EntryProvider extends ChangeNotifier {
   final DatabaseService _databaseService = DatabaseService.instance;
   List<Entry> _entries = [];
   List<Entry> _filteredEntries = [];
-  bool _isLoading = false;
   String? _error;
 
   // Properties to hold the start and end dates for filtering
@@ -20,24 +19,19 @@ class EntryProvider extends ChangeNotifier {
   List<Entry> get filteredEntries => _filteredEntries;
   DateTime get startDate => _startDate;
   DateTime get endDate => _endDate;
-  bool get isLoading => _isLoading;
   String? get error => _error;
 
   EntryProvider() {
-    _fetchEntries();
+    fetchEntries();
   }
 
-  Future<void> _fetchEntries() async {
-    _isLoading = true;
-    notifyListeners();
-
+  Future<void> fetchEntries() async {
     try {
       _entries = await _databaseService.fetchEntries();
     } catch (e) {
       _error = e.toString();
     } finally {
       _filteredEntries = _filterEntriesBetweenDates(_startDate, _endDate);
-      _isLoading = false;
       notifyListeners();
     }
   }
