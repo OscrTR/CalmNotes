@@ -1,7 +1,6 @@
 import 'package:calm_notes/colors.dart';
-import 'package:calm_notes/main.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
-import 'package:calm_notes/pages/home_page.dart';
+import 'package:calm_notes/router.dart';
 import 'package:flutter/material.dart';
 
 class NotificationService {
@@ -72,11 +71,7 @@ class NotificationService {
     debugPrint('onActionReceivedMethod');
     final payload = receivedAction.payload ?? {};
     if (payload["navigate"] == "true") {
-      MyApp.navigatorKey.currentState?.push(
-        MaterialPageRoute(
-          builder: (_) => const HomePage(),
-        ),
-      );
+      router.go('/home');
     }
   }
 
