@@ -25,6 +25,11 @@ final router = GoRouter(
               child: const HomePage(),
               transitionsBuilder:
                   (context, animation, secondaryAnimation, child) {
+                final String extraString =
+                    GoRouterState.of(context).extra.toString();
+                if (extraString == 'splash') {
+                  return child;
+                }
                 const begin = Offset(-1.0, 0.0);
                 const end = Offset.zero;
                 const curve = Curves.ease;

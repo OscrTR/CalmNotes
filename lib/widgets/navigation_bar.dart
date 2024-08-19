@@ -18,11 +18,11 @@ class CustomNavigationBar extends StatelessWidget {
             Symbols.library_books,
             weight: 300,
           ),
-          route: '/',
+          route: '/home',
           iconSize: 30,
           action: () {
-            if (GoRouterState.of(context).uri.toString() != '/') {
-              GoRouter.of(context).push('/');
+            if (GoRouterState.of(context).uri.toString() != '/home') {
+              GoRouter.of(context).push('/home');
             }
           }),
       _NavItem(

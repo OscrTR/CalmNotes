@@ -1,6 +1,5 @@
 import 'package:another_flutter_splash_screen/another_flutter_splash_screen.dart';
 import 'package:calm_notes/colors.dart';
-import 'package:calm_notes/pages/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
@@ -26,7 +25,7 @@ class _SplashScreenState extends State<SplashScreen> {
       asyncNavigationCallback: () async {
         await Future.delayed(const Duration(seconds: 3));
         if (context.mounted) {
-          GoRouter.of(context).go("/home");
+          GoRouter.of(context).go("/home", extra: 'splash');
         }
       },
     );
