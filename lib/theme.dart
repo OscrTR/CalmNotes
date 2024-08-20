@@ -30,6 +30,8 @@ final ThemeData appTheme = ThemeData(
     cardTheme: const CardTheme(color: CustomColors.color10, elevation: 0),
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
+        minimumSize: const Size(0, 40),
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
         foregroundColor: CustomColors.primaryColor,
         side: const BorderSide(color: CustomColors.secondaryColor),
         shape: RoundedRectangleBorder(

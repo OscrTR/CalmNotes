@@ -1,4 +1,6 @@
 import 'package:calm_notes/colors.dart';
+import 'package:calm_notes/widgets/animated_button/animated_button.dart';
+import 'package:calm_notes/widgets/animated_button/transition_type.dart';
 import 'package:calm_notes/widgets/calendar.dart';
 import 'package:calm_notes/widgets/chart.dart';
 import 'package:calm_notes/widgets/pie_chart.dart';
@@ -7,7 +9,6 @@ import 'package:calm_notes/providers/entry_provider.dart';
 import 'package:calm_notes/providers/factor_provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_animated_button/flutter_animated_button.dart';
 import 'package:provider/provider.dart';
 
 class StatisticsPage extends StatefulWidget {
@@ -199,8 +200,11 @@ class _StatisticsPageState extends State<StatisticsPage> {
                 selectedTextColor: CustomColors.backgroundColor,
                 selectedBackgroundColor: CustomColors.primaryColor,
                 backgroundColor: CustomColors.backgroundColor,
-                borderColor: CustomColors.secondaryColor,
+                borderColor: isSelected
+                    ? CustomColors.primaryColor
+                    : CustomColors.secondaryColor,
                 borderRadius: 5,
+                borderWidth: 1,
                 textStyle: const TextStyle(color: CustomColors.primaryColor),
                 transitionType: TransitionType.LEFT_TO_RIGHT,
                 onPress: () {

@@ -1,10 +1,13 @@
 import 'package:calm_notes/colors.dart';
 import 'package:calm_notes/models/emotion.dart';
 import 'package:calm_notes/providers/emotion_provider.dart';
+import 'package:calm_notes/widgets/animated_button/animated_button.dart';
+import 'package:calm_notes/widgets/animated_button/transition_type.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
+import 'dart:ui' as ui;
 
 class Emotions extends StatefulWidget {
   const Emotions({super.key});
@@ -38,6 +41,7 @@ class _EmotionsState extends State<Emotions> {
 
     return Wrap(
       spacing: 10,
+      runSpacing: 10,
       children: [
         ..._buildEmotionButtonList(emotionsToDisplay),
         _buildAddEmotionButton(),
@@ -47,10 +51,52 @@ class _EmotionsState extends State<Emotions> {
 
   List<Widget> _buildEmotionButtonList(List<Emotion> emotions) {
     return emotions.map((emotion) {
-      return emotion.selectedCount > 0
-          ? _buildFilledEmotionButton(emotion)
-          : _buildOutlinedEmotionButton(emotion);
+      final bool isSelected = emotion.selectedCount > 0 ? true : false;
+      return AnimatedButton(
+        text: isSelected
+            ? '${emotion.name} (${emotion.selectedCount})'
+            : emotion.name,
+        isSelected: isSelected,
+        height: 40,
+        width: _getTextWidth(
+                isSelected
+                    ? '${emotion.name} (${emotion.selectedCount})'
+                    : emotion.name,
+                const TextStyle(
+                  fontSize: 14,
+                )) +
+            40,
+        selectedTextColor: CustomColors.backgroundColor,
+        selectedBackgroundColor: CustomColors.primaryColor,
+        backgroundColor: CustomColors.backgroundColor,
+        borderRadius: 5,
+        borderColor: isSelected
+            ? CustomColors.primaryColor
+            : CustomColors.secondaryColor,
+        borderWidth: 1,
+        textStyle: const TextStyle(color: CustomColors.primaryColor),
+        transitionType: TransitionType.LEFT_TO_RIGHT,
+        onPress: () {
+          context.read<EmotionProvider>().incrementEmotion(emotion);
+        },
+        onLongPress: () {
+          context.read<EmotionProvider>().resetSelectedEmotion(emotion);
+        },
+      );
+
+      // return emotion.selectedCount > 0
+      //     ? _buildFilledEmotionButton(emotion)
+      //     : _buildOutlinedEmotionButton(emotion);
     }).toList();
+  }
+
+  double _getTextWidth(String text, TextStyle style) {
+    final TextPainter textPainter = TextPainter(
+      text: TextSpan(text: text, style: style),
+      textDirection: ui.TextDirection.ltr,
+    )..layout(minWidth: 0, maxWidth: double.infinity);
+
+    return textPainter.size.width;
   }
 
   Widget _buildFilledEmotionButton(Emotion emotion) {
