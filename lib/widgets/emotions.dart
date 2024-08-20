@@ -127,10 +127,9 @@ class _EmotionsState extends State<Emotions> {
 
   Widget _buildAddEmotionDialogContent(BuildContext context) {
     final provider = context.watch<EmotionProvider>();
-    final emotions = provider.emotions;
-    final displayedEmotions = provider.emotionsToDisplay;
+    final emotions = provider.emotionsInDialog;
     final double height =
-        (emotions.length - displayedEmotions.length) * 48.0 + 66;
+        emotions.length < 5 ? emotions.length * 48.0 + 66 : 200;
 
     return emotions.isEmpty
         ? _buildEmptyEmotionsDialogContent(context)

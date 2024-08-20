@@ -41,6 +41,7 @@ class _TagsState extends State<Tags> {
 
     return Wrap(
       spacing: 10,
+      runSpacing: 10,
       children: [
         ..._buildTagButtonList(tagsToDisplay),
         _buildAddTagButton(context),
@@ -49,7 +50,6 @@ class _TagsState extends State<Tags> {
   }
 
   List<Widget> _buildTagButtonList(List<Tag> tags) {
-    const bool popOnClick = false;
     return tags.map((tag) {
       final bool isSelected = tag.selectedCount > 0 ? true : false;
       return AnimatedButton(
@@ -89,18 +89,6 @@ class _TagsState extends State<Tags> {
     )..layout(minWidth: 0, maxWidth: double.infinity);
 
     return textPainter.size.width;
-  }
-
-  Widget _buildFilledTagButton(Tag tag, BuildContext context) {
-    return FilledButton(
-      onPressed: () {
-        context.read<TagProvider>().incrementTag(tag);
-      },
-      onLongPress: () {
-        context.read<TagProvider>().resetSelectedTag(tag);
-      },
-      child: Text('${tag.name} (${tag.selectedCount})'),
-    );
   }
 
   Widget _buildOutlinedTagButton(
@@ -148,7 +136,8 @@ class _TagsState extends State<Tags> {
 
   Widget _buildAddTagDialogContent(BuildContext context) {
     final provider = context.watch<TagProvider>();
-    final tags = provider.tags;
+    final tags = provider.tagsInDialog;
+
     final double height = tags.length < 5 ? tags.length * 48.0 + 66 : 200;
 
     return tags.isEmpty

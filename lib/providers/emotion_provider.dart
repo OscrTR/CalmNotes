@@ -6,9 +6,11 @@ class EmotionProvider extends ChangeNotifier {
   final DatabaseService _databaseService = DatabaseService.instance;
   List<Emotion> _emotions = [];
   List<Emotion> _emotionsToDisplay = [];
+  List<Emotion> _emotionsInDialog = [];
 
   List<Emotion> get emotions => _emotions;
   List<Emotion> get emotionsToDisplay => _emotionsToDisplay;
+  List<Emotion> get emotionsInDialog => _emotionsInDialog;
 
   EmotionProvider() {
     _fetchEmotions();
@@ -51,11 +53,20 @@ class EmotionProvider extends ChangeNotifier {
     _emotions = fetchedEmotions;
     _emotionsToDisplay =
         mergeEmotionLists(_emotionsToDisplay, fetchedEmotionsToDisplay);
+
+    _emotionsInDialog = _emotions
+        .where((emotion) => !_emotionsToDisplay
+            .any((displayedEmotion) => emotion.id == displayedEmotion.id))
+        .toList();
     notifyListeners();
   }
 
   Future<void> fetchDisplayedEmotions() async {
     _emotionsToDisplay = await _databaseService.fetchEmotionsToDisplay();
+    _emotionsInDialog = _emotions
+        .where((emotion) => !_emotionsToDisplay
+            .any((displayedEmotion) => emotion.id == displayedEmotion.id))
+        .toList();
     notifyListeners();
   }
 
