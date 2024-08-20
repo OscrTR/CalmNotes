@@ -52,32 +52,36 @@ class _TagsState extends State<Tags> {
   List<Widget> _buildTagButtonList(List<Tag> tags) {
     return tags.map((tag) {
       final bool isSelected = tag.selectedCount > 0 ? true : false;
-      return AnimatedButton(
-        text: isSelected ? '${tag.name} (${tag.selectedCount})' : tag.name,
-        isSelected: isSelected,
-        height: 40,
-        width: _getTextWidth(
-                isSelected ? '${tag.name} (${tag.selectedCount})' : tag.name,
-                const TextStyle(
-                  fontSize: 14,
-                )) +
-            40,
-        selectedTextColor: CustomColors.backgroundColor,
-        selectedBackgroundColor: CustomColors.primaryColor,
-        backgroundColor: CustomColors.backgroundColor,
-        borderRadius: 5,
-        borderColor: isSelected
-            ? CustomColors.primaryColor
-            : CustomColors.secondaryColor,
-        borderWidth: 1,
-        textStyle: const TextStyle(color: CustomColors.primaryColor),
-        transitionType: TransitionType.LEFT_TO_RIGHT,
-        onPress: () {
-          context.read<TagProvider>().incrementTag(tag);
-        },
-        onLongPress: () {
-          context.read<TagProvider>().resetSelectedTag(tag);
-        },
+      return ConstrainedBox(
+        constraints:
+            BoxConstraints(maxWidth: MediaQuery.of(context).size.width / 2),
+        child: AnimatedButton(
+          text: isSelected ? '${tag.name} (${tag.selectedCount})' : tag.name,
+          isSelected: isSelected,
+          height: 40,
+          width: _getTextWidth(
+                  isSelected ? '${tag.name} (${tag.selectedCount})' : tag.name,
+                  const TextStyle(
+                    fontSize: 14,
+                  )) +
+              40,
+          selectedTextColor: CustomColors.backgroundColor,
+          selectedBackgroundColor: CustomColors.primaryColor,
+          backgroundColor: CustomColors.backgroundColor,
+          borderRadius: 5,
+          borderColor: isSelected
+              ? CustomColors.primaryColor
+              : CustomColors.secondaryColor,
+          borderWidth: 1,
+          textStyle: const TextStyle(color: CustomColors.primaryColor),
+          transitionType: TransitionType.LEFT_TO_RIGHT,
+          onPress: () {
+            context.read<TagProvider>().incrementTag(tag);
+          },
+          onLongPress: () {
+            context.read<TagProvider>().resetSelectedTag(tag);
+          },
+        ),
       );
     }).toList();
   }
@@ -93,14 +97,22 @@ class _TagsState extends State<Tags> {
 
   Widget _buildOutlinedTagButton(
       Tag tag, BuildContext context, bool popOnClick) {
-    return OutlinedButton(
-      onPressed: () {
-        context.read<TagProvider>().incrementTag(tag);
-        if (popOnClick) {
-          Navigator.pop(context, 'Tag added');
-        }
-      },
-      child: Text(tag.name),
+    return ConstrainedBox(
+      constraints:
+          BoxConstraints(maxWidth: MediaQuery.of(context).size.width / 2),
+      child: OutlinedButton(
+        onPressed: () {
+          context.read<TagProvider>().incrementTag(tag);
+          if (popOnClick) {
+            Navigator.pop(context, 'Tag added');
+          }
+        },
+        child: Text(
+          tag.name,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+      ),
     );
   }
 

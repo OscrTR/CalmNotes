@@ -52,36 +52,40 @@ class _EmotionsState extends State<Emotions> {
   List<Widget> _buildEmotionButtonList(List<Emotion> emotions) {
     return emotions.map((emotion) {
       final bool isSelected = emotion.selectedCount > 0 ? true : false;
-      return AnimatedButton(
-        text: isSelected
-            ? '${emotion.name} (${emotion.selectedCount})'
-            : emotion.name,
-        isSelected: isSelected,
-        height: 40,
-        width: _getTextWidth(
-                isSelected
-                    ? '${emotion.name} (${emotion.selectedCount})'
-                    : emotion.name,
-                const TextStyle(
-                  fontSize: 14,
-                )) +
-            40,
-        selectedTextColor: CustomColors.backgroundColor,
-        selectedBackgroundColor: CustomColors.primaryColor,
-        backgroundColor: CustomColors.backgroundColor,
-        borderRadius: 5,
-        borderColor: isSelected
-            ? CustomColors.primaryColor
-            : CustomColors.secondaryColor,
-        borderWidth: 1,
-        textStyle: const TextStyle(color: CustomColors.primaryColor),
-        transitionType: TransitionType.LEFT_TO_RIGHT,
-        onPress: () {
-          context.read<EmotionProvider>().incrementEmotion(emotion);
-        },
-        onLongPress: () {
-          context.read<EmotionProvider>().resetSelectedEmotion(emotion);
-        },
+      return ConstrainedBox(
+        constraints:
+            BoxConstraints(maxWidth: MediaQuery.of(context).size.width / 2),
+        child: AnimatedButton(
+          text: isSelected
+              ? '${emotion.name} (${emotion.selectedCount})'
+              : emotion.name,
+          isSelected: isSelected,
+          height: 40,
+          width: _getTextWidth(
+                  isSelected
+                      ? '${emotion.name} (${emotion.selectedCount})'
+                      : emotion.name,
+                  const TextStyle(
+                    fontSize: 14,
+                  )) +
+              40,
+          selectedTextColor: CustomColors.backgroundColor,
+          selectedBackgroundColor: CustomColors.primaryColor,
+          backgroundColor: CustomColors.backgroundColor,
+          borderRadius: 5,
+          borderColor: isSelected
+              ? CustomColors.primaryColor
+              : CustomColors.secondaryColor,
+          borderWidth: 1,
+          textStyle: const TextStyle(color: CustomColors.primaryColor),
+          transitionType: TransitionType.LEFT_TO_RIGHT,
+          onPress: () {
+            context.read<EmotionProvider>().incrementEmotion(emotion);
+          },
+          onLongPress: () {
+            context.read<EmotionProvider>().resetSelectedEmotion(emotion);
+          },
+        ),
       );
     }).toList();
   }
@@ -180,12 +184,20 @@ class _EmotionsState extends State<Emotions> {
   }
 
   Widget _buildAddEmotionButtonInDialog(Emotion emotion, BuildContext context) {
-    return OutlinedButton(
-      onPressed: () {
-        context.read<EmotionProvider>().incrementEmotion(emotion);
-        Navigator.pop(context, 'Add emotion');
-      },
-      child: Text(emotion.name),
+    return ConstrainedBox(
+      constraints:
+          BoxConstraints(maxWidth: MediaQuery.of(context).size.width / 2),
+      child: OutlinedButton(
+        onPressed: () {
+          context.read<EmotionProvider>().incrementEmotion(emotion);
+          Navigator.pop(context, 'Add emotion');
+        },
+        child: Text(
+          emotion.name,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+      ),
     );
   }
 

@@ -144,7 +144,7 @@ class AnimatedButton extends StatefulWidget {
     this.backgroundColor = Colors.white60,
     this.isReverse = false,
     this.textMaxLine = 1,
-    this.textOverflow = TextOverflow.clip,
+    this.textOverflow = TextOverflow.ellipsis,
     this.textAlignment = Alignment.center,
     this.height = 50,
     this.width = double.infinity,
@@ -176,7 +176,7 @@ class AnimatedButton extends StatefulWidget {
     this.selectedTextColor = Colors.blue,
     this.selectedBackgroundColor = Colors.white,
     this.textMaxLine = 1,
-    this.textOverflow = TextOverflow.clip,
+    this.textOverflow = TextOverflow.ellipsis,
     this.textAlignment = Alignment.center,
     this.animationDuration = const Duration(milliseconds: 500),
     this.backgroundColor = Colors.white60,
@@ -268,6 +268,7 @@ class AnimatedButtonState extends State<AnimatedButton>
     var body = Stack(
       children: [
         AnimatedContainer(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
           duration: widget.animationDuration,
           width: widget.width,
           height: widget.height,
@@ -296,6 +297,7 @@ class AnimatedButtonState extends State<AnimatedButton>
         AnimatedBuilder(
           animation: _controller,
           child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
               width: widget.width,
               height: widget.height,
               decoration: BoxDecoration(
