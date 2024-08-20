@@ -83,10 +83,6 @@ class _EmotionsState extends State<Emotions> {
           context.read<EmotionProvider>().resetSelectedEmotion(emotion);
         },
       );
-
-      // return emotion.selectedCount > 0
-      //     ? _buildFilledEmotionButton(emotion)
-      //     : _buildOutlinedEmotionButton(emotion);
     }).toList();
   }
 
@@ -97,24 +93,6 @@ class _EmotionsState extends State<Emotions> {
     )..layout(minWidth: 0, maxWidth: double.infinity);
 
     return textPainter.size.width;
-  }
-
-  Widget _buildFilledEmotionButton(Emotion emotion) {
-    return FilledButton(
-      onPressed: () =>
-          context.read<EmotionProvider>().incrementEmotion(emotion),
-      onLongPress: () =>
-          context.read<EmotionProvider>().resetSelectedEmotion(emotion),
-      child: Text('${emotion.name} (${emotion.selectedCount})'),
-    );
-  }
-
-  Widget _buildOutlinedEmotionButton(Emotion emotion) {
-    return OutlinedButton(
-      onPressed: () =>
-          context.read<EmotionProvider>().incrementEmotion(emotion),
-      child: Text(emotion.name),
-    );
   }
 
   Widget _buildAddEmotionButton() {

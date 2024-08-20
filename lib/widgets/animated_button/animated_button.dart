@@ -133,7 +133,7 @@ class AnimatedButton extends StatefulWidget {
   final AnimatedOn animatedOn;
 
   const AnimatedButton({
-    Key? key,
+    super.key,
     required this.text,
     required this.onPress,
     this.onLongPress,
@@ -161,11 +161,10 @@ class AnimatedButton extends StatefulWidget {
   })  : isStrip = false,
         stripColor = Colors.transparent,
         stripSize = 0,
-        stripTransitionType = StripTransitionType.LEFT_TO_RIGHT,
-        super(key: key);
+        stripTransitionType = StripTransitionType.LEFT_TO_RIGHT;
 
-  AnimatedButton.strip({
-    Key? key,
+  const AnimatedButton.strip({
+    super.key,
     required this.text,
     required this.onPress,
     this.onLongPress,
@@ -196,10 +195,10 @@ class AnimatedButton extends StatefulWidget {
         isStrip = true;
 
   @override
-  _AnimatedButtonState createState() => _AnimatedButtonState();
+  AnimatedButtonState createState() => AnimatedButtonState();
 }
 
-class _AnimatedButtonState extends State<AnimatedButton>
+class AnimatedButtonState extends State<AnimatedButton>
     with TickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> slideAnimation;
@@ -268,7 +267,8 @@ class _AnimatedButtonState extends State<AnimatedButton>
 
     var body = Stack(
       children: [
-        Container(
+        AnimatedContainer(
+          duration: widget.animationDuration,
           width: widget.width,
           height: widget.height,
           decoration: BoxDecoration(
@@ -289,8 +289,8 @@ class _AnimatedButtonState extends State<AnimatedButton>
                   textAlignment: widget.textAlignment,
                 )
               : Align(
-                  child: textNormal,
                   alignment: widget.textAlignment,
+                  child: textNormal,
                 ),
         ),
         AnimatedBuilder(
@@ -314,8 +314,8 @@ class _AnimatedButtonState extends State<AnimatedButton>
                       textAlignment: widget.textAlignment,
                     )
                   : Align(
-                      child: textSelected,
                       alignment: widget.textAlignment,
+                      child: textSelected,
                     )),
           builder: (context, child) {
             return ClipPath(
@@ -340,15 +340,15 @@ class _AnimatedButtonState extends State<AnimatedButton>
         : InkWell(
             onTap: () => onPressed(),
             onLongPress: () => onLongPressed(),
-            child: body,
             borderRadius: BorderRadius.circular(widget.borderRadius),
+            child: body,
           );
   }
 
   @override
   void dispose() {
+    _controller.dispose();
     super.dispose();
-    animationController?.dispose();
   }
 
   onPressed() {
