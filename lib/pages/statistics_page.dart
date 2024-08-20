@@ -7,6 +7,7 @@ import 'package:calm_notes/providers/entry_provider.dart';
 import 'package:calm_notes/providers/factor_provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animated_button/flutter_animated_button.dart';
 import 'package:provider/provider.dart';
 
 class StatisticsPage extends StatefulWidget {
@@ -134,47 +135,45 @@ class _StatisticsPageState extends State<StatisticsPage> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        _buildRangeTypeButton(
-          context,
-          provider,
-          type: 'week',
-          isSelected: rangeType == 'week',
-          label: context.tr('statistics_week'),
-          onSelect: () {
-            setState(() {
-              rangeType = 'week';
-            });
-            provider.setDefaultWeekDate();
-            _scrollToSelectedDate();
-          },
+        Expanded(
+          child: AnimatedButton(
+              text: context.tr('statistics_week'),
+              isSelected: rangeType == 'week',
+              height: 40,
+              selectedTextColor: CustomColors.backgroundColor,
+              selectedBackgroundColor: CustomColors.primaryColor,
+              backgroundColor: CustomColors.backgroundColor,
+              borderRadius: 5,
+              textStyle: const TextStyle(color: CustomColors.primaryColor),
+              transitionType: TransitionType.LEFT_TO_RIGHT,
+              onPress: () {
+                setState(() {
+                  rangeType = 'week';
+                });
+                provider.setDefaultWeekDate();
+                _scrollToSelectedDate();
+              }),
         ),
-        _buildRangeTypeButton(
-          context,
-          provider,
-          type: 'month',
-          isSelected: rangeType == 'month',
-          label: context.tr('statistics_month'),
-          onSelect: () {
-            setState(() {
-              rangeType = 'month';
-            });
-            provider.setDefaultMonthDate();
-            _scrollToSelectedDate();
-          },
+        Expanded(
+          child: AnimatedButton(
+              text: context.tr('statistics_month'),
+              isSelected: rangeType == 'month',
+              height: 40,
+              selectedTextColor: CustomColors.backgroundColor,
+              selectedBackgroundColor: CustomColors.primaryColor,
+              backgroundColor: CustomColors.backgroundColor,
+              borderRadius: 5,
+              textStyle: const TextStyle(color: CustomColors.primaryColor),
+              transitionType: TransitionType.LEFT_TO_RIGHT,
+              onPress: () {
+                setState(() {
+                  rangeType = 'month';
+                });
+                provider.setDefaultMonthDate();
+                _scrollToSelectedDate();
+              }),
         ),
       ],
-    );
-  }
-
-  Widget _buildRangeTypeButton(BuildContext context, EntryProvider provider,
-      {required String type,
-      required bool isSelected,
-      required String label,
-      required VoidCallback onSelect}) {
-    return Expanded(
-      child: isSelected
-          ? FilledButton(onPressed: () {}, child: Text(label))
-          : TextButton(onPressed: onSelect, child: Text(label)),
     );
   }
 
@@ -192,35 +191,27 @@ class _StatisticsPageState extends State<StatisticsPage> {
           final label = _formatDateLabel(context, date);
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4.0),
-            child: isSelected
-                ? FilledButton(
-                    onPressed: () {},
-                    style: _dateButtonStyle(),
-                    child: Text(label),
-                  )
-                : OutlinedButton(
-                    style: _dateButtonStyle(),
-                    onPressed: () {
-                      setState(() {
-                        _selectedStartDate = date;
-                      });
-                      provider.setStartEndDate(
-                        date,
-                        _getEndDate(date),
-                      );
-                    },
-                    child: Text(label),
-                  ),
+            child: AnimatedButton(
+                text: label,
+                height: 40,
+                width: 85,
+                isSelected: isSelected,
+                selectedTextColor: CustomColors.backgroundColor,
+                selectedBackgroundColor: CustomColors.primaryColor,
+                backgroundColor: CustomColors.backgroundColor,
+                borderColor: CustomColors.secondaryColor,
+                borderRadius: 5,
+                textStyle: const TextStyle(color: CustomColors.primaryColor),
+                transitionType: TransitionType.LEFT_TO_RIGHT,
+                onPress: () {
+                  setState(() {
+                    _selectedStartDate = date;
+                    provider.setStartEndDate(date, _getEndDate(date));
+                  });
+                }),
           );
         }).toList(),
       ),
-    );
-  }
-
-  ButtonStyle _dateButtonStyle() {
-    return ButtonStyle(
-      minimumSize: WidgetStateProperty.all(const Size(85.0, 40.0)),
-      maximumSize: WidgetStateProperty.all(const Size(85.0, 40.0)),
     );
   }
 
