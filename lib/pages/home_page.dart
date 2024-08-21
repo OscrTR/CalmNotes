@@ -5,7 +5,6 @@ import 'package:calm_notes/providers/entry_provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:calm_notes/colors.dart';
 import 'package:calm_notes/models/entry.dart';

@@ -13,11 +13,11 @@ class DatabaseService {
 
   Future<Database> get database async {
     if (_db != null) return _db!;
-    _db = await getDatabase();
+    _db = await _initDatabase();
     return _db!;
   }
 
-  Future<Database> getDatabase() async {
+  Future<Database> _initDatabase() async {
     final databaseDirPath = await getDatabasesPath();
     final databasePath = join(databaseDirPath, "calmNotes_db.db");
     return openDatabase(
@@ -35,6 +35,7 @@ class DatabaseService {
           tags TEXT
         )
         ''');
+
         db.execute('''
         CREATE TABLE reminders (
           id INTEGER PRIMARY KEY,
@@ -63,9 +64,9 @@ class DatabaseService {
     );
   }
 
-  Future<void> _insert(String table, Map<String, dynamic> values) async {
+  Future<int> _insert(String table, Map<String, dynamic> values) async {
     final db = await database;
-    await db.insert(table, values);
+    return await db.insert(table, values);
   }
 
   Future<void> _update(
@@ -93,8 +94,8 @@ class DatabaseService {
 
   // Entry methods
 
-  Future<void> addEntry(Entry entry) async {
-    await _insert('entries', entry.toMap());
+  Future<int> addEntry(Entry entry) async {
+    return await _insert('entries', entry.toMap());
   }
 
   Future<List<Entry>> fetchEntries() async {
@@ -109,9 +110,8 @@ class DatabaseService {
   }
 
   Future<int> getEntryMood(int id) async {
-    final data = await _queryById('entries', id);
-    if (data == null) throw Exception('Entry with id $id not found');
-    return Entry.fromMap(data).mood;
+    final entry = await getEntry(id);
+    return entry.mood;
   }
 
   Future<void> updateEntry(Entry entry) async {
@@ -161,9 +161,11 @@ class DatabaseService {
     return Emotion.fromMap(data);
   }
 
-  Future<int> getSelectedEmotionCount(int id) async {
-    final emotion = await getEmotion(id);
-    return emotion.selectedCount;
+  Future<void> updateEmotion(int id, {int? selectedCount, int? lastUse}) async {
+    final values = <String, dynamic>{};
+    if (selectedCount != null) values['selectedCount'] = selectedCount;
+    if (lastUse != null) values['lastUse'] = lastUse;
+    await _update('emotions', values, id);
   }
 
   Future<void> incrementSelectedEmotionCount(int id) async {
@@ -172,13 +174,7 @@ class DatabaseService {
         ? emotion.selectedCount + 1
         : emotion.selectedCount;
     final lastUse = DateTime.now().toUtc().millisecondsSinceEpoch;
-    await _update(
-        'emotions',
-        {
-          'selectedCount': newCount,
-          'lastUse': lastUse,
-        },
-        id);
+    await updateEmotion(id, selectedCount: newCount, lastUse: lastUse);
   }
 
   Future<List<Emotion>> fetchEmotionsToDisplay() async {
@@ -190,8 +186,9 @@ class DatabaseService {
     }
     final unselectedEmotions =
         emotions.where((e) => e.selectedCount == 0).toList();
-    final minRequired = 3 - selectedEmotions.length;
-    return selectedEmotions + unselectedEmotions.take(minRequired).toList();
+    final requiredEmotions = 3 - selectedEmotions.length;
+    return selectedEmotions +
+        unselectedEmotions.take(requiredEmotions).toList();
   }
 
   Future<void> resetSelectedEmotionsCount() async {
@@ -200,34 +197,21 @@ class DatabaseService {
   }
 
   Future<void> resetSelectedEmotionCount(int id) async {
-    await _update(
-        'emotions',
-        {
-          'selectedCount': 0,
-        },
-        id);
+    await updateEmotion(id, selectedCount: 0);
   }
 
   Future<void> setSelectedEmotionsCount(int id) async {
-    final Entry entry = await getEntry(id);
-    final Map<String, int> emotionMap = convertStringToMap(entry.emotions!);
-
-    final List<Emotion> emotions = await fetchEmotions();
-    final Map<String, Emotion> emotionMapFromDb = {
-      for (var e in emotions) e.name: e
-    };
+    final entry = await getEntry(id);
+    final emotionMap = _convertStringToMap(entry.emotions!);
+    final emotions = await fetchEmotions();
+    final emotionMapFromDb = {for (var e in emotions) e.name: e};
 
     for (var entry in emotionMap.entries) {
       final name = entry.key;
       final count = entry.value;
       if (emotionMapFromDb.containsKey(name)) {
         final emotion = emotionMapFromDb[name]!;
-        await _update(
-            'emotions',
-            {
-              'selectedCount': count,
-            },
-            emotion.id!);
+        await updateEmotion(emotion.id!, selectedCount: count);
       }
     }
   }
@@ -256,9 +240,11 @@ class DatabaseService {
     return Tag.fromMap(data);
   }
 
-  Future<int> getSelectedTagCount(int id) async {
-    final tag = await getTag(id);
-    return tag.selectedCount;
+  Future<void> updateTag(int id, {int? selectedCount, int? lastUse}) async {
+    final values = <String, dynamic>{};
+    if (selectedCount != null) values['selectedCount'] = selectedCount;
+    if (lastUse != null) values['lastUse'] = lastUse;
+    await _update('tags', values, id);
   }
 
   Future<void> incrementSelectedTagCount(int id) async {
@@ -266,13 +252,7 @@ class DatabaseService {
     final newCount =
         (tag.selectedCount < 10) ? tag.selectedCount + 1 : tag.selectedCount;
     final lastUse = DateTime.now().toUtc().millisecondsSinceEpoch;
-    await _update(
-        'tags',
-        {
-          'selectedCount': newCount,
-          'lastUse': lastUse,
-        },
-        id);
+    await updateTag(id, selectedCount: newCount, lastUse: lastUse);
   }
 
   Future<List<Tag>> fetchTagsToDisplay() async {
@@ -282,8 +262,8 @@ class DatabaseService {
       return selectedTags;
     }
     final unselectedTags = tags.where((t) => t.selectedCount == 0).toList();
-    final required = 3 - selectedTags.length;
-    return selectedTags + unselectedTags.take(required).toList();
+    final requiredTags = 3 - selectedTags.length;
+    return selectedTags + unselectedTags.take(requiredTags).toList();
   }
 
   Future<void> resetSelectedTagsCount() async {
@@ -292,40 +272,28 @@ class DatabaseService {
   }
 
   Future<void> resetSelectedTagCount(int id) async {
-    final db = await database;
-    await db.update(
-      'tags',
-      {
-        'selectedCount': 0,
-      },
-      where: 'id = ?',
-      whereArgs: [id],
-    );
+    await updateTag(id, selectedCount: 0);
   }
 
   Future<void> setSelectedTagsCount(int id) async {
     final entry = await getEntry(id);
-    final tagMap = convertStringToMap(entry.tags!);
+    final tagMap = _convertStringToMap(entry.tags!);
     final tags = await fetchTags();
     final tagMapFromDb = {for (var t in tags) t.name: t};
+
     for (var entry in tagMap.entries) {
       final name = entry.key;
       final count = entry.value;
       if (tagMapFromDb.containsKey(name)) {
         final tag = tagMapFromDb[name]!;
-        await _update(
-            'tags',
-            {
-              'selectedCount': count,
-            },
-            tag.id!);
+        await updateTag(tag.id!, selectedCount: count);
       }
     }
   }
 
   // Helper method for converting String to Map
 
-  Map<String, int> convertStringToMap(String data) {
+  Map<String, int> _convertStringToMap(String data) {
     final items = data.split(',');
     final Map<String, int> map = {};
     for (var item in items) {

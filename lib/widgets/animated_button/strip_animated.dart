@@ -1,5 +1,4 @@
 import 'package:flutter/widgets.dart';
-
 import 'transition_type.dart';
 
 class StripAnimated extends StatelessWidget {
@@ -39,8 +38,8 @@ class StripAnimated extends StatelessWidget {
                       ? 0
                       : stripSize),
               child: Align(
-                child: text,
                 alignment: textAlignment,
+                child: text,
               ),
             ),
           ),
@@ -59,7 +58,11 @@ class StripAnimated extends StatelessWidget {
           if (animationType == StripTransitionType.LEFT_TO_RIGHT)
             Container(
                 width: stripSize, height: double.infinity, color: stripColor),
-          Expanded(child: Align(child: text, alignment: textAlignment)),
+          Expanded(
+              child: Align(
+            alignment: textAlignment,
+            child: text,
+          )),
           if (animationType == StripTransitionType.RIGHT_TO_LEFT)
             Container(
                 width: stripSize, height: double.infinity, color: stripColor)

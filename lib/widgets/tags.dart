@@ -233,7 +233,7 @@ class _TagsState extends State<Tags> {
           ),
           TextButton(
             onPressed: () {
-              context.read<TagProvider>().deleteTag(tag.id!, tag.name);
+              context.read<TagProvider>().deleteTag(tag);
               Navigator.pop(context, 'Delete');
             },
             child: Text(context.tr('tag_dialog_delete_dialog_delete')),

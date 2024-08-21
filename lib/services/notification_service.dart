@@ -31,6 +31,7 @@ class NotificationService {
       debug: false,
     );
 
+    // Request permission to send notifications if not already allowed
     await AwesomeNotifications().isNotificationAllowed().then(
       (isAllowed) async {
         if (!isAllowed) {
@@ -47,25 +48,21 @@ class NotificationService {
     );
   }
 
-  /// Use this method to detect when a new notification or a schedule is created
   static Future<void> onNotificationCreatedMethod(
       ReceivedNotification receivedNotification) async {
     debugPrint('onNotificationCreatedMethod');
   }
 
-  /// Use this method to detect every time that a new notification is displayed
   static Future<void> onNotificationDisplayedMethod(
       ReceivedNotification receivedNotification) async {
     debugPrint('onNotificationDisplayedMethod');
   }
 
-  /// Use this method to detect if the user dismissed a notification
   static Future<void> onDismissActionReceivedMethod(
       ReceivedAction receivedAction) async {
     debugPrint('onDismissActionReceivedMethod');
   }
 
-  /// Use this method to detect when the user taps on a notification or action button
   static Future<void> onActionReceivedMethod(
       ReceivedAction receivedAction) async {
     debugPrint('onActionReceivedMethod');
@@ -84,6 +81,7 @@ class NotificationService {
       time.hour,
       time.minute,
     );
+
     await AwesomeNotifications().createNotification(
         content: NotificationContent(
           id: -1,

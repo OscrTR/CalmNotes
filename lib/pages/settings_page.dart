@@ -85,7 +85,7 @@ class _SettingsPageState extends State<SettingsPage> {
               style: Theme.of(context).textTheme.bodyMedium,
             ),
             GestureDetector(
-              onTap: () => provider.deleteReminder(reminder.id!),
+              onTap: () => provider.deleteReminder(reminder),
               child: Container(
                 height: 30,
                 width: 30,

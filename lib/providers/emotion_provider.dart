@@ -13,96 +13,88 @@ class EmotionProvider extends ChangeNotifier {
   List<Emotion> get emotionsInDialog => _emotionsInDialog;
 
   EmotionProvider() {
-    _fetchEmotions();
+    fetchEmotions();
   }
 
-  List<Emotion> mergeEmotionLists(List<Emotion> list1, List<Emotion> list2) {
-    // Create a map from list2 for quick lookup by id
+  // Combines two lists of emotions, updating existing ones and adding new ones.
+  List<Emotion> _mergeEmotionLists(List<Emotion> list1, List<Emotion> list2) {
     Map<int, Emotion> map2 = {for (var e in list2) e.id!: e};
 
-    // Create a new list with updated values from list2
     List<Emotion> updatedList = list1
         .map((emotion) {
           if (map2.containsKey(emotion.id)) {
-            // Update the emotion from list1 with values from list2
             return emotion.updateFrom(map2[emotion.id]!);
           }
-          // If not in list2, exclude this emotion
           return null;
         })
         .whereType<Emotion>()
         .toList();
 
-    // Add new elements from list2 that were not in list1
     List<Emotion> newElements = map2.entries
         .where((entry) => !list1.any((e) => e.id == entry.key))
         .map((entry) => entry.value)
         .toList();
 
-    // Combine the updated list1 with new elements from list2
     updatedList.addAll(newElements);
 
     return updatedList;
   }
 
-  Future<void> _fetchEmotions() async {
-    final fetchedEmotions = await _databaseService.fetchEmotions();
-    final fetchedEmotionsToDisplay =
-        await _databaseService.fetchEmotionsToDisplay();
-
-    _emotions = fetchedEmotions;
-    _emotionsToDisplay =
-        mergeEmotionLists(_emotionsToDisplay, fetchedEmotionsToDisplay);
-
+  // Updates the list of emotions displayed and those in the dialog.
+  void _updateDisplayedAndDialogEmotions() {
     _emotionsInDialog = _emotions
         .where((emotion) => !_emotionsToDisplay
             .any((displayedEmotion) => emotion.id == displayedEmotion.id))
         .toList();
+  }
+
+  Future<void> fetchEmotions() async {
+    _emotions = await _databaseService.fetchEmotions();
+    _emotionsToDisplay = _mergeEmotionLists(
+        _emotionsToDisplay, await _databaseService.fetchEmotionsToDisplay());
+    _updateDisplayedAndDialogEmotions();
     notifyListeners();
   }
 
   Future<void> fetchDisplayedEmotions() async {
     _emotionsToDisplay = await _databaseService.fetchEmotionsToDisplay();
-    _emotionsInDialog = _emotions
-        .where((emotion) => !_emotionsToDisplay
-            .any((displayedEmotion) => emotion.id == displayedEmotion.id))
-        .toList();
+    _updateDisplayedAndDialogEmotions();
     notifyListeners();
   }
 
   Future<void> addEmotion(String name) async {
     await _databaseService.addEmotion(name);
-    await _fetchEmotions();
+    await fetchEmotions();
   }
 
   Future<void> deleteEmotion(Emotion emotion) async {
     await _databaseService.deleteEmotion(emotion.id!);
-    await _fetchEmotions();
+    await fetchEmotions();
   }
 
   Future<void> incrementEmotion(Emotion emotion) async {
     await _databaseService.incrementSelectedEmotionCount(emotion.id!);
-    await _fetchEmotions();
+    await fetchEmotions();
   }
 
   Future<void> addAndIncrementEmotion(String emotionName) async {
     final int emotionId = await _databaseService.addEmotion(emotionName);
     await _databaseService.incrementSelectedEmotionCount(emotionId);
-    await _fetchEmotions();
+    await fetchEmotions();
   }
 
   Future<void> resetSelectedEmotion(Emotion emotion) async {
     await _databaseService.resetSelectedEmotionCount(emotion.id!);
-    await _fetchEmotions();
+    await fetchEmotions();
   }
 
   Future<void> resetEmotions() async {
     await _databaseService.resetSelectedEmotionsCount();
-    await _fetchEmotions();
+    await fetchEmotions();
   }
 
   Future<void> setEmotions(int id) async {
     await _databaseService.setSelectedEmotionsCount(id);
-    await _fetchEmotions();
+    await fetchEmotions();
   }
 }

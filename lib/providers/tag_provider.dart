@@ -13,7 +13,7 @@ class TagProvider extends ChangeNotifier {
   List<Tag> get tagsInDialog => _tagsInDialog;
 
   TagProvider() {
-    _fetchTags();
+    fetchTags();
   }
 
   List<Tag> _combineLists(List<Tag> list1, List<Tag> list2) {
@@ -45,7 +45,7 @@ class TagProvider extends ChangeNotifier {
     return updatedList;
   }
 
-  Future<void> _fetchTags() async {
+  Future<void> fetchTags() async {
     // Fetch tags and tagsToDisplay in parallel
     final results = await Future.wait(
         [_databaseService.fetchTags(), _databaseService.fetchTagsToDisplay()]);
@@ -71,37 +71,37 @@ class TagProvider extends ChangeNotifier {
 
   Future<void> addTag(String name) async {
     await _databaseService.addTag(name);
-    await _fetchTags();
+    await fetchTags();
   }
 
-  Future<void> deleteTag(int id, String tagName) async {
-    await _databaseService.deleteTag(id);
-    await _fetchTags();
+  Future<void> deleteTag(Tag tag) async {
+    await _databaseService.deleteTag(tag.id!);
+    await fetchTags();
   }
 
   Future<void> incrementTag(Tag tag) async {
     await _databaseService.incrementSelectedTagCount(tag.id!);
-    await _fetchTags();
+    await fetchTags();
   }
 
   Future<void> addAndIncrementTag(String tagName) async {
     final int tagId = await _databaseService.addTag(tagName);
     await _databaseService.incrementSelectedTagCount(tagId);
-    await _fetchTags();
+    await fetchTags();
   }
 
   Future<void> resetSelectedTag(Tag tag) async {
     await _databaseService.resetSelectedTagCount(tag.id!);
-    await _fetchTags();
+    await fetchTags();
   }
 
   Future<void> resetTags() async {
     await _databaseService.resetSelectedTagsCount();
-    await _fetchTags();
+    await fetchTags();
   }
 
   Future<void> setTags(int id) async {
     await _databaseService.setSelectedTagsCount(id);
-    await _fetchTags();
+    await fetchTags();
   }
 }

@@ -40,4 +40,24 @@ class Entry {
       tags: map['tags'],
     );
   }
+
+  Entry copyWith({
+    int? id,
+    int? mood,
+    String? date,
+    String? emotions,
+    String? title,
+    String? description,
+    String? tags,
+  }) {
+    return Entry(
+      id: id ?? this.id,
+      mood: mood ?? this.mood,
+      date: date ?? this.date,
+      emotions: emotions ?? this.emotions,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      tags: tags ?? this.tags,
+    );
+  }
 }

@@ -62,8 +62,8 @@ class EntryProvider extends ChangeNotifier {
   }
 
   Future<void> addEntry(Entry entry) async {
-    await _databaseService.addEntry(entry);
-    _entries.add(entry);
+    final entryId = await _databaseService.addEntry(entry);
+    _entries.add(entry.copyWith(id: entryId));
     _filteredEntries = _filterEntriesBetweenDates(_startDate, _endDate);
     notifyListeners();
   }
