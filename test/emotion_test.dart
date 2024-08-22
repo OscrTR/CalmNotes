@@ -1,5 +1,5 @@
 import 'package:calm_notes/models/emotion.dart';
-import 'package:test/test.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('Emotion', () {

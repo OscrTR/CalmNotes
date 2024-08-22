@@ -105,8 +105,7 @@ class DatabaseService {
 
   Future<Entry> getEntry(int id) async {
     final data = await _queryById('entries', id);
-    if (data == null) throw Exception('Entry with id $id not found');
-    return Entry.fromMap(data);
+    return Entry.fromMap(data!);
   }
 
   Future<int> getEntryMood(int id) async {
@@ -157,8 +156,7 @@ class DatabaseService {
 
   Future<Emotion> getEmotion(int id) async {
     final data = await _queryById('emotions', id);
-    if (data == null) throw Exception('Emotion with id $id not found');
-    return Emotion.fromMap(data);
+    return Emotion.fromMap(data!);
   }
 
   Future<void> updateEmotion(int id, {int? selectedCount, int? lastUse}) async {
@@ -200,8 +198,8 @@ class DatabaseService {
     await updateEmotion(id, selectedCount: 0);
   }
 
-  Future<void> setSelectedEmotionsCount(int id) async {
-    final entry = await getEntry(id);
+  Future<void> setSelectedEmotionsCount(int entryId) async {
+    final entry = await getEntry(entryId);
     final emotionMap = _convertStringToMap(entry.emotions!);
     final emotions = await fetchEmotions();
     final emotionMapFromDb = {for (var e in emotions) e.name: e};
@@ -236,8 +234,7 @@ class DatabaseService {
 
   Future<Tag> getTag(int id) async {
     final data = await _queryById('tags', id);
-    if (data == null) throw Exception('Tag with id $id not found');
-    return Tag.fromMap(data);
+    return Tag.fromMap(data!);
   }
 
   Future<void> updateTag(int id, {int? selectedCount, int? lastUse}) async {

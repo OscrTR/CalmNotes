@@ -1,3 +1,5 @@
+import 'package:calm_notes/models/emotion.dart';
+import 'package:calm_notes/models/tag.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:calm_notes/models/entry.dart';
 import 'package:calm_notes/models/reminder.dart';
@@ -34,6 +36,96 @@ void main() {
     await db.close();
   });
 
+  group('Database Tests', () {
+    test('Database is created with correct tables', () async {
+      // Initialize the database
+      final db = await dbService.database;
+
+      // Verify tables are created
+      final tables = await db
+          .rawQuery("SELECT name FROM sqlite_master WHERE type='table'");
+
+      final tableNames = tables.map((table) => table['name']).toList();
+      final expectedTableNames = ['entries', 'reminders', 'emotions', 'tags'];
+
+      expect(tables.length, 4);
+      expect(tableNames, expectedTableNames);
+
+      // Verify the structure of the 'entries' table
+      final entriesColumns = await db.rawQuery('PRAGMA table_info(entries)');
+      final expectedEntriesColumns = [
+        {
+          'cid': 0,
+          'name': 'id',
+          'type': 'INTEGER',
+          'notnull': 0,
+          'dflt_value': null,
+          'pk': 1
+        },
+        {
+          'cid': 1,
+          'name': 'date',
+          'type': 'TEXT',
+          'notnull': 1,
+          'dflt_value': null,
+          'pk': 0
+        },
+        {
+          'cid': 2,
+          'name': 'mood',
+          'type': 'INTEGER',
+          'notnull': 1,
+          'dflt_value': null,
+          'pk': 0
+        },
+        {
+          'cid': 3,
+          'name': 'emotions',
+          'type': 'TEXT',
+          'notnull': 0,
+          'dflt_value': null,
+          'pk': 0
+        },
+        {
+          'cid': 4,
+          'name': 'title',
+          'type': 'TEXT',
+          'notnull': 0,
+          'dflt_value': null,
+          'pk': 0
+        },
+        {
+          'cid': 5,
+          'name': 'description',
+          'type': 'TEXT',
+          'notnull': 0,
+          'dflt_value': null,
+          'pk': 0
+        },
+        {
+          'cid': 6,
+          'name': 'tags',
+          'type': 'TEXT',
+          'notnull': 0,
+          'dflt_value': null,
+          'pk': 0
+        },
+      ];
+
+      // Compare the actual columns with expected columns
+      for (int i = 0; i < entriesColumns.length; i++) {
+        expect(entriesColumns[i]['cid'], expectedEntriesColumns[i]['cid']);
+        expect(entriesColumns[i]['name'], expectedEntriesColumns[i]['name']);
+        expect(entriesColumns[i]['type'], expectedEntriesColumns[i]['type']);
+        expect(
+            entriesColumns[i]['notnull'], expectedEntriesColumns[i]['notnull']);
+        expect(entriesColumns[i]['dflt_value'],
+            expectedEntriesColumns[i]['dflt_value']);
+        expect(entriesColumns[i]['pk'], expectedEntriesColumns[i]['pk']);
+      }
+    });
+  });
+
   group('Entry Methods', () {
     test('Add and fetch Entry', () async {
       final entry = Entry(
@@ -52,6 +144,8 @@ void main() {
       expect(entries.first.date, '2024-08-20');
       expect(entries.first.mood, 5);
       expect(entries.first.emotions, 'Happy,Excited:2');
+      expect(
+          entries.first.mood, await dbService.getEntryMood(entries.first.id!));
     });
 
     test('Update and fetch Entry', () async {
@@ -136,14 +230,54 @@ void main() {
     });
 
     test('Reset selected counts', () async {
-      await dbService.addEmotion('Happy');
+      final happyId = await dbService.addEmotion('Happy');
       await dbService.addEmotion('Sad');
 
+      await dbService.incrementSelectedEmotionCount(happyId);
+
       await dbService.fetchEmotions();
+
+      Emotion updatedEmotion = await dbService.getEmotion(happyId);
+      expect(updatedEmotion.selectedCount, 1);
+
       await dbService.resetSelectedEmotionsCount();
 
       final updatedEmotions = await dbService.fetchEmotions();
       expect(updatedEmotions.every((e) => e.selectedCount == 0), isTrue);
+
+      await dbService.incrementSelectedEmotionCount(happyId);
+      updatedEmotion = await dbService.getEmotion(happyId);
+      expect(updatedEmotion.selectedCount, 1);
+
+      await dbService.resetSelectedEmotionCount(happyId);
+      updatedEmotion = await dbService.getEmotion(happyId);
+      expect(updatedEmotion.selectedCount, 0);
+    });
+
+    test('Set selected count for emotions', () async {
+      final entry = Entry(
+        date: '2024-08-20',
+        mood: 5,
+        emotions: 'Happy:1,Excited:2',
+        title: 'Great Day',
+        description: 'Had a wonderful day!',
+        tags: 'personal:1,work:3',
+      );
+
+      final entryId = await dbService.addEntry(entry);
+
+      await dbService.addEmotion('Happy');
+      await dbService.addEmotion('Excited');
+
+      final initialEmotions = await dbService.fetchEmotions();
+      expect(initialEmotions[0].selectedCount, 0);
+      expect(initialEmotions[1].selectedCount, 0);
+
+      await dbService.setSelectedEmotionsCount(entryId);
+      final updatedEmotions = await dbService.fetchEmotions();
+
+      expect(updatedEmotions[0].selectedCount, 2);
+      expect(updatedEmotions[1].selectedCount, 1);
     });
   });
 
@@ -165,14 +299,57 @@ void main() {
     });
 
     test('Reset selected counts', () async {
-      await dbService.addTag('Work');
-      await dbService.addTag('Personal');
+      final workId = await dbService.addTag('work');
+      await dbService.addTag('personal');
 
+      Tag updatedTag = await dbService.getTag(workId);
+      expect(updatedTag.selectedCount, 0);
+
+      await dbService.incrementSelectedTagCount(workId);
       await dbService.fetchTags();
+
+      updatedTag = await dbService.getTag(workId);
+      expect(updatedTag.selectedCount, 1);
+
       await dbService.resetSelectedTagsCount();
 
       final updatedTags = await dbService.fetchTags();
       expect(updatedTags.every((t) => t.selectedCount == 0), isTrue);
+
+      await dbService.incrementSelectedTagCount(workId);
+
+      updatedTag = await dbService.getTag(workId);
+      expect(updatedTag.selectedCount, 1);
+
+      await dbService.resetSelectedTagCount(workId);
+      updatedTag = await dbService.getTag(workId);
+      expect(updatedTag.selectedCount, 0);
+    });
+
+    test('Set selected count for tags', () async {
+      final entry = Entry(
+        date: '2024-08-20',
+        mood: 5,
+        emotions: 'Happy:1,Excited:2',
+        title: 'Great Day',
+        description: 'Had a wonderful day!',
+        tags: 'personal:1,work:3',
+      );
+
+      final entryId = await dbService.addEntry(entry);
+
+      await dbService.addTag('personal');
+      await dbService.addTag('work');
+
+      final initialTags = await dbService.fetchTags();
+      expect(initialTags[0].selectedCount, 0);
+      expect(initialTags[1].selectedCount, 0);
+
+      await dbService.setSelectedTagsCount(entryId);
+      final updatedTags = await dbService.fetchTags();
+
+      expect(updatedTags[0].selectedCount, 3);
+      expect(updatedTags[1].selectedCount, 1);
     });
   });
 }

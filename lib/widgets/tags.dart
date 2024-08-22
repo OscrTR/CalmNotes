@@ -127,6 +127,19 @@ class _TagsState extends State<Tags> {
   }
 
   void _showAddTagDialog(BuildContext context) {
+    print(context.locale);
+
+    void checkEasyLocalizationInitialized(BuildContext context) {
+      final localization = EasyLocalization.of(context);
+      if (localization == null) {
+        throw Exception("EasyLocalization is not initialized.");
+      } else {
+        print(
+            "EasyLocalization is initialized with locale: ${localization.locale}");
+      }
+    }
+
+    checkEasyLocalizationInitialized(context);
     showDialog<String>(
       context: context,
       builder: (BuildContext context) => AlertDialog(
