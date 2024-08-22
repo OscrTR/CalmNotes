@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Test Date:</td>
-            <td class="headerValue">2024-08-22 11:57:15</td>
+            <td class="headerValue">2024-08-22 13:53:40</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntryHi">-</td>
@@ -69,7 +69,7 @@
 <span id="L7"><span class="lineNum">       7</span>              :   final String? description;</span>
 <span id="L8"><span class="lineNum">       8</span>              :   final String? tags;</span>
 <span id="L9"><span class="lineNum">       9</span>              : </span>
-<span id="L10"><span class="lineNum">      10</span> <span class="tlaGNC tlaBgGNC">           3 :   Entry({</span></span>
+<span id="L10"><span class="lineNum">      10</span> <span class="tlaGNC tlaBgGNC">           5 :   Entry({</span></span>
 <span id="L11"><span class="lineNum">      11</span>              :     this.id,</span>
 <span id="L12"><span class="lineNum">      12</span>              :     required this.date,</span>
 <span id="L13"><span class="lineNum">      13</span>              :     required this.mood,</span>
@@ -79,27 +79,27 @@
 <span id="L17"><span class="lineNum">      17</span>              :     this.tags,</span>
 <span id="L18"><span class="lineNum">      18</span>              :   });</span>
 <span id="L19"><span class="lineNum">      19</span>              : </span>
-<span id="L20"><span class="lineNum">      20</span> <span class="tlaGNC">           3 :   Map&lt;String, dynamic&gt; toMap() {</span></span>
-<span id="L21"><span class="lineNum">      21</span> <span class="tlaGNC">           3 :     return {</span></span>
-<span id="L22"><span class="lineNum">      22</span> <span class="tlaGNC">           3 :       'id': id,</span></span>
-<span id="L23"><span class="lineNum">      23</span> <span class="tlaGNC">           3 :       'date': date,</span></span>
-<span id="L24"><span class="lineNum">      24</span> <span class="tlaGNC">           3 :       'mood': mood,</span></span>
-<span id="L25"><span class="lineNum">      25</span> <span class="tlaGNC">           3 :       'emotions': emotions,</span></span>
-<span id="L26"><span class="lineNum">      26</span> <span class="tlaGNC">           3 :       'title': title,</span></span>
-<span id="L27"><span class="lineNum">      27</span> <span class="tlaGNC">           3 :       'description': description,</span></span>
-<span id="L28"><span class="lineNum">      28</span> <span class="tlaGNC">           3 :       'tags': tags,</span></span>
+<span id="L20"><span class="lineNum">      20</span> <span class="tlaGNC">           5 :   Map&lt;String, dynamic&gt; toMap() {</span></span>
+<span id="L21"><span class="lineNum">      21</span> <span class="tlaGNC">           5 :     return {</span></span>
+<span id="L22"><span class="lineNum">      22</span> <span class="tlaGNC">           5 :       'id': id,</span></span>
+<span id="L23"><span class="lineNum">      23</span> <span class="tlaGNC">           5 :       'date': date,</span></span>
+<span id="L24"><span class="lineNum">      24</span> <span class="tlaGNC">           5 :       'mood': mood,</span></span>
+<span id="L25"><span class="lineNum">      25</span> <span class="tlaGNC">           5 :       'emotions': emotions,</span></span>
+<span id="L26"><span class="lineNum">      26</span> <span class="tlaGNC">           5 :       'title': title,</span></span>
+<span id="L27"><span class="lineNum">      27</span> <span class="tlaGNC">           5 :       'description': description,</span></span>
+<span id="L28"><span class="lineNum">      28</span> <span class="tlaGNC">           5 :       'tags': tags,</span></span>
 <span id="L29"><span class="lineNum">      29</span>              :     };</span>
 <span id="L30"><span class="lineNum">      30</span>              :   }</span>
 <span id="L31"><span class="lineNum">      31</span>              : </span>
-<span id="L32"><span class="lineNum">      32</span> <span class="tlaGNC">           2 :   factory Entry.fromMap(Map&lt;String, dynamic&gt; map) {</span></span>
-<span id="L33"><span class="lineNum">      33</span> <span class="tlaGNC">           2 :     return Entry(</span></span>
-<span id="L34"><span class="lineNum">      34</span> <span class="tlaGNC">           2 :       id: map['id'],</span></span>
-<span id="L35"><span class="lineNum">      35</span> <span class="tlaGNC">           2 :       date: map['date'],</span></span>
-<span id="L36"><span class="lineNum">      36</span> <span class="tlaGNC">           2 :       mood: map['mood'],</span></span>
-<span id="L37"><span class="lineNum">      37</span> <span class="tlaGNC">           2 :       emotions: map['emotions'],</span></span>
-<span id="L38"><span class="lineNum">      38</span> <span class="tlaGNC">           2 :       title: map['title'],</span></span>
-<span id="L39"><span class="lineNum">      39</span> <span class="tlaGNC">           2 :       description: map['description'],</span></span>
-<span id="L40"><span class="lineNum">      40</span> <span class="tlaGNC">           2 :       tags: map['tags'],</span></span>
+<span id="L32"><span class="lineNum">      32</span> <span class="tlaGNC">           4 :   factory Entry.fromMap(Map&lt;String, dynamic&gt; map) {</span></span>
+<span id="L33"><span class="lineNum">      33</span> <span class="tlaGNC">           4 :     return Entry(</span></span>
+<span id="L34"><span class="lineNum">      34</span> <span class="tlaGNC">           4 :       id: map['id'],</span></span>
+<span id="L35"><span class="lineNum">      35</span> <span class="tlaGNC">           4 :       date: map['date'],</span></span>
+<span id="L36"><span class="lineNum">      36</span> <span class="tlaGNC">           4 :       mood: map['mood'],</span></span>
+<span id="L37"><span class="lineNum">      37</span> <span class="tlaGNC">           4 :       emotions: map['emotions'],</span></span>
+<span id="L38"><span class="lineNum">      38</span> <span class="tlaGNC">           4 :       title: map['title'],</span></span>
+<span id="L39"><span class="lineNum">      39</span> <span class="tlaGNC">           4 :       description: map['description'],</span></span>
+<span id="L40"><span class="lineNum">      40</span> <span class="tlaGNC">           4 :       tags: map['tags'],</span></span>
 <span id="L41"><span class="lineNum">      41</span>              :     );</span>
 <span id="L42"><span class="lineNum">      42</span>              :   }</span>
 <span id="L43"><span class="lineNum">      43</span>              : </span>

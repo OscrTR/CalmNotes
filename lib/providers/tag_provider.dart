@@ -91,9 +91,7 @@ class TagProvider extends ChangeNotifier {
   }
 
   Future<void> resetSelectedTag(Tag tag) async {
-    print('reset');
     await _databaseService.resetSelectedTagCount(tag.id!);
-    print('reset done');
     await fetchTags();
   }
 

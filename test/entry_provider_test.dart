@@ -48,6 +48,18 @@ void main() {
   test('Initial state is correct', () {
     expect(entryProvider.entries, []);
     expect(entryProvider.filteredEntries, []);
+    expect(
+        entryProvider.startDate.day,
+        DateTime.now()
+            .subtract(Duration(days: DateTime.now().weekday - 1))
+            .day);
+    expect(
+        entryProvider.endDate.day,
+        DateTime.now()
+            .subtract(Duration(days: DateTime.now().weekday - 1))
+            .add(const Duration(days: 6))
+            .day);
+    expect(entryProvider.error, null);
   });
 
   test('addentry adds a new entry', () async {
@@ -126,5 +138,47 @@ void main() {
             entry.mood == entry1.mood &&
             entry.date == entry1.date),
         isFalse);
+  });
+
+  test('Setting default week and month date', () {
+    entryProvider.setStartEndDate(DateTime(2024, 8, 10), DateTime(2024, 8, 11));
+    expect(entryProvider.startDate, DateTime(2024, 8, 10));
+    expect(entryProvider.endDate, DateTime(2024, 8, 11));
+
+    entryProvider.setDefaultWeekDate();
+    expect(
+        entryProvider.startDate.day,
+        DateTime.now()
+            .subtract(Duration(days: DateTime.now().weekday - 1))
+            .day);
+    expect(
+        entryProvider.endDate.day,
+        DateTime.now()
+            .subtract(Duration(days: DateTime.now().weekday - 1))
+            .add(const Duration(days: 6))
+            .day);
+
+    entryProvider.setDefaultMonthDate();
+    DateTime now = DateTime.now();
+    expect(entryProvider.startDate.day, DateTime(now.year, now.month, 1).day);
+    expect(entryProvider.endDate.day, DateTime(now.year, now.month + 1, 0).day);
+  });
+
+  test('Getting mood distribution', () async {
+    final entry1 = Entry(mood: 2, date: '2024-08-19|00:00:00');
+    final entry2 = Entry(mood: 4, date: '2024-08-19|00:00:00');
+    final entry3 = Entry(mood: 5, date: '2024-08-20|00:00:00');
+    final entry4 = Entry(mood: 5, date: '2024-08-20|00:00:00');
+    final entry5 = Entry(mood: 8, date: '2024-08-21|00:00:00');
+    final entry6 = Entry(mood: 9, date: '2024-08-22|00:00:00');
+    await entryProvider.addEntry(entry1);
+    await entryProvider.addEntry(entry2);
+    await entryProvider.addEntry(entry3);
+    await entryProvider.addEntry(entry4);
+    await entryProvider.addEntry(entry5);
+    await entryProvider.addEntry(entry6);
+
+    final moodMap = entryProvider.getMoodDistribution();
+    expect(moodMap, {2: 1, 4: 1, 5: 2, 8: 1, 9: 1});
   });
 }

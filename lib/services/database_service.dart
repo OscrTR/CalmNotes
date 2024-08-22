@@ -13,11 +13,11 @@ class DatabaseService {
 
   Future<Database> get database async {
     if (_db != null) return _db!;
-    _db = await _initDatabase();
+    _db = await initDatabase();
     return _db!;
   }
 
-  Future<Database> _initDatabase() async {
+  Future<Database> initDatabase() async {
     final databaseDirPath = await getDatabasesPath();
     final databasePath = join(databaseDirPath, "calmNotes_db.db");
     return openDatabase(

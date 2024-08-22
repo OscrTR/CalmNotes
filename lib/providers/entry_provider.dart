@@ -89,14 +89,6 @@ class EntryProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Method to update the date range and refresh the filtered entries
-  void updateDateRange(DateTime startDate, DateTime endDate) {
-    _startDate = startDate;
-    _endDate = endDate;
-    _filteredEntries = _filterEntriesBetweenDates(_startDate, _endDate);
-    notifyListeners();
-  }
-
   // Method to filter entries between specified dates
   List<Entry> _filterEntriesBetweenDates(DateTime startDate, DateTime endDate) {
     DateTime startOfDay =
