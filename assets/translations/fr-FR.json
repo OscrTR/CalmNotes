@@ -1,6 +1,9 @@
 {
     "global_dialog_cancel":"Annuler",
 
+    "notification_title":"Comment te sens-tu ?",
+    "notification_description":"Ajoute une entrée à ton journal.",
+
     "tag_dialog_title":"Ajouter tag",
     "tag_dialog_hint":"nom du tag",
     "tag_dialog_no_tag":"Aucun tag trouvé.",

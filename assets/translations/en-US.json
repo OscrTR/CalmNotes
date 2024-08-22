@@ -1,6 +1,9 @@
 {
     "global_dialog_cancel":"Cancel",
 
+    "notification_title":"How are you feeling?",
+    "notification_description":"Add an entry to your journal.",
+
     "tag_dialog_title":"Add tag",
     "tag_dialog_hint":"tag name",
     "tag_dialog_no_tag":"No tag found.",

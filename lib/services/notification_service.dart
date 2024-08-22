@@ -1,12 +1,13 @@
 import 'package:calm_notes/colors.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:calm_notes/router.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 class NotificationService {
   static Future<void> initializeNotification() async {
     await AwesomeNotifications().initialize(
-      null,
+      'resource://drawable/res_notification_icon',
       [
         NotificationChannel(
           channelGroupKey: 'reminders',
@@ -86,8 +87,8 @@ class NotificationService {
         content: NotificationContent(
           id: -1,
           channelKey: 'reminders',
-          title: 'How are you feeling?',
-          body: 'Add an entry to your journal.',
+          title: tr('notification_title'),
+          body: tr('notification_description'),
           wakeUpScreen: true,
           category: NotificationCategory.Reminder,
           autoDismissible: false,
