@@ -1,3 +1,4 @@
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:calm_notes/models/reminder.dart';
 import 'package:flutter/material.dart';
 import 'package:calm_notes/services/database_service.dart';
@@ -17,8 +18,9 @@ class ReminderProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> addReminder(String time) async {
+  Future<void> addReminder(String time, int notificationId) async {
     final reminder = Reminder(
+      id: notificationId,
       time: time,
     );
     await _databaseService.addReminder(reminder);
@@ -26,6 +28,7 @@ class ReminderProvider with ChangeNotifier {
   }
 
   Future<void> deleteReminder(Reminder reminder) async {
+    await AwesomeNotifications().cancel(reminder.id!);
     await _databaseService.deleteReminder(reminder.id!);
     await _fetchReminders();
   }

@@ -215,9 +215,14 @@ class _SettingsPageState extends State<SettingsPage> {
   void _addReminder(BuildContext context) {
     final reminderProvider =
         Provider.of<ReminderProvider>(context, listen: false);
+
     final formattedTime = MaterialLocalizations.of(context)
         .formatTimeOfDay(selectedTime, alwaysUse24HourFormat: true);
-    reminderProvider.addReminder(formattedTime);
-    NotificationService.showNotification(selectedTime);
+
+    int notificationId =
+        DateTime.now().millisecondsSinceEpoch.remainder(100000);
+
+    reminderProvider.addReminder(formattedTime, notificationId);
+    NotificationService.showNotification(selectedTime, notificationId);
   }
 }

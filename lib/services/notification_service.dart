@@ -1,5 +1,5 @@
-import 'package:calm_notes/colors.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:calm_notes/colors.dart';
 import 'package:calm_notes/router.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -10,26 +10,14 @@ class NotificationService {
       'resource://drawable/res_notification_icon',
       [
         NotificationChannel(
-          channelGroupKey: 'reminders',
-          channelKey: 'reminders',
-          channelName: 'Reminders notifications',
-          channelDescription: 'Notification channel for reminderts',
-          defaultColor: CustomColors.color10,
-          ledColor: CustomColors.color10,
-          importance: NotificationImportance.Max,
+          channelKey: 'scheduled_channel',
+          channelName: 'Scheduled Notifications',
+          channelDescription: 'Notification channel for reminders.',
+          importance: NotificationImportance.High,
           channelShowBadge: true,
-          onlyAlertOnce: true,
           playSound: true,
-          criticalAlerts: true,
         )
       ],
-      channelGroups: [
-        NotificationChannelGroup(
-          channelGroupKey: 'reminders_group',
-          channelGroupName: 'Reminders',
-        )
-      ],
-      debug: false,
     );
 
     // Request permission to send notifications if not already allowed
@@ -73,7 +61,8 @@ class NotificationService {
     }
   }
 
-  static Future<void> showNotification(TimeOfDay time) async {
+  static Future<void> showNotification(
+      TimeOfDay time, int notificationId) async {
     DateTime date = DateTime.now();
     DateTime scheduleTime = DateTime(
       date.year,
@@ -85,10 +74,11 @@ class NotificationService {
 
     await AwesomeNotifications().createNotification(
         content: NotificationContent(
-          id: -1,
-          channelKey: 'reminders',
+          id: notificationId,
+          channelKey: 'scheduled_channel',
           title: tr('notification_title'),
           body: tr('notification_description'),
+          color: CustomColors.primaryColor,
           wakeUpScreen: true,
           category: NotificationCategory.Reminder,
           autoDismissible: false,
