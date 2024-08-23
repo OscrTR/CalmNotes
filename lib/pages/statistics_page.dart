@@ -195,7 +195,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
             child: AnimatedButton(
                 text: label,
                 height: 40,
-                width: 85,
+                width: 88,
                 isSelected: isSelected,
                 selectedTextColor: CustomColors.backgroundColor,
                 selectedBackgroundColor: CustomColors.primaryColor,
