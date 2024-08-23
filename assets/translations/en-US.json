@@ -1,7 +1,7 @@
 {
     "global_dialog_cancel":"Cancel",
 
-    "notification_title":"How are you feeling?",
+    "notification_title":"How is your day going?",
     "notification_description":"Add an entry to your journal.",
 
     "tag_dialog_title":"Add tag",
@@ -18,7 +18,7 @@
     "emotion_dialog_delete_dialog_subtitle":"Are you sure you want to delete this emotion?",
     "emotion_dialog_delete_dialog_delete":"Delete",
 
-    "home_title":"Hello!",
+    "home_title":"Hello",
     "home_subtitle":"Don't make a bad day make you feel like you have a bad life.",
     "home_no_entry":"No entries found.",
 
@@ -53,9 +53,10 @@
     "edit_delete_dialog_subtitle":"Are you sure you want to delete this entry?",
     "edit_delete_dialog_delete":"Delete",
 
-    "create_page_title":"How do you feel?",
+    "create_page_title":"How is your day going?",
     "create_title":"Title",
     "create_description":"Description",
-    "create_tags":"What was it about?",
+    "create_emotions":"How do you feel?",
+    "create_tags":"What is it about?",
     "create_save":"Save"
 }

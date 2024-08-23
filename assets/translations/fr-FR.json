@@ -1,7 +1,7 @@
 {
     "global_dialog_cancel":"Annuler",
 
-    "notification_title":"Comment te sens-tu ?",
+    "notification_title":"Comment se passe ta journée ?",
     "notification_description":"Ajoute une entrée à ton journal.",
 
     "tag_dialog_title":"Ajouter tag",
@@ -18,7 +18,7 @@
     "emotion_dialog_delete_dialog_subtitle":"Es-tu sûr·e de vouloir supprimer cette émotion?",
     "emotion_dialog_delete_dialog_delete":"Supprimer",
 
-    "home_title":"Salut!",
+    "home_title":"Salut",
     "home_subtitle":"Ne laisse pas une mauvaise journée te faire croire que tu as une mauvaise vie.",
     "home_no_entry":"Aucune entrée trouvée.",
 
@@ -53,9 +53,10 @@
     "edit_delete_dialog_subtitle":"Es-tu sûr·e de vouloir supprimer cette entrée?",
     "edit_delete_dialog_delete":"Supprimer",
 
-    "create_page_title":"Comment te sens-tu?",
+    "create_page_title":"Comment se passe ta journée?",
     "create_title":"Titre",
     "create_description":"Description",
-    "create_tags":"À quel sujet était-ce?",
+    "create_emotions":"Que ressens-tu?",
+    "create_tags":"À quel sujet est-ce?",
     "create_save":"Enregistrer"
 }

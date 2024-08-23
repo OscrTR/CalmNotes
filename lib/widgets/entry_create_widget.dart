@@ -65,7 +65,7 @@ class _EntryCreateState extends State<EntryCreate> {
                   const SizedBox(height: 24),
                   _buildMoodSlider(),
                   const SizedBox(height: 14),
-                  const Emotions(),
+                  _buildEmotionsSection(context),
                   const SizedBox(height: 24),
                   _buildTitleField(context),
                   const SizedBox(height: 10),
@@ -106,8 +106,9 @@ class _EntryCreateState extends State<EntryCreate> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Padding(
+        Container(
           padding: const EdgeInsets.only(bottom: 6),
+          width: MediaQuery.of(context).size.width - 100,
           child: Text(
             context.tr('create_page_title'),
             style:
@@ -190,6 +191,18 @@ class _EntryCreateState extends State<EntryCreate> {
       style: Theme.of(context).textTheme.bodyMedium,
       maxLines: null,
       keyboardType: TextInputType.multiline,
+    );
+  }
+
+  Widget _buildEmotionsSection(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(context.tr('create_emotions'),
+            style: Theme.of(context).textTheme.titleMedium),
+        const SizedBox(height: 10),
+        const Emotions(),
+      ],
     );
   }
 
