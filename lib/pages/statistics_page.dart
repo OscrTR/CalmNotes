@@ -104,11 +104,14 @@ class _StatisticsPageState extends State<StatisticsPage> {
 
   Widget _buildFactorSelectionContent(
       List<Entry> entries, BuildContext context) {
+    final factorsList = _extractFactors(entries);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(context.tr('statistics_factor_dialog_subtitle')),
+        Text(context.tr(factorsList.isEmpty
+            ? 'statistics_no_factor'
+            : 'statistics_factor_dialog_subtitle')),
         const SizedBox(height: 10),
         Wrap(
           spacing: 10,

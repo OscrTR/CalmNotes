@@ -33,6 +33,7 @@
 
     "statistics_factor_dialog_title":"Sélection de facteur",
     "statistics_factor_dialog_subtitle":"Sélectionne un facteur à comparer avec ton humeur.",
+    "statistics_no_factor":"Aucun facteur trouvé sur cette période.",
     "statistics_factor_dialog_add":"Ajouter",
     "statistics_week":"Semaine",
     "statistics_month":"Mois",

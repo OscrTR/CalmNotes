@@ -33,6 +33,7 @@
 
     "statistics_factor_dialog_title":"Factor selection",
     "statistics_factor_dialog_subtitle":"Select a factor to compare with your mood.",
+    "statistics_no_factor":"No factor found for this period.",
     "statistics_factor_dialog_add":"Add",
     "statistics_week":"Week",
     "statistics_month":"Month",
