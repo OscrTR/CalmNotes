@@ -41,6 +41,7 @@
     "statistics_mood_graph_add_factor":"Ajouter un facteur",
     "statistics_mood_calendar":"Calendrier de l'humeur",
     "statistics_mood_distribution":"Distribution de l'humeur",
+    "statistics_no_data":"Pas assez de données à afficher.",
 
     "edit_page_title":"Modifier l'entrée",
     "edit_title":"Titre",

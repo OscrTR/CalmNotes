@@ -41,6 +41,7 @@
     "statistics_mood_graph_add_factor":"Add factor",
     "statistics_mood_calendar":"Mood calendar",
     "statistics_mood_distribution":"Mood distribution",
+    "statistics_no_data":"Not enough data to display.",
 
     "edit_page_title":"Edit entry",
     "edit_title":"Title",

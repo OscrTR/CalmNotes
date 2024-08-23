@@ -1,5 +1,6 @@
 import 'package:calm_notes/colors.dart';
 import 'package:calm_notes/providers/entry_provider.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:provider/provider.dart';
@@ -17,8 +18,9 @@ class _CustomPieChartState extends State<CustomPieChart> {
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<EntryProvider>();
-    final moodData =
-        provider.getMoodDistribution(); // Get the mood data from the provider
+    final moodData = provider.getMoodDistribution();
+
+    print(moodData);
 
     return GestureDetector(
       onTap: () {
@@ -26,22 +28,39 @@ class _CustomPieChartState extends State<CustomPieChart> {
           _showMood = !_showMood;
         });
       },
-      child: Container(
-        height: 250,
-        width: 352.7,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          color: Colors.white,
-        ),
-        padding: const EdgeInsets.only(top: 24, bottom: 24, left: 0, right: 20),
-        child: PieChart(
-          PieChartData(
-            sectionsSpace: 2,
-            centerSpaceRadius: 70,
-            sections: _buildSections(moodData),
+      child: Stack(children: [
+        Container(
+          height: 250,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            color: Colors.white,
+          ),
+          padding:
+              const EdgeInsets.only(top: 24, bottom: 24, left: 0, right: 20),
+          child: PieChart(
+            PieChartData(
+              sectionsSpace: 2,
+              centerSpaceRadius: 70,
+              sections: _buildSections(moodData),
+            ),
           ),
         ),
-      ),
+        if (moodData.isEmpty)
+          Positioned(
+            child: Container(
+              height: 250,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: CustomColors.primaryColor.withOpacity(0.3),
+              ),
+              child: Center(
+                child: Text(
+                  tr('statistics_no_data'),
+                ),
+              ),
+            ),
+          ),
+      ]),
     );
   }
 

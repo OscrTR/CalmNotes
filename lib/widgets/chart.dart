@@ -3,6 +3,7 @@ import 'package:calm_notes/models/entry.dart';
 import 'package:calm_notes/models/factor.dart';
 import 'package:calm_notes/providers/entry_provider.dart';
 import 'package:calm_notes/providers/factor_provider.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -39,34 +40,54 @@ class _ChartState extends State<Chart> {
     final Map<double, Color> gradientColorsStopsMap =
         _createGradientColorStopsMap(entrySpots);
 
+    print(isOnlyNaN(entrySpots));
+
     return Column(
       children: [
-        Container(
-          height: 250,
-          width: 352.7,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
-            color: Colors.white,
-          ),
-          padding:
-              const EdgeInsets.only(top: 24, bottom: 14, left: 0, right: 20),
-          child: LineChart(
-            LineChartData(
-              minY: 0,
-              maxY: 10,
-              lineBarsData: _buildLineBarsData(
-                  entrySpots,
-                  gradientColorsStopsMap,
-                  factorProvider,
-                  entries,
-                  spotsDate,
-                  factorSpots),
-              lineTouchData: const LineTouchData(enabled: false),
-              titlesData: _buildTitlesData(spotsDate),
-              gridData: _buildGridData(),
-              borderData: _buildBorderData(),
+        Stack(
+          children: [
+            Container(
+              height: 250,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: Colors.white,
+              ),
+              padding: const EdgeInsets.only(
+                  top: 24, bottom: 14, left: 0, right: 20),
+              child: LineChart(
+                LineChartData(
+                  minY: 0,
+                  maxY: 10,
+                  lineBarsData: _buildLineBarsData(
+                      entrySpots,
+                      gradientColorsStopsMap,
+                      factorProvider,
+                      entries,
+                      spotsDate,
+                      factorSpots),
+                  lineTouchData: const LineTouchData(enabled: false),
+                  titlesData: _buildTitlesData(spotsDate),
+                  gridData: _buildGridData(),
+                  borderData: _buildBorderData(),
+                ),
+              ),
             ),
-          ),
+            if (isOnlyNaN(entrySpots))
+              Positioned(
+                child: Container(
+                  height: 250,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: CustomColors.primaryColor.withOpacity(0.3),
+                  ),
+                  child: Center(
+                    child: Text(
+                      tr('statistics_no_data'),
+                    ),
+                  ),
+                ),
+              ),
+          ],
         ),
       ],
     );
