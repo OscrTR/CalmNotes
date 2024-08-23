@@ -167,6 +167,9 @@ class _EntryCreateState extends State<EntryCreate> {
   Widget _buildTitleField(BuildContext context) {
     return TextField(
       controller: _titleController,
+      onTapOutside: (event) {
+        FocusManager.instance.primaryFocus?.unfocus();
+      },
       decoration: InputDecoration(
         border: const OutlineInputBorder(borderSide: BorderSide.none),
         hintText: context.tr('create_title'),
@@ -181,6 +184,9 @@ class _EntryCreateState extends State<EntryCreate> {
   Widget _buildDescriptionField(BuildContext context) {
     return TextField(
       controller: _descriptionController,
+      onTapOutside: (event) {
+        FocusManager.instance.primaryFocus?.unfocus();
+      },
       decoration: InputDecoration(
         border: const OutlineInputBorder(borderSide: BorderSide.none),
         hintText: context.tr('create_description'),

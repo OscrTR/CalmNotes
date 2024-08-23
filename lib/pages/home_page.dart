@@ -151,10 +151,11 @@ class _HomePageState extends State<HomePage> {
         title: Padding(
           padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               _buildEntryDate(entry.date),
               Container(
+                margin: const EdgeInsets.only(right: 17),
                 height: 48,
                 width: 1,
                 color: CustomColors.ternaryColor,
@@ -175,32 +176,34 @@ class _HomePageState extends State<HomePage> {
     String capitalizedDateString =
         dateString[0].toUpperCase() + dateString.substring(1);
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          dateTime.day.toString(),
-          style: const TextStyle(
-            fontWeight: FontWeight.w800,
-            fontSize: 20,
-            color: Colors.black,
+    return SizedBox(
+      width: 48,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            dateTime.day.toString(),
+            style: const TextStyle(
+              fontWeight: FontWeight.w800,
+              fontSize: 20,
+              color: Colors.black,
+            ),
           ),
-        ),
-        Text(
-          capitalizedDateString,
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 12,
-            color: Colors.grey,
+          Text(
+            capitalizedDateString,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 12,
+              color: Colors.grey,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
   Widget _buildEntryDetails(Entry entry) {
-    return SizedBox(
-      width: 250,
+    return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -208,13 +211,16 @@ class _HomePageState extends State<HomePage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Expanded(
-                child: Text(
-                  entry.title ?? '',
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: CustomColors.primaryColor,
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 5),
+                  child: Text(
+                    entry.title ?? '',
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: CustomColors.primaryColor,
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
