@@ -127,8 +127,6 @@ class _TagsState extends State<Tags> {
   }
 
   void _showAddTagDialog(BuildContext context) {
-    print(context.locale);
-
     void checkEasyLocalizationInitialized(BuildContext context) {
       final localization = EasyLocalization.of(context);
       if (localization == null) {

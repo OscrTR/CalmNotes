@@ -6,7 +6,6 @@ import 'package:calm_notes/providers/factor_provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class Chart extends StatefulWidget {
@@ -39,8 +38,6 @@ class _ChartState extends State<Chart> {
 
     final Map<double, Color> gradientColorsStopsMap =
         _createGradientColorStopsMap(entrySpots);
-
-    print(isOnlyNaN(entrySpots));
 
     return Column(
       children: [
@@ -138,6 +135,7 @@ class _ChartState extends State<Chart> {
     return LineChartBarData(
       spots: spots,
       isCurved: true,
+      preventCurveOverShooting: true,
       gradient: gradientColors.length > 1
           ? LinearGradient(colors: gradientColors)
           : null,
@@ -371,10 +369,16 @@ class _ChartState extends State<Chart> {
   }
 
   List<Color> _createGradientColors(List<FlSpot> spotsList) {
-    return spotsList
+    List<Color> result = spotsList
         .where((spot) => !spot.y.isNaN)
         .map((spot) => moodColors[spot.y.round()])
         .toList();
+
+    if (result.length <= 1) {
+      result = [Colors.transparent, Colors.transparent];
+    }
+
+    return result;
   }
 
   Map<double, Color> _createGradientColorStopsMap(List<FlSpot> spotsList) {

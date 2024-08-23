@@ -20,8 +20,6 @@ class _CustomPieChartState extends State<CustomPieChart> {
     final provider = context.watch<EntryProvider>();
     final moodData = provider.getMoodDistribution();
 
-    print(moodData);
-
     return GestureDetector(
       onTap: () {
         setState(() {
