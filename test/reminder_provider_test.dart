@@ -40,14 +40,18 @@ void main() {
   });
 
   test('addreminder adds a new reminder', () async {
-    await reminderProvider.addReminder('2024-09-10:00');
+    int notificationId =
+        DateTime.now().millisecondsSinceEpoch.remainder(100000);
+    await reminderProvider.addReminder('2024-09-10:00', notificationId);
 
-    expect(reminderProvider.reminders.first.id, 1);
+    expect(reminderProvider.reminders.first.id, notificationId);
     expect(reminderProvider.reminders.first.time, '2024-09-10:00');
   });
 
   test('deletereminder removes the reminder', () async {
-    await reminderProvider.addReminder('2024-09-10:00');
+    int notificationId =
+        DateTime.now().millisecondsSinceEpoch.remainder(100000);
+    await reminderProvider.addReminder('2024-09-10:00', notificationId);
     await reminderProvider.deleteReminder(reminderProvider.reminders.first);
 
     expect(reminderProvider.reminders, []);

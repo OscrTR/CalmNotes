@@ -111,14 +111,16 @@ class _CalendarState extends State<Calendar> {
       rowSizes: const [auto],
       children: localizedDays
           .map(
-            (day) => Container(
-              width: 44.68,
-              alignment: Alignment.center,
-              child: Text(
-                day,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: CustomColors.ternaryColor,
+            (day) => Center(
+              child: Container(
+                width: 44.68,
+                alignment: Alignment.center,
+                child: Text(
+                  day,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: CustomColors.ternaryColor,
+                  ),
                 ),
               ),
             ),
@@ -150,9 +152,8 @@ class _CalendarState extends State<Calendar> {
         return Container(
           margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
           decoration: BoxDecoration(
-            color: isInRange ? currentDateColor : Colors.transparent,
-            borderRadius: BorderRadius.circular(90),
-          ),
+              color: isInRange ? currentDateColor : Colors.transparent,
+              shape: BoxShape.circle),
           child: Center(
             child: Stack(
               children: [
