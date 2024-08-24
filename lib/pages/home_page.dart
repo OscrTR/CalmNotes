@@ -23,6 +23,7 @@ class _HomePageState extends State<HomePage> {
     final Locale currentLocale = context.locale;
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Padding(
         padding: const EdgeInsets.only(top: 20, bottom: 0, left: 20, right: 20),
         child: Consumer<EntryProvider>(
@@ -141,6 +142,7 @@ class _HomePageState extends State<HomePage> {
                           controller: scrollController,
                           child: EntryDetails(
                             entry: entry,
+                            scrollController: scrollController,
                           )),
                     );
                   });

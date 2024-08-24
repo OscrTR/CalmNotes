@@ -51,7 +51,9 @@ class CustomNavigationBar extends StatelessWidget {
                           child: SingleChildScrollView(
                               clipBehavior: Clip.none,
                               controller: scrollController,
-                              child: const EntryCreate()),
+                              child: EntryCreate(
+                                scrollController: scrollController,
+                              )),
                         );
                       });
                 },

@@ -13,7 +13,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class EntryCreate extends StatefulWidget {
-  const EntryCreate({super.key});
+  final ScrollController scrollController;
+  const EntryCreate({super.key, required this.scrollController});
 
   @override
   State<EntryCreate> createState() => _EntryCreateState();
@@ -23,6 +24,9 @@ class _EntryCreateState extends State<EntryCreate> {
   DateTime _selectedDate = DateTime.now();
   TimeOfDay _selectedTime = TimeOfDay.now();
   int _selectedMood = 5;
+  final ValueNotifier<double> _bottomPadding = ValueNotifier<double>(0);
+  double previousBottomPaddingValue = 0;
+  bool keyboardIsOpening = false;
 
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
@@ -31,11 +35,37 @@ class _EntryCreateState extends State<EntryCreate> {
   void dispose() {
     _titleController.dispose();
     _descriptionController.dispose();
+    _bottomPadding.removeListener(() {});
+    _bottomPadding.dispose();
     super.dispose();
   }
 
   @override
+  void initState() {
+    _bottomPadding.addListener(() async {
+      if (_bottomPadding.value > previousBottomPaddingValue) {
+        if (!keyboardIsOpening) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            widget.scrollController.animateTo(
+              100,
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeInOut,
+            );
+          });
+        }
+        keyboardIsOpening = true;
+      } else {
+        keyboardIsOpening = false;
+      }
+      previousBottomPaddingValue = _bottomPadding.value;
+    });
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    _bottomPadding.value = MediaQuery.of(context).viewInsets.bottom;
+
     return Container(
         decoration: const BoxDecoration(
             color: CustomColors.backgroundColor,
@@ -73,7 +103,8 @@ class _EntryCreateState extends State<EntryCreate> {
                   const SizedBox(height: 24),
                   _buildTagsSection(context),
                   const SizedBox(height: 24),
-                  _buildSaveButton(context)
+                  _buildSaveButton(context),
+                  SizedBox(height: _bottomPadding.value),
                 ],
               ),
             ),

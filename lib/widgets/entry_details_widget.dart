@@ -15,10 +15,9 @@ import 'package:provider/provider.dart';
 
 class EntryDetails extends StatefulWidget {
   final Entry entry;
-  const EntryDetails({
-    super.key,
-    required this.entry,
-  });
+  final ScrollController scrollController;
+  const EntryDetails(
+      {super.key, required this.entry, required this.scrollController});
 
   @override
   State<EntryDetails> createState() => _EntryDetailsState();
@@ -28,6 +27,9 @@ class _EntryDetailsState extends State<EntryDetails> {
   DateTime _selectedDate = DateTime.now();
   TimeOfDay _selectedTime = TimeOfDay.now();
   int? _selectedMood;
+  final ValueNotifier<double> _bottomPadding = ValueNotifier<double>(0);
+  double previousBottomPaddingValue = 0;
+  bool keyboardIsOpening = false;
 
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
@@ -36,17 +38,37 @@ class _EntryDetailsState extends State<EntryDetails> {
   void dispose() {
     _titleController.dispose();
     _descriptionController.dispose();
+    _bottomPadding.removeListener(() {});
+    _bottomPadding.dispose();
     super.dispose();
   }
 
   @override
   void initState() {
+    _bottomPadding.addListener(() async {
+      if (_bottomPadding.value > previousBottomPaddingValue) {
+        if (!keyboardIsOpening) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            widget.scrollController.animateTo(
+              100,
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeInOut,
+            );
+          });
+        }
+        keyboardIsOpening = true;
+      } else {
+        keyboardIsOpening = false;
+      }
+      previousBottomPaddingValue = _bottomPadding.value;
+    });
     super.initState();
     _loadEntryData();
   }
 
   @override
   Widget build(BuildContext context) {
+    _bottomPadding.value = MediaQuery.of(context).viewInsets.bottom;
     return Container(
       decoration: const BoxDecoration(
           color: CustomColors.backgroundColor,
@@ -93,6 +115,7 @@ class _EntryDetailsState extends State<EntryDetails> {
                   _buildTagsSection(context),
                   const SizedBox(height: 24),
                   _buildSaveButton(context),
+                  SizedBox(height: _bottomPadding.value),
                 ],
               ],
             ),
