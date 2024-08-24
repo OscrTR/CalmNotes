@@ -53,6 +53,7 @@ final ThemeData appTheme = ThemeData(
       style: FilledButton.styleFrom(
         foregroundColor: CustomColors.backgroundColor,
         backgroundColor: CustomColors.primaryColor,
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(5),
         ),

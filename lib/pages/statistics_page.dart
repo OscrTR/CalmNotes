@@ -312,7 +312,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
 
       if (index == -1) return;
 
-      const buttonWidth = 93.0;
+      const buttonWidth = 96.0;
       final offset = (index * buttonWidth) -
           (MediaQuery.of(context).size.width / 2 - buttonWidth / 2) +
           20;

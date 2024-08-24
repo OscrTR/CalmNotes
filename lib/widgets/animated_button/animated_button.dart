@@ -199,7 +199,7 @@ class AnimatedButton extends StatefulWidget {
 }
 
 class AnimatedButtonState extends State<AnimatedButton>
-    with TickerProviderStateMixin {
+    with TickerProviderStateMixin, AutomaticKeepAliveClientMixin {
   late AnimationController _controller;
   late Animation<double> slideAnimation;
   Animation? scaleAnimation;
@@ -383,4 +383,7 @@ class AnimatedButtonState extends State<AnimatedButton>
     enter ? _controller.forward() : _controller.reverse();
     widget.onChanges?.call(enter);
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }
