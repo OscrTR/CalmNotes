@@ -250,6 +250,7 @@ class AnimatedButtonState extends State<AnimatedButton>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     // deselect/normal text
     var textNormal = Text(
       widget.text,
