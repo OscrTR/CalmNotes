@@ -31,6 +31,7 @@
     "settings_language_dialog_english":"Anglais",
     "settings_language_dialog_french":"Français",
 
+    "statistics_page_title":"Statistiques",
     "statistics_factor_dialog_title":"Sélection de facteur",
     "statistics_factor_dialog_subtitle":"Sélectionne un facteur à comparer avec ton humeur.",
     "statistics_no_factor":"Aucun facteur trouvé sur cette période.",

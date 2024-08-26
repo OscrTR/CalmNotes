@@ -47,7 +47,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
         padding: const EdgeInsets.only(top: 20, bottom: 0, left: 20, right: 20),
         child: ListView(
           children: [
-            Text('Statistics',
+            Text(context.tr('statistics_page_title'),
                 style: Theme.of(context).textTheme.headlineMedium),
             const SizedBox(height: 20),
             _buildRangeTypeButtons(context, entryProvider),

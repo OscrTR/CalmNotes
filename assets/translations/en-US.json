@@ -31,6 +31,7 @@
     "settings_language_dialog_english":"English",
     "settings_language_dialog_french":"French",
 
+    "statistics_page_title":"Statistics",
     "statistics_factor_dialog_title":"Factor selection",
     "statistics_factor_dialog_subtitle":"Select a factor to compare with your mood.",
     "statistics_no_factor":"No factor found for this period.",
