@@ -73,13 +73,22 @@ class _HomePageState extends State<HomePage> {
               context.tr('home_title'),
               style: Theme.of(context).textTheme.headlineMedium,
             ),
-            IconButton(
-              iconSize: 30,
-              color: CustomColors.primaryColor,
-              onPressed: () => GoRouter.of(context).push('/settings'),
-              icon: SvgPicture.asset(
-                height: 30.0,
-                'assets/icons/settings_icon.svg',
+            GestureDetector(
+              onTap: () => GoRouter.of(context).push('/settings'),
+              child: Container(
+                height: 48,
+                width: 48,
+                alignment: Alignment.centerRight,
+                child: ClipRect(
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    widthFactor: 0.85,
+                    child: SvgPicture.asset(
+                      height: 30.0,
+                      'assets/icons/settings_icon.svg',
+                    ),
+                  ),
+                ),
               ),
             ),
           ],

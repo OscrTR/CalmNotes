@@ -186,38 +186,43 @@ class _StatisticsPageState extends State<StatisticsPage> {
     final ScrollController scrollController =
         rangeType == 'week' ? _scrollControllerWeeks : _scrollControllerMonths;
 
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      controller: scrollController,
-      child: Row(
-        children: dateList.map((date) {
+    return SizedBox(
+      height: 40,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        controller: scrollController,
+        itemCount: dateList.length,
+        itemBuilder: (context, index) {
+          final date = dateList[index];
           final isSelected = _isDateSelected(date);
           final label = _formatDateLabel(context, date);
+
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4.0),
             child: AnimatedButton(
-                text: label,
-                height: 40,
-                width: 88,
-                isSelected: isSelected,
-                selectedTextColor: CustomColors.backgroundColor,
-                selectedBackgroundColor: CustomColors.primaryColor,
-                backgroundColor: CustomColors.backgroundColor,
-                borderColor: isSelected
-                    ? CustomColors.primaryColor
-                    : CustomColors.secondaryColor,
-                borderRadius: 5,
-                borderWidth: 1,
-                textStyle: const TextStyle(color: CustomColors.primaryColor),
-                transitionType: TransitionType.LEFT_TO_RIGHT,
-                onPress: () {
-                  setState(() {
-                    _selectedStartDate = date;
-                    provider.setStartEndDate(date, _getEndDate(date));
-                  });
-                }),
+              text: label,
+              height: 40,
+              width: 90,
+              isSelected: isSelected,
+              selectedTextColor: CustomColors.backgroundColor,
+              selectedBackgroundColor: CustomColors.primaryColor,
+              backgroundColor: CustomColors.backgroundColor,
+              borderColor: isSelected
+                  ? CustomColors.primaryColor
+                  : CustomColors.secondaryColor,
+              borderRadius: 5,
+              borderWidth: 1,
+              textStyle: const TextStyle(color: CustomColors.primaryColor),
+              transitionType: TransitionType.LEFT_TO_RIGHT,
+              onPress: () {
+                setState(() {
+                  _selectedStartDate = date;
+                  provider.setStartEndDate(date, _getEndDate(date));
+                });
+              },
+            ),
           );
-        }).toList(),
+        },
       ),
     );
   }
@@ -312,7 +317,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
 
       if (index == -1) return;
 
-      const buttonWidth = 96.0;
+      const buttonWidth = 98.0;
       final offset = (index * buttonWidth) -
           (MediaQuery.of(context).size.width / 2 - buttonWidth / 2) +
           20;

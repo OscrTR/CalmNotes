@@ -39,7 +39,7 @@ class CustomNavigationBar extends StatelessWidget {
                   return DraggableScrollableSheet(
                       initialChildSize: 0.9,
                       maxChildSize: 0.9,
-                      minChildSize: 0.5,
+                      minChildSize: 0.7,
                       snap: true,
                       snapSizes: const [0.9],
                       builder: (context, scrollController) {
