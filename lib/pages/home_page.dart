@@ -1,6 +1,5 @@
 import 'package:calm_notes/providers/emotion_provider.dart';
 import 'package:calm_notes/providers/tag_provider.dart';
-import 'package:calm_notes/widgets/entry_details_widget.dart';
 import 'package:calm_notes/providers/entry_provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -127,37 +126,8 @@ class _HomePageState extends State<HomePage> {
       margin: const EdgeInsets.symmetric(vertical: 5),
       child: ListTile(
         contentPadding: EdgeInsets.zero,
-        onTap: () async {
-          await showModalBottomSheet(
-            context: context,
-            useRootNavigator: true,
-            isScrollControlled: true,
-            backgroundColor: Colors.transparent,
-            builder: (context) {
-              return DraggableScrollableSheet(
-                  initialChildSize: 0.9,
-                  maxChildSize: 0.9,
-                  minChildSize: 0.5,
-                  snap: true,
-                  snapSizes: const [0.9],
-                  builder: (context, scrollController) {
-                    return Container(
-                      decoration: const BoxDecoration(
-                          color: CustomColors.backgroundColor,
-                          borderRadius:
-                              BorderRadius.vertical(top: Radius.circular(20))),
-                      child: SingleChildScrollView(
-                          clipBehavior: Clip.none,
-                          controller: scrollController,
-                          child: EntryDetails(
-                            entry: entry,
-                            scrollController: scrollController,
-                          )),
-                    );
-                  });
-            },
-          );
-          Future.microtask(() => onModalSheetClosed(context));
+        onTap: () {
+          GoRouter.of(context).push('/entry/${entry.id}');
         },
         title: Padding(
           padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),

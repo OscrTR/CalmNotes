@@ -10,11 +10,12 @@ import 'package:calm_notes/providers/entry_provider.dart';
 import 'package:calm_notes/providers/tag_provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 
 class EntryCreate extends StatefulWidget {
-  final ScrollController scrollController;
-  const EntryCreate({super.key, required this.scrollController});
+  final Entry? entry;
+  const EntryCreate({super.key, this.entry});
 
   @override
   State<EntryCreate> createState() => _EntryCreateState();
@@ -23,10 +24,7 @@ class EntryCreate extends StatefulWidget {
 class _EntryCreateState extends State<EntryCreate> {
   DateTime _selectedDate = DateTime.now();
   TimeOfDay _selectedTime = TimeOfDay.now();
-  int _selectedMood = 5;
-  final ValueNotifier<double> _bottomPadding = ValueNotifier<double>(0);
-  double previousBottomPaddingValue = 0;
-  bool keyboardIsOpening = false;
+  int? _selectedMood;
 
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
@@ -35,85 +33,97 @@ class _EntryCreateState extends State<EntryCreate> {
   void dispose() {
     _titleController.dispose();
     _descriptionController.dispose();
-    _bottomPadding.removeListener(() {});
-    _bottomPadding.dispose();
     super.dispose();
   }
 
   @override
   void initState() {
-    _bottomPadding.addListener(() async {
-      if (_bottomPadding.value > previousBottomPaddingValue) {
-        if (!keyboardIsOpening) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            widget.scrollController.animateTo(
-              100,
-              duration: const Duration(milliseconds: 200),
-              curve: Curves.easeInOut,
-            );
-          });
-        }
-        keyboardIsOpening = true;
-      } else {
-        keyboardIsOpening = false;
-      }
-      previousBottomPaddingValue = _bottomPadding.value;
-    });
+    if (widget.entry != null) {
+      _selectedMood = widget.entry!.mood;
+      _selectedDate = getDateTime(widget.entry!.date)!;
+      _selectedTime = parseTimeOfDay(widget.entry!.date);
+      _titleController.text = widget.entry!.title!;
+      _descriptionController.text = widget.entry!.description!;
+      Future.microtask(() {
+        Provider.of<EmotionProvider>(context, listen: false)
+            .setEmotions(widget.entry!.id!);
+        Provider.of<TagProvider>(context, listen: false)
+            .setTags(widget.entry!.id!);
+      });
+    } else {
+      _selectedMood = 5;
+    }
     super.initState();
+  }
+
+  DateTime? getDateTime(String date) {
+    try {
+      final parts = date.split('|');
+      final dateTime = DateFormat('yyyy-MM-dd').parse(parts[0]);
+      final time = DateFormat('HH:mm').parse(parts[1]);
+      return DateTime(
+          dateTime.year, dateTime.month, dateTime.day, time.hour, time.minute);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  TimeOfDay parseTimeOfDay(String dateTimeString) {
+    // Split the string to separate date and time
+    List<String> parts = dateTimeString.split('|');
+
+    // Extract the time part (assuming the format is correct)
+    if (parts.length != 2) {
+      throw const FormatException('Invalid date-time format');
+    }
+
+    String timePart = parts[1];
+
+    // Split the time part into hours and minutes
+    List<String> timeParts = timePart.split(':');
+    if (timeParts.length != 2) {
+      throw const FormatException('Invalid time format');
+    }
+
+    int hour = int.parse(timeParts[0]);
+    int minute = int.parse(timeParts[1]);
+
+    // Create and return a TimeOfDay object
+    return TimeOfDay(hour: hour, minute: minute);
   }
 
   @override
   Widget build(BuildContext context) {
-    _bottomPadding.value = MediaQuery.of(context).viewInsets.bottom;
-
     return Container(
-        decoration: const BoxDecoration(
-            color: CustomColors.backgroundColor,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-        child: Stack(
-          children: [
-            Positioned(
-                top: 10,
-                right: 0,
-                left: 0,
-                child: Center(
-                  child: Container(
-                    width: 40,
-                    height: 5,
-                    decoration: BoxDecoration(
-                      color: CustomColors.secondaryColor,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                )),
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildHeader(context),
-                  const SizedBox(height: 24),
-                  _buildMoodSlider(),
-                  const SizedBox(height: 14),
-                  _buildEmotionsSection(context),
-                  const SizedBox(height: 24),
-                  _buildTitleField(context),
-                  const SizedBox(height: 10),
-                  _buildDescriptionField(context),
-                  const SizedBox(height: 24),
-                  _buildTagsSection(context),
-                  const SizedBox(height: 24),
-                  _buildSaveButton(context),
-                  SizedBox(height: _bottomPadding.value),
-                ],
-              ),
+        decoration: const BoxDecoration(color: CustomColors.backgroundColor),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildHeader(context),
+                const SizedBox(height: 24),
+                _buildMoodSlider(),
+                const SizedBox(height: 14),
+                _buildEmotionsSection(context),
+                const SizedBox(height: 24),
+                _buildTitleField(context),
+                const SizedBox(height: 10),
+                _buildDescriptionField(context),
+                const SizedBox(height: 24),
+                _buildTagsSection(context),
+                const SizedBox(height: 24),
+                _buildSaveButton(context),
+              ],
             ),
-          ],
+          ),
         ));
   }
 
   Widget _buildMoodSlider() {
     return CustomSlider(
+      initialValue: widget.entry?.mood.toDouble(),
       onChanged: (double newValue) {
         setState(() {
           _selectedMood = newValue.toInt();
@@ -133,37 +143,62 @@ class _EntryCreateState extends State<EntryCreate> {
     );
   }
 
+  Widget _buildBackButton(BuildContext context) {
+    return GestureDetector(
+      onTap: () => _navigateBack(context),
+      child: Container(
+        height: 48,
+        width: 48,
+        alignment: Alignment.centerLeft,
+        child: const ClipRect(
+          child: Align(
+            alignment: Alignment.centerRight,
+            widthFactor: 0.85,
+            child: Icon(
+              Icons.arrow_back,
+              color: CustomColors.primaryColor,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDeleteButton(BuildContext context) {
+    return GestureDetector(
+      onTap: () => _showDeleteDialog(context),
+      child: Container(
+        height: 48,
+        width: 48,
+        alignment: Alignment.centerRight,
+        child: const SizedBox(
+          width: 20,
+          child: Icon(
+            Symbols.delete,
+            color: CustomColors.primaryColor,
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildTitleRow(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
+        _buildBackButton(context),
         Container(
           padding: const EdgeInsets.only(bottom: 6),
-          width: MediaQuery.of(context).size.width - 100,
           child: Text(
-            context.tr('create_page_title'),
+            context.tr(
+                widget.entry != null ? 'edit_page_title' : 'create_page_title'),
             style:
                 Theme.of(context).textTheme.headlineMedium?.copyWith(height: 1),
           ),
         ),
-        GestureDetector(
-          onTap: () => _cancelEntryCreation(context),
-          child: Container(
-            height: 48,
-            width: 48,
-            alignment: Alignment.centerRight,
-            child: const ClipRect(
-              child: Align(
-                alignment: Alignment.centerRight,
-                widthFactor: 0.85,
-                child: Icon(
-                  Icons.close,
-                  color: CustomColors.primaryColor,
-                ),
-              ),
-            ),
-          ),
-        ),
+        widget.entry != null
+            ? _buildDeleteButton(context)
+            : const SizedBox(width: 48),
       ],
     );
   }
@@ -198,9 +233,6 @@ class _EntryCreateState extends State<EntryCreate> {
   Widget _buildTitleField(BuildContext context) {
     return TextField(
       controller: _titleController,
-      onTapOutside: (event) {
-        FocusManager.instance.primaryFocus?.unfocus();
-      },
       decoration: InputDecoration(
         border: const OutlineInputBorder(borderSide: BorderSide.none),
         hintText: context.tr('create_title'),
@@ -215,9 +247,6 @@ class _EntryCreateState extends State<EntryCreate> {
   Widget _buildDescriptionField(BuildContext context) {
     return TextField(
       controller: _descriptionController,
-      onTapOutside: (event) {
-        FocusManager.instance.primaryFocus?.unfocus();
-      },
       decoration: InputDecoration(
         border: const OutlineInputBorder(borderSide: BorderSide.none),
         hintText: context.tr('create_description'),
@@ -270,27 +299,28 @@ class _EntryCreateState extends State<EntryCreate> {
     );
   }
 
-  void _cancelEntryCreation(BuildContext context) {
-    Provider.of<EmotionProvider>(context, listen: false).resetEmotions();
-    Provider.of<TagProvider>(context, listen: false).resetTags();
-    Navigator.pop(context, 'Cancel');
-  }
-
   void _saveEntry(BuildContext context) {
     final emotionProvider =
         Provider.of<EmotionProvider>(context, listen: false);
     final tagProvider = Provider.of<TagProvider>(context, listen: false);
+    final entryProvider = Provider.of<EntryProvider>(context, listen: false);
 
     final entry = Entry(
+      id: widget.entry?.id,
       date: _formatDateTime(context),
-      mood: _selectedMood,
+      mood: _selectedMood!,
       emotions: _convertEmotionsToString(emotionProvider.emotionsToDisplay),
       title: _titleController.text,
       description: _descriptionController.text,
       tags: _convertTagsToString(tagProvider.tagsToDisplay),
     );
 
-    Provider.of<EntryProvider>(context, listen: false).addEntry(entry);
+    if (widget.entry != null) {
+      entryProvider.updateEntry(entry);
+    } else {
+      entryProvider.addEntry(entry);
+    }
+
     Navigator.pop(context, 'Create entry');
     emotionProvider.resetEmotions();
     tagProvider.resetTags();
@@ -345,5 +375,42 @@ class _EntryCreateState extends State<EntryCreate> {
         _selectedTime = picked;
       });
     }
+  }
+
+  void _navigateBack(BuildContext context) {
+    Navigator.pop(context, 'Previous page');
+    Provider.of<EmotionProvider>(context, listen: false).resetEmotions();
+    Provider.of<TagProvider>(context, listen: false).resetTags();
+  }
+
+  void _showDeleteDialog(BuildContext context) {
+    showDialog<String>(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        backgroundColor: CustomColors.backgroundColor,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(5),
+        ),
+        title: Text(context.tr('edit_delete_dialog_title')),
+        content: Text(context.tr('edit_delete_dialog_subtitle')),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.pop(context, 'Cancel'),
+            child: Text(context.tr('global_dialog_cancel')),
+          ),
+          TextButton(
+            onPressed: () => _deleteEntry(context),
+            child: Text(context.tr('edit_delete_dialog_delete')),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _deleteEntry(BuildContext context) {
+    Provider.of<EntryProvider>(context, listen: false)
+        .deleteEntry(widget.entry!.id!);
+    Navigator.pop(context, 'Delete');
+    _navigateBack(context);
   }
 }
