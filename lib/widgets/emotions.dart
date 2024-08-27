@@ -78,7 +78,7 @@ class _EmotionsState extends State<Emotions> {
               : CustomColors.secondaryColor,
           borderWidth: 1,
           textStyle: const TextStyle(color: CustomColors.primaryColor),
-          transitionType: TransitionType.LEFT_TO_RIGHT,
+          transitionType: TransitionType.leftToRight,
           onPress: () {
             context.read<EmotionProvider>().incrementEmotion(emotion);
           },

@@ -13,31 +13,31 @@ class RectClipper extends CustomClipper<Path> {
     Path path = Path();
 
     switch (transitionType) {
-      case TransitionType.LEFT_TO_RIGHT:
+      case TransitionType.leftToRight:
         path.lineTo(size.width * clipFactor, 0.0);
         path.lineTo(size.width * clipFactor, size.height);
         path.lineTo(0.0, size.height);
         break;
-      case TransitionType.RIGHT_TO_LEFT:
+      case TransitionType.rightToLeft:
         path.moveTo(size.width, 0.0);
         path.lineTo(size.width * clipFactor, 0.0);
         path.lineTo(size.width * clipFactor, size.height);
         path.lineTo(size.width, size.height);
         break;
 
-      case TransitionType.TOP_TO_BOTTOM:
+      case TransitionType.topToBottom:
         path.lineTo(0.0, size.height * clipFactor);
         path.lineTo(size.width, size.height * clipFactor);
         path.lineTo(size.width, 0.0);
         break;
-      case TransitionType.BOTTOM_TO_TOP:
+      case TransitionType.bottomToTop:
         path.moveTo(0.0, size.height);
         path.lineTo(0.0, size.height * clipFactor);
         path.lineTo(size.width, size.height * clipFactor);
         path.lineTo(size.width, size.height);
 
         break;
-      case TransitionType.CENTER_LR_IN:
+      case TransitionType.centerLRIn:
         path.moveTo(size.width / 2 * clipFactor, 0);
         path.lineTo(0, 0);
         path.lineTo(0, size.height);
@@ -48,7 +48,7 @@ class RectClipper extends CustomClipper<Path> {
         path.lineTo(size.width / 2 * clipFactor, size.height);
 
         break;
-      case TransitionType.CENTER_TB_IN:
+      case TransitionType.centerTBIn:
         path.moveTo(0, size.height / 2 * clipFactor);
         path.lineTo(0, 0);
         path.lineTo(size.width, 0);
@@ -59,7 +59,7 @@ class RectClipper extends CustomClipper<Path> {
         path.lineTo(size.width, size.height - (size.height / 2 * clipFactor));
         path.lineTo(0, size.height - (size.height / 2 * clipFactor));
         break;
-      case TransitionType.CENTER_LR_OUT:
+      case TransitionType.centerLROut:
         var halfWidth = size.width / 2;
         var clipFactorWidth = halfWidth * clipFactor;
         path.moveTo(halfWidth, 0.0);
@@ -68,7 +68,7 @@ class RectClipper extends CustomClipper<Path> {
         path.lineTo(halfWidth + clipFactorWidth, size.height);
         path.lineTo(halfWidth + clipFactorWidth, 0);
         break;
-      case TransitionType.CENTER_TB_OUT:
+      case TransitionType.centerTBOut:
         var halfHeight = size.height / 2;
         var clipFactorHeight = halfHeight * clipFactor;
         path.moveTo(0.0, halfHeight);
@@ -77,63 +77,63 @@ class RectClipper extends CustomClipper<Path> {
         path.lineTo(size.width, halfHeight + clipFactorHeight);
         path.lineTo(0.0, halfHeight + clipFactorHeight);
         break;
-      case TransitionType.LEFT_TOP_ROUNDER:
+      case TransitionType.leftTopRounder:
         path.addOval(Rect.fromCircle(
             center: const Offset(0, 0),
             radius:
                 (sqrt((size.width * size.width) + (size.height * size.height)) *
                     clipFactor)));
         break;
-      case TransitionType.LEFT_BOTTOM_ROUNDER:
+      case TransitionType.leftBottomRounder:
         path.addOval(Rect.fromCircle(
             center: Offset(0, size.height),
             radius:
                 (sqrt((size.width * size.width) + (size.height * size.height)) *
                     clipFactor)));
         break;
-      case TransitionType.LEFT_CENTER_ROUNDER:
+      case TransitionType.leftCenterRounder:
         path.addOval(Rect.fromCircle(
             center: Offset(0, size.height / 2),
             radius:
                 (sqrt((size.width * size.width) + (size.height * size.height)) *
                     clipFactor)));
         break;
-      case TransitionType.RIGHT_BOTTOM_ROUNDER:
+      case TransitionType.rightBottomRounder:
         path.addOval(Rect.fromCircle(
             center: Offset(size.width, size.height),
             radius:
                 (sqrt((size.width * size.width) + (size.height * size.height)) *
                     clipFactor)));
         break;
-      case TransitionType.RIGHT_TOP_ROUNDER:
+      case TransitionType.rightTopRounder:
         path.addOval(Rect.fromCircle(
             center: Offset(size.width, 0),
             radius:
                 (sqrt((size.width * size.width) + (size.height * size.height)) *
                     clipFactor)));
         break;
-      case TransitionType.RIGHT_CENTER_ROUNDER:
+      case TransitionType.rightCenterRounder:
         path.addOval(Rect.fromCircle(
             center: Offset(size.width, size.height / 2),
             radius:
                 (sqrt((size.width * size.width) + (size.height * size.height)) *
                     clipFactor)));
         break;
-      case TransitionType.TOP_CENTER_ROUNDER:
+      case TransitionType.topCenterRounder:
         path.addOval(Rect.fromCircle(
             center: Offset(size.width / 2, 0),
             radius:
                 (sqrt((size.width * size.width) + (size.height * size.height)) *
                     clipFactor)));
         break;
-      case TransitionType.BOTTOM_CENTER_ROUNDER:
+      case TransitionType.bottomCenterRounder:
         path.addOval(Rect.fromCircle(
             center: Offset(size.width / 2, size.height),
             radius:
                 (sqrt((size.width * size.width) + (size.height * size.height)) *
                     clipFactor)));
         break;
-      case TransitionType.CENTER_ROUNDER:
+      case TransitionType.centerRounder:
         path.addOval(Rect.fromCircle(
             center: Offset(size.width / 2, size.height / 2),
             radius:
@@ -160,24 +160,24 @@ class RectStripClipper extends CustomClipper<Path> {
     Path path = Path();
 
     switch (transitionType) {
-      case StripTransitionType.LEFT_TO_RIGHT:
+      case StripTransitionType.leftToRight:
         path.lineTo(size.width * clipFactor, 0.0);
         path.lineTo(size.width * clipFactor, size.height);
         path.lineTo(0.0, size.height);
         break;
-      case StripTransitionType.RIGHT_TO_LEFT:
+      case StripTransitionType.rightToLeft:
         path.moveTo(size.width, 0.0);
         path.lineTo(size.width * clipFactor, 0.0);
         path.lineTo(size.width * clipFactor, size.height);
         path.lineTo(size.width, size.height);
         break;
 
-      case StripTransitionType.TOP_TO_BOTTOM:
+      case StripTransitionType.topToBottom:
         path.lineTo(0.0, size.height * clipFactor);
         path.lineTo(size.width, size.height * clipFactor);
         path.lineTo(size.width, 0.0);
         break;
-      case StripTransitionType.BOTTOM_TO_TOP:
+      case StripTransitionType.bottomToTop:
         path.moveTo(0.0, size.height);
         path.lineTo(0.0, size.height * clipFactor);
         path.lineTo(size.width, size.height * clipFactor);

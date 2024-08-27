@@ -74,7 +74,7 @@ class _TagsState extends State<Tags> {
               : CustomColors.secondaryColor,
           borderWidth: 1,
           textStyle: const TextStyle(color: CustomColors.primaryColor),
-          transitionType: TransitionType.LEFT_TO_RIGHT,
+          transitionType: TransitionType.leftToRight,
           onPress: () {
             context.read<TagProvider>().incrementTag(tag);
           },
@@ -131,9 +131,6 @@ class _TagsState extends State<Tags> {
       final localization = EasyLocalization.of(context);
       if (localization == null) {
         throw Exception("EasyLocalization is not initialized.");
-      } else {
-        print(
-            "EasyLocalization is initialized with locale: ${localization.locale}");
       }
     }
 

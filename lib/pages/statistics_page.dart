@@ -160,7 +160,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
               backgroundColor: CustomColors.backgroundColor,
               borderRadius: 5,
               textStyle: const TextStyle(color: CustomColors.primaryColor),
-              transitionType: TransitionType.LEFT_TO_RIGHT,
+              transitionType: TransitionType.leftToRight,
               onPress: () {
                 setState(() {
                   rangeType = 'week';
@@ -179,7 +179,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
               backgroundColor: CustomColors.backgroundColor,
               borderRadius: 5,
               textStyle: const TextStyle(color: CustomColors.primaryColor),
-              transitionType: TransitionType.LEFT_TO_RIGHT,
+              transitionType: TransitionType.leftToRight,
               onPress: () {
                 setState(() {
                   rangeType = 'month';
@@ -224,7 +224,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
               borderRadius: 5,
               borderWidth: 1,
               textStyle: const TextStyle(color: CustomColors.primaryColor),
-              transitionType: TransitionType.LEFT_TO_RIGHT,
+              transitionType: TransitionType.leftToRight,
               onPress: () {
                 setState(() {
                   _selectedStartDate = date;

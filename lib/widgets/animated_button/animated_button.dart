@@ -86,11 +86,11 @@ class AnimatedButton extends StatefulWidget {
   final ValueChanged<bool>? onChanges;
 
   /// [TransitionType]  type of animation which apply to Button
-  /// by Default it is TransitionType.LEFT_TO_RIGHT
+  /// by Default it is TransitionType.leftToRight
   final TransitionType transitionType;
 
   /// [StripTransitionType]  type of animation which apply to Strip Button
-  /// by Default it is TransitionType.LEFT_TO_RIGHT
+  /// by Default it is TransitionType.leftToRight
   final StripTransitionType stripTransitionType;
 
   /// [bool] this value will be [true] when user used [AnimatedButton] widget
@@ -101,9 +101,9 @@ class AnimatedButton extends StatefulWidget {
   ///[Color] color of strip which used in [AnimatedButton.strip] widget
   final Color stripColor;
 
-  ///[double] size of strip it will use width when used [TransitionType.LEFT_TO_RIGHT]
-  ///or [TransitionType.RIGHT_TO_LEFT] animation and it will use height when used
-  /// [TransitionType.BOTTOM_TO_TOP] or [TransitionType.TOP_TO_BOTTOM]
+  ///[double] size of strip it will use width when used [TransitionType.leftToRight]
+  ///or [TransitionType.rightToLeft] animation and it will use height when used
+  /// [TransitionType.bottomToTop] or [TransitionType.topToBottom]
   final double stripSize;
 
   ///[Color] color of the border by Default it is [Colors.transparent]
@@ -137,7 +137,7 @@ class AnimatedButton extends StatefulWidget {
     required this.text,
     required this.onPress,
     this.onLongPress,
-    this.transitionType = TransitionType.LEFT_TO_RIGHT,
+    this.transitionType = TransitionType.leftToRight,
     this.textStyle = const TextStyle(color: Colors.white, fontSize: 20),
     this.selectedTextColor = Colors.blue,
     this.selectedBackgroundColor = Colors.white,
@@ -161,7 +161,7 @@ class AnimatedButton extends StatefulWidget {
   })  : isStrip = false,
         stripColor = Colors.transparent,
         stripSize = 0,
-        stripTransitionType = StripTransitionType.LEFT_TO_RIGHT;
+        stripTransitionType = StripTransitionType.leftToRight;
 
   const AnimatedButton.strip({
     super.key,
@@ -171,7 +171,7 @@ class AnimatedButton extends StatefulWidget {
     this.isReverse = false,
     this.height = 50,
     this.width = double.infinity,
-    this.stripTransitionType = StripTransitionType.LEFT_TO_RIGHT,
+    this.stripTransitionType = StripTransitionType.leftToRight,
     this.textStyle = const TextStyle(color: Colors.white, fontSize: 20),
     this.selectedTextColor = Colors.blue,
     this.selectedBackgroundColor = Colors.white,
@@ -191,7 +191,7 @@ class AnimatedButton extends StatefulWidget {
   })  : borderRadius = 0,
         borderWidth = 0,
         borderColor = Colors.transparent,
-        transitionType = TransitionType.LEFT_TO_RIGHT,
+        transitionType = TransitionType.leftToRight,
         isStrip = true;
 
   @override
@@ -215,8 +215,8 @@ class AnimatedButtonState extends State<AnimatedButton>
     _controller =
         AnimationController(duration: widget.animationDuration, vsync: this);
     if (widget.isStrip) {
-      if (widget.stripTransitionType == StripTransitionType.RIGHT_TO_LEFT ||
-          widget.stripTransitionType == StripTransitionType.BOTTOM_TO_TOP) {
+      if (widget.stripTransitionType == StripTransitionType.rightToLeft ||
+          widget.stripTransitionType == StripTransitionType.bottomToTop) {
         slideBegin = 1.0;
         slideEnd = 0.0;
       } else {
@@ -224,8 +224,8 @@ class AnimatedButtonState extends State<AnimatedButton>
         slideEnd = 1.0;
       }
     } else {
-      if (widget.transitionType == TransitionType.RIGHT_TO_LEFT ||
-          widget.transitionType == TransitionType.BOTTOM_TO_TOP) {
+      if (widget.transitionType == TransitionType.rightToLeft ||
+          widget.transitionType == TransitionType.bottomToTop) {
         slideBegin = 1.0;
         slideEnd = 0.0;
       } else {

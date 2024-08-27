@@ -18,11 +18,11 @@ class StripAnimated extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (animationType == StripTransitionType.BOTTOM_TO_TOP ||
-        animationType == StripTransitionType.TOP_TO_BOTTOM) {
+    if (animationType == StripTransitionType.bottomToTop ||
+        animationType == StripTransitionType.topToBottom) {
       return Column(
         children: [
-          if (animationType == StripTransitionType.TOP_TO_BOTTOM)
+          if (animationType == StripTransitionType.topToBottom)
             Container(
               width: double.infinity,
               height: stripSize,
@@ -31,10 +31,10 @@ class StripAnimated extends StatelessWidget {
           Expanded(
             child: Padding(
               padding: EdgeInsets.only(
-                  top: animationType == StripTransitionType.TOP_TO_BOTTOM
+                  top: animationType == StripTransitionType.topToBottom
                       ? 0
                       : stripSize,
-                  bottom: animationType == StripTransitionType.BOTTOM_TO_TOP
+                  bottom: animationType == StripTransitionType.bottomToTop
                       ? 0
                       : stripSize),
               child: Align(
@@ -43,7 +43,7 @@ class StripAnimated extends StatelessWidget {
               ),
             ),
           ),
-          if (animationType == StripTransitionType.BOTTOM_TO_TOP)
+          if (animationType == StripTransitionType.bottomToTop)
             Container(
               width: double.infinity,
               height: stripSize,
@@ -55,7 +55,7 @@ class StripAnimated extends StatelessWidget {
       return Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          if (animationType == StripTransitionType.LEFT_TO_RIGHT)
+          if (animationType == StripTransitionType.leftToRight)
             Container(
                 width: stripSize, height: double.infinity, color: stripColor),
           Expanded(
@@ -63,7 +63,7 @@ class StripAnimated extends StatelessWidget {
             alignment: textAlignment,
             child: text,
           )),
-          if (animationType == StripTransitionType.RIGHT_TO_LEFT)
+          if (animationType == StripTransitionType.rightToLeft)
             Container(
                 width: stripSize, height: double.infinity, color: stripColor)
         ],
