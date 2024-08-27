@@ -20,14 +20,14 @@ class CustomNavigationBar extends StatelessWidget {
             iconSize: 30,
             customAction: () {
               if (GoRouterState.of(context).uri.toString() != '/home') {
-                GoRouter.of(context).push('/home');
+                GoRouter.of(context).go('/home');
               }
             },
           ),
           IconButton(
               onPressed: () async {
                 if (GoRouterState.of(context).uri.toString() != '/entry') {
-                  GoRouter.of(context).push('/entry');
+                  GoRouter.of(context).go('/entry');
                 }
               },
               icon: const Icon(
@@ -39,7 +39,7 @@ class CustomNavigationBar extends StatelessWidget {
             iconSize: 30,
             customAction: () {
               if (GoRouterState.of(context).uri.toString() != '/statistics') {
-                GoRouter.of(context).push('/statistics');
+                GoRouter.of(context).go('/statistics');
               }
             },
           ),

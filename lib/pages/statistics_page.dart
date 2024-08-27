@@ -1,3 +1,4 @@
+import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:calm_notes/colors.dart';
 import 'package:calm_notes/widgets/animated_button/animated_button.dart';
 import 'package:calm_notes/widgets/animated_button/transition_type.dart';
@@ -9,6 +10,7 @@ import 'package:calm_notes/providers/entry_provider.dart';
 import 'package:calm_notes/providers/factor_provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 class StatisticsPage extends StatefulWidget {
@@ -25,10 +27,21 @@ class _StatisticsPageState extends State<StatisticsPage> {
   DateTime? _selectedStartDate;
   final ScrollController _scrollControllerWeeks = ScrollController();
   final ScrollController _scrollControllerMonths = ScrollController();
+  bool myInterceptor(bool stopDefaultButtonEvent, RouteInfo info) {
+    GoRouter.of(context).go('/home');
+    return true;
+  }
+
+  @override
+  void dispose() {
+    BackButtonInterceptor.remove(myInterceptor);
+    super.dispose();
+  }
 
   @override
   void initState() {
     super.initState();
+    BackButtonInterceptor.add(myInterceptor);
     _initializeDateRanges();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollToSelectedDate();

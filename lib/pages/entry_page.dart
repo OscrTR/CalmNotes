@@ -1,3 +1,4 @@
+import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:calm_notes/colors.dart';
 import 'package:calm_notes/widgets/emotions.dart';
 import 'package:calm_notes/widgets/slider.dart';
@@ -10,6 +11,7 @@ import 'package:calm_notes/providers/entry_provider.dart';
 import 'package:calm_notes/providers/tag_provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 
@@ -28,9 +30,16 @@ class _EntryCreateState extends State<EntryCreate> {
 
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
+  bool myInterceptor(bool stopDefaultButtonEvent, RouteInfo info) {
+    GoRouter.of(context).go('/home');
+    Provider.of<EmotionProvider>(context, listen: false).resetEmotions();
+    Provider.of<TagProvider>(context, listen: false).resetTags();
+    return true;
+  }
 
   @override
   void dispose() {
+    BackButtonInterceptor.remove(myInterceptor);
     _titleController.dispose();
     _descriptionController.dispose();
     super.dispose();
@@ -38,6 +47,7 @@ class _EntryCreateState extends State<EntryCreate> {
 
   @override
   void initState() {
+    BackButtonInterceptor.add(myInterceptor);
     if (widget.entry != null) {
       _selectedMood = widget.entry!.mood;
       _selectedDate = getDateTime(widget.entry!.date)!;

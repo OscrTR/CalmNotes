@@ -1,3 +1,4 @@
+import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:calm_notes/providers/emotion_provider.dart';
 import 'package:calm_notes/providers/tag_provider.dart';
 import 'package:calm_notes/providers/entry_provider.dart';
@@ -17,6 +18,23 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  bool myInterceptor(bool stopDefaultButtonEvent, RouteInfo info) {
+    GoRouter.of(context).go('/home');
+    return true;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    BackButtonInterceptor.add(myInterceptor);
+  }
+
+  @override
+  void dispose() {
+    BackButtonInterceptor.remove(myInterceptor);
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final Locale currentLocale = context.locale;
@@ -73,7 +91,7 @@ class _HomePageState extends State<HomePage> {
               style: Theme.of(context).textTheme.headlineMedium,
             ),
             GestureDetector(
-              onTap: () => GoRouter.of(context).push('/settings'),
+              onTap: () => GoRouter.of(context).go('/settings'),
               child: Container(
                 height: 48,
                 width: 48,
@@ -127,7 +145,7 @@ class _HomePageState extends State<HomePage> {
       child: ListTile(
         contentPadding: EdgeInsets.zero,
         onTap: () {
-          GoRouter.of(context).push('/entry/${entry.id}');
+          GoRouter.of(context).go('/entry/${entry.id}');
         },
         title: Padding(
           padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),

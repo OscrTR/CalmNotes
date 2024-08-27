@@ -1,9 +1,11 @@
+import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:calm_notes/colors.dart';
 import 'package:calm_notes/models/reminder.dart';
 import 'package:calm_notes/providers/reminder_provider.dart';
 import 'package:calm_notes/services/notification_service.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 
@@ -16,6 +18,23 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   TimeOfDay selectedTime = TimeOfDay.now();
+
+  bool myInterceptor(bool stopDefaultButtonEvent, RouteInfo info) {
+    GoRouter.of(context).go('/home');
+    return true;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    BackButtonInterceptor.add(myInterceptor);
+  }
+
+  @override
+  void dispose() {
+    BackButtonInterceptor.remove(myInterceptor);
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
