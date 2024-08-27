@@ -295,9 +295,14 @@ class _StatisticsPageState extends State<StatisticsPage> {
       [bool byMonth = false]) {
     List<DateTime> ranges = [];
     DateTime currentDate = DateTime(DateTime.now().year, 1, 1);
-    DateTime endDate = DateTime(DateTime.now().year, 12, 31);
 
-    while (currentDate.isBefore(endDate)) {
+    // Calculate the last day of the current week (Sunday)
+    DateTime now = DateTime.now();
+    int daysUntilEndOfWeek = DateTime.sunday - now.weekday;
+    DateTime endDate = now.add(Duration(days: daysUntilEndOfWeek));
+
+    while (currentDate.isBefore(endDate) ||
+        currentDate.isAtSameMomentAs(endDate)) {
       ranges.add(currentDate);
       currentDate = byMonth
           ? DateTime(currentDate.year, currentDate.month + 1, 1)
@@ -310,34 +315,10 @@ class _StatisticsPageState extends State<StatisticsPage> {
   void _scrollToSelectedDate() {
     if (_selectedStartDate == null) return;
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final List<DateTime> dateList = rangeType == 'week' ? _weeks : _months;
       final ScrollController scrollController = rangeType == 'week'
           ? _scrollControllerWeeks
           : _scrollControllerMonths;
-      int index;
-      if (rangeType == 'week') {
-        index = dateList.indexWhere((date) =>
-            date.year == _selectedStartDate!.year &&
-            date.month == _selectedStartDate!.month &&
-            date.day == _selectedStartDate!.day);
-      } else {
-        index = dateList.indexWhere((date) =>
-            date.year == _selectedStartDate!.year &&
-            date.month == _selectedStartDate!.month);
-      }
-
-      if (index == -1) return;
-
-      const buttonWidth = 98.0;
-      final offset = (index * buttonWidth) -
-          (MediaQuery.of(context).size.width / 2 - buttonWidth / 2) +
-          20;
-
-      scrollController.animateTo(
-        offset,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-      );
+      scrollController.jumpTo(scrollController.position.maxScrollExtent);
     });
   }
 
