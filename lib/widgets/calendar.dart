@@ -24,13 +24,14 @@ class _CalendarState extends State<Calendar> {
 
     Map<DateTime, int> entryMap = _convertEntriesToMap(entries);
 
-    final firstDayOfRange = _getFirstDayOfRange(provider.startDate);
+    final startingMonday = _mostRecentMonday(provider.startDate);
+
     final lastDayOfRange =
         _getLastDayOfRange(provider.startDate, provider.endDate);
 
-    final firstDayOfWeek = _getFirstDayOfWeek(firstDayOfRange);
-    final totalDays = lastDayOfRange.difference(firstDayOfWeek).inDays + 1;
-    final numberOfRows = ((totalDays + 6) / 7).ceil();
+    final firstDayOfWeek = startingMonday;
+    final totalDays = lastDayOfRange.difference(firstDayOfWeek).inDays;
+    final numberOfRows = (totalDays / 7).ceil();
 
     final localizedDays = _getLocalizedDays(context);
 
@@ -78,27 +79,24 @@ class _CalendarState extends State<Calendar> {
         MapEntry(date, (totalMood / moodCountMap[date]!).round()));
   }
 
-  DateTime _getFirstDayOfRange(DateTime startDate) {
-    return DateTime(startDate.year, startDate.month, startDate.day);
-  }
-
   DateTime _getLastDayOfRange(DateTime startDate, DateTime endDate) {
     return endDate.isBefore(DateTime(startDate.year, startDate.month + 1, 0))
         ? endDate
         : DateTime(startDate.year, startDate.month + 1, 0);
   }
 
-  DateTime _getFirstDayOfWeek(DateTime firstDayOfRange) {
-    return firstDayOfRange
-        .subtract(Duration(days: firstDayOfRange.weekday % 7));
-  }
+  DateTime _mostRecentMonday(DateTime date) =>
+      DateTime(date.year, date.month, date.day - (date.weekday - 1));
 
   List<String> _getLocalizedDays(BuildContext context) {
-    final Locale currentLocale = context.locale;
+    final Locale currentLocale = Localizations.localeOf(context);
     DateFormat dayFormat = DateFormat.E(currentLocale.toString());
 
+    // Start from a fixed Monday (e.g., Monday of any week)
+    DateTime baseMonday = DateTime(2023, 8, 14); // August 14, 2023 is a Monday
+
     return List.generate(7, (i) {
-      DateTime date = DateTime(2023, 8, 13 + i);
+      DateTime date = baseMonday.add(Duration(days: i));
       String dayAbbreviation = dayFormat.format(date).replaceAll('.', '');
       return dayAbbreviation.substring(0, 1).toUpperCase() +
           dayAbbreviation.substring(1).toLowerCase();

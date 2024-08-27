@@ -130,10 +130,16 @@ class _ChartState extends State<Chart> {
         show: true,
         getDotPainter:
             (FlSpot spot, double xPercentage, LineChartBarData bar, int index) {
-          final bool shouldShowDot = index > 0 &&
-              bar.spots[index - 1].y.isNaN &&
-              index < bar.spots.length - 1 &&
-              bar.spots[index + 1].y.isNaN;
+          final bool shouldShowDot = (index == 0 &&
+                  !bar.spots[index].y.isNaN &&
+                  bar.spots[index + 1].y.isNaN) ||
+              (index == bar.spots.length - 1 &&
+                  !bar.spots[index].y.isNaN &&
+                  bar.spots[index - 1].y.isNaN) ||
+              index > 0 &&
+                  bar.spots[index - 1].y.isNaN &&
+                  index < bar.spots.length - 1 &&
+                  bar.spots[index + 1].y.isNaN;
 
           return FlDotCirclePainter(
             radius: shouldShowDot ? 4 : 0,
