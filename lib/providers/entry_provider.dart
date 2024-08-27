@@ -115,7 +115,8 @@ class EntryProvider extends ChangeNotifier {
 
   void selectFactor(String factor) {
     _selectedFactor = factor;
-    _convertFactorsToSpots(_entries, _selectedFactor, _spotsDate);
+    _factorSpots =
+        _convertFactorsToSpots(_entries, _selectedFactor, _spotsDate);
     notifyListeners();
   }
 
