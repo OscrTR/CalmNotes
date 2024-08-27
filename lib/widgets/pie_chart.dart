@@ -18,7 +18,7 @@ class _CustomPieChartState extends State<CustomPieChart> {
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<EntryProvider>();
-    final moodData = provider.getMoodDistribution();
+    final moodData = provider.moodDistribution;
 
     return GestureDetector(
       onTap: () {

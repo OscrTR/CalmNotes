@@ -178,7 +178,7 @@ void main() {
     await entryProvider.addEntry(entry5);
     await entryProvider.addEntry(entry6);
 
-    final moodMap = entryProvider.getMoodDistribution();
+    final moodMap = entryProvider.moodDistribution;
     expect(moodMap, {2: 1, 4: 1, 5: 2, 8: 1, 9: 1});
   });
 }

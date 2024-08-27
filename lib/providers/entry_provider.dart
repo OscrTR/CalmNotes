@@ -22,6 +22,7 @@ class EntryProvider extends ChangeNotifier {
   List<DateTime> _weeks = [];
   List<DateTime> _months = [];
   bool _isWeekSelected = true;
+  Map<int, int> _moodDistribution = {};
 
   // Properties to hold the start and end dates for filtering
   DateTime _startDate =
@@ -46,6 +47,7 @@ class EntryProvider extends ChangeNotifier {
   List<DateTime> get weeks => _weeks;
   List<DateTime> get months => _months;
   bool get isWeekSelected => _isWeekSelected;
+  Map<int, int> get moodDistribution => _moodDistribution;
 
   EntryProvider() {
     fetchEntries();
@@ -128,6 +130,7 @@ class EntryProvider extends ChangeNotifier {
     _factorsList = await _extractFactors(_filteredEntries);
     _entrySpots = await _convertEntriesToSpots(_entries, spotsDate);
     _gradientColorsStopsMap = await _createGradientColorStopsMap(_entrySpots);
+    _moodDistribution = await _getMoodDistribution();
   }
 
   void changeRangeTypeSelection() {
@@ -230,8 +233,9 @@ class EntryProvider extends ChangeNotifier {
       DateTime startDate, DateTime endDate) async {
     DateTime startOfDay =
         DateTime(startDate.year, startDate.month, startDate.day);
-    DateTime endOfDay = DateTime(
-        endDate.year, endDate.month, endDate.day, 23, 59, 59, 999, 999);
+    DateTime endOfDay =
+        DateTime(endDate.year, endDate.month, endDate.day, 23, 59, 59, 999, 999)
+            .subtract(const Duration(days: 1));
 
     return _entries.where((entry) {
       DateTime entryDate =
@@ -242,11 +246,11 @@ class EntryProvider extends ChangeNotifier {
     }).toList();
   }
 
-  Map<int, int> getMoodDistribution() {
+  Future<Map<int, int>> _getMoodDistribution() async {
     Map<int, int> moodSumMap = {};
 
-    for (var i = 0; i < 11; i++) {
-      int count = _entries.where((entry) => entry.mood == i).length;
+    for (var i = 0; i <= 10; i++) {
+      int count = _filteredEntries.where((entry) => entry.mood == i).length;
       if (count > 0) {
         moodSumMap[i] = count;
       }
