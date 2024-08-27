@@ -15,7 +15,13 @@ class EntryProvider extends ChangeNotifier {
   List<FlSpot> _entrySpots = [];
   Map<double, Color> _gradientColorsStopsMap = {};
   String _selectedFactor = '';
+  List<String> _factorsList = [];
   List<FlSpot> _factorSpots = [];
+  double _initialWeeksListOffset = 0;
+  double _initialMonthsListOffset = 0;
+  List<DateTime> _weeks = [];
+  List<DateTime> _months = [];
+  bool _isWeekSelected = true;
 
   // Properties to hold the start and end dates for filtering
   DateTime _startDate =
@@ -33,10 +39,20 @@ class EntryProvider extends ChangeNotifier {
   List<FlSpot> get entrySpots => _entrySpots;
   Map<double, Color> get gradientColorsStopsMap => _gradientColorsStopsMap;
   String get selectedFactor => _selectedFactor;
+  List<String> get factorsList => _factorsList;
   List<FlSpot> get factorSpots => _factorSpots;
+  double get initialWeeksListOffset => _initialWeeksListOffset;
+  double get initialMonthsListOffset => _initialMonthsListOffset;
+  List<DateTime> get weeks => _weeks;
+  List<DateTime> get months => _months;
+  bool get isWeekSelected => _isWeekSelected;
 
   EntryProvider() {
     fetchEntries();
+    _weeks = _generateDateRanges(const Duration(days: 7));
+    _months = _generateDateRanges(const Duration(days: 30), true);
+    _initialWeeksListOffset = 98.0 * _weeks.length;
+    _initialMonthsListOffset = 98.0 * _months.length;
   }
 
   Future<void> fetchEntries() async {
@@ -109,8 +125,13 @@ class EntryProvider extends ChangeNotifier {
 
   Future<void> updateStatistics() async {
     _filteredEntries = await _filterEntriesBetweenDates(_startDate, _endDate);
+    _factorsList = await _extractFactors(_filteredEntries);
     _entrySpots = await _convertEntriesToSpots(_entries, spotsDate);
     _gradientColorsStopsMap = await _createGradientColorStopsMap(_entrySpots);
+  }
+
+  void changeRangeTypeSelection() {
+    _isWeekSelected = !_isWeekSelected;
   }
 
   void selectFactor(String factor) {
@@ -288,5 +309,48 @@ class EntryProvider extends ChangeNotifier {
       for (var spot in nonNullSpots)
         (spot.x - minX) / rangeX: moodColors[spot.y.round()]
     };
+  }
+
+  List<DateTime> _generateDateRanges(Duration duration,
+      [bool byMonth = false]) {
+    List<DateTime> ranges = [];
+    DateTime currentDate = DateTime(DateTime.now().year, 1, 1);
+
+    // Calculate the last day of the current week (Sunday)
+    DateTime now = DateTime.now();
+    int daysUntilEndOfWeek = DateTime.sunday - now.weekday;
+    DateTime endDate = now.add(Duration(days: daysUntilEndOfWeek));
+
+    while (currentDate.isBefore(endDate) ||
+        currentDate.isAtSameMomentAs(endDate)) {
+      ranges.add(currentDate);
+      currentDate = byMonth
+          ? DateTime(currentDate.year, currentDate.month + 1, 1)
+          : currentDate.add(duration);
+    }
+
+    return ranges;
+  }
+
+  Future<List<String>> _extractFactors(List<Entry> entries) async {
+    Set<String> factorsSet = {};
+
+    for (var entry in entries) {
+      _processEntry(entry.emotions, factorsSet);
+      _processEntry(entry.tags, factorsSet);
+    }
+
+    return factorsSet.toList();
+  }
+
+  void _processEntry(String? entryString, Set<String> factorsSet) {
+    if (entryString != null && entryString.isNotEmpty) {
+      for (var item in entryString.split(',')) {
+        var trimmedItem = item.trim().split(" : ")[0];
+        if (trimmedItem.isNotEmpty) {
+          factorsSet.add(trimmedItem);
+        }
+      }
+    }
   }
 }

@@ -20,12 +20,9 @@ class StatisticsPage extends StatefulWidget {
 }
 
 class _StatisticsPageState extends State<StatisticsPage> {
-  String rangeType = 'week';
-  List<DateTime> _weeks = [];
-  List<DateTime> _months = [];
   DateTime? _selectedStartDate;
-  final ScrollController _scrollControllerWeeks = ScrollController();
-  final ScrollController _scrollControllerMonths = ScrollController();
+  ScrollController? _scrollControllerWeeks;
+  ScrollController? _scrollControllerMonths;
   bool myInterceptor(bool stopDefaultButtonEvent, RouteInfo info) {
     GoRouter.of(context).go('/home');
     return true;
@@ -41,10 +38,11 @@ class _StatisticsPageState extends State<StatisticsPage> {
   void initState() {
     super.initState();
     BackButtonInterceptor.add(myInterceptor);
-    _initializeDateRanges();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _scrollToSelectedDate();
-    });
+    final entryProvider = context.read<EntryProvider>();
+    _scrollControllerWeeks = ScrollController(
+        initialScrollOffset: entryProvider.initialWeeksListOffset);
+    _scrollControllerMonths = ScrollController(
+        initialScrollOffset: entryProvider.initialMonthsListOffset);
   }
 
   @override
@@ -93,7 +91,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
               Text(context.tr('statistics_mood_graph'),
                   style: Theme.of(context).textTheme.titleMedium),
               OutlinedButton(
-                onPressed: () => _showFactorSelectionDialog(entries),
+                onPressed: () => _showFactorSelectionDialog(entryProvider),
                 child: Text(context.tr('statistics_mood_graph_add_factor')),
               ),
             ],
@@ -114,8 +112,9 @@ class _StatisticsPageState extends State<StatisticsPage> {
   }
 
   Widget _buildFactorSelectionContent(
-      List<Entry> entries, BuildContext context) {
-    final factorsList = _extractFactors(entries);
+      EntryProvider entryProvider, BuildContext context) {
+    final factorsList = entryProvider.factorsList;
+    final entries = entryProvider.filteredEntries;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -126,15 +125,14 @@ class _StatisticsPageState extends State<StatisticsPage> {
         const SizedBox(height: 10),
         Wrap(
           spacing: 10,
-          children: _buildFactorButtonList(entries, context),
+          children: _buildFactorButtonList(entries, context, factorsList),
         ),
       ],
     );
   }
 
   List<Widget> _buildFactorButtonList(
-      List<Entry> entries, BuildContext context) {
-    final factorsList = _extractFactors(entries);
+      List<Entry> entries, BuildContext context, List<String> factorsList) {
     return factorsList.map((factor) {
       return OutlinedButton(
         onPressed: () {
@@ -153,7 +151,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
         Expanded(
           child: AnimatedButton(
               text: context.tr('statistics_week'),
-              isSelected: rangeType == 'week',
+              isSelected: provider.isWeekSelected,
               height: 40,
               selectedTextColor: CustomColors.backgroundColor,
               selectedBackgroundColor: CustomColors.primaryColor,
@@ -162,17 +160,15 @@ class _StatisticsPageState extends State<StatisticsPage> {
               textStyle: const TextStyle(color: CustomColors.primaryColor),
               transitionType: TransitionType.leftToRight,
               onPress: () {
-                setState(() {
-                  rangeType = 'week';
-                });
+                provider.changeRangeTypeSelection();
                 provider.setDefaultWeekDate();
-                _scrollToSelectedDate();
+                _scrollToSelectedDate(provider);
               }),
         ),
         Expanded(
           child: AnimatedButton(
               text: context.tr('statistics_month'),
-              isSelected: rangeType == 'month',
+              isSelected: !provider.isWeekSelected,
               height: 40,
               selectedTextColor: CustomColors.backgroundColor,
               selectedBackgroundColor: CustomColors.primaryColor,
@@ -181,11 +177,9 @@ class _StatisticsPageState extends State<StatisticsPage> {
               textStyle: const TextStyle(color: CustomColors.primaryColor),
               transitionType: TransitionType.leftToRight,
               onPress: () {
-                setState(() {
-                  rangeType = 'month';
-                });
+                provider.changeRangeTypeSelection();
                 provider.setDefaultMonthDate();
-                _scrollToSelectedDate();
+                _scrollToSelectedDate(provider);
               }),
         ),
       ],
@@ -193,9 +187,12 @@ class _StatisticsPageState extends State<StatisticsPage> {
   }
 
   Widget _buildDateSelector(BuildContext context, EntryProvider provider) {
-    final List<DateTime> dateList = rangeType == 'week' ? _weeks : _months;
-    final ScrollController scrollController =
-        rangeType == 'week' ? _scrollControllerWeeks : _scrollControllerMonths;
+    final weeks = provider.weeks;
+    final months = provider.months;
+    final List<DateTime> dateList = provider.isWeekSelected ? weeks : months;
+    final ScrollController? scrollController = provider.isWeekSelected
+        ? _scrollControllerWeeks
+        : _scrollControllerMonths;
 
     return SizedBox(
       height: 40,
@@ -205,8 +202,8 @@ class _StatisticsPageState extends State<StatisticsPage> {
         itemCount: dateList.length,
         itemBuilder: (context, index) {
           final date = dateList[index];
-          final isSelected = _isDateSelected(date);
-          final label = _formatDateLabel(context, date);
+          final isSelected = _isDateSelected(date, provider);
+          final label = _formatDateLabel(context, date, provider);
 
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4.0),
@@ -228,7 +225,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
               onPress: () {
                 setState(() {
                   _selectedStartDate = date;
-                  provider.setStartEndDate(date, _getEndDate(date));
+                  provider.setStartEndDate(date, _getEndDate(date, provider));
                 });
               },
             ),
@@ -238,8 +235,8 @@ class _StatisticsPageState extends State<StatisticsPage> {
     );
   }
 
-  bool _isDateSelected(DateTime date) {
-    return rangeType == 'week'
+  bool _isDateSelected(DateTime date, EntryProvider entryProvider) {
+    return entryProvider.isWeekSelected
         ? date.year == _selectedStartDate?.year &&
             date.month == _selectedStartDate?.month &&
             date.day == _selectedStartDate?.day
@@ -247,10 +244,11 @@ class _StatisticsPageState extends State<StatisticsPage> {
             date.month == _selectedStartDate?.month;
   }
 
-  String _formatDateLabel(BuildContext context, DateTime date) {
+  String _formatDateLabel(
+      BuildContext context, DateTime date, EntryProvider entryProvider) {
     final currentLocale = context.locale;
-    final label = DateFormat(
-            rangeType == 'week' ? 'MMM d' : 'MMM', currentLocale.toString())
+    final label = DateFormat(entryProvider.isWeekSelected ? 'MMM d' : 'MMM',
+            currentLocale.toString())
         .format(date);
     return capitalizeFirstLetter(label);
   }
@@ -260,8 +258,8 @@ class _StatisticsPageState extends State<StatisticsPage> {
     return input[0].toUpperCase() + input.substring(1);
   }
 
-  DateTime _getEndDate(DateTime startDate) {
-    return rangeType == 'week'
+  DateTime _getEndDate(DateTime startDate, EntryProvider entryProvider) {
+    return entryProvider.isWeekSelected
         ? startDate
             .add(const Duration(days: 7))
             .subtract(const Duration(seconds: 1))
@@ -269,65 +267,17 @@ class _StatisticsPageState extends State<StatisticsPage> {
             .subtract(const Duration(seconds: 1));
   }
 
-  List<String> _extractFactors(List<Entry> entries) {
-    Set<String> factorsSet = {};
-
-    for (var entry in entries) {
-      _processEntry(entry.emotions, factorsSet);
-      _processEntry(entry.tags, factorsSet);
-    }
-
-    return factorsSet.toList();
-  }
-
-  void _processEntry(String? entryString, Set<String> factorsSet) {
-    if (entryString != null && entryString.isNotEmpty) {
-      for (var item in entryString.split(',')) {
-        var trimmedItem = item.trim().split(" : ")[0];
-        if (trimmedItem.isNotEmpty) {
-          factorsSet.add(trimmedItem);
-        }
-      }
-    }
-  }
-
-  List<DateTime> _generateDateRanges(Duration duration,
-      [bool byMonth = false]) {
-    List<DateTime> ranges = [];
-    DateTime currentDate = DateTime(DateTime.now().year, 1, 1);
-
-    // Calculate the last day of the current week (Sunday)
-    DateTime now = DateTime.now();
-    int daysUntilEndOfWeek = DateTime.sunday - now.weekday;
-    DateTime endDate = now.add(Duration(days: daysUntilEndOfWeek));
-
-    while (currentDate.isBefore(endDate) ||
-        currentDate.isAtSameMomentAs(endDate)) {
-      ranges.add(currentDate);
-      currentDate = byMonth
-          ? DateTime(currentDate.year, currentDate.month + 1, 1)
-          : currentDate.add(duration);
-    }
-
-    return ranges;
-  }
-
-  void _scrollToSelectedDate() {
+  void _scrollToSelectedDate(EntryProvider entryProvider) {
     if (_selectedStartDate == null) return;
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final ScrollController scrollController = rangeType == 'week'
+      final ScrollController? scrollController = entryProvider.isWeekSelected
           ? _scrollControllerWeeks
           : _scrollControllerMonths;
-      scrollController.jumpTo(scrollController.position.maxScrollExtent);
+      scrollController!.jumpTo(scrollController.position.maxScrollExtent);
     });
   }
 
-  void _initializeDateRanges() {
-    _weeks = _generateDateRanges(const Duration(days: 7));
-    _months = _generateDateRanges(const Duration(days: 30), true);
-  }
-
-  void _showFactorSelectionDialog(List<Entry> entries) {
+  void _showFactorSelectionDialog(EntryProvider entryProvider) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -337,7 +287,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
             borderRadius: BorderRadius.circular(5),
           ),
           title: Text(context.tr('statistics_factor_dialog_title')),
-          content: _buildFactorSelectionContent(entries, context),
+          content: _buildFactorSelectionContent(entryProvider, context),
           actions: <Widget>[
             TextButton(
               onPressed: () => Navigator.pop(context, 'Cancel'),
