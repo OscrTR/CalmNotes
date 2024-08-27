@@ -24,13 +24,13 @@ class _CalendarState extends State<Calendar> {
 
     Map<DateTime, int> entryMap = _convertEntriesToMap(entries);
 
-    final startingMonday = _mostRecentMonday(provider.startDate);
-
     final lastDayOfRange =
         _getLastDayOfRange(provider.startDate, provider.endDate);
 
-    final firstDayOfWeek = startingMonday;
-    final totalDays = lastDayOfRange.difference(firstDayOfWeek).inDays;
+    final firstDayOfWeek = _mostRecentMonday(provider.startDate);
+    final totalDays = _isLastDayOfMonth(lastDayOfRange)
+        ? lastDayOfRange.difference(firstDayOfWeek).inDays + 1
+        : lastDayOfRange.difference(firstDayOfWeek).inDays;
     final numberOfRows = (totalDays / 7).ceil();
 
     final localizedDays = _getLocalizedDays(context);
@@ -170,5 +170,15 @@ class _CalendarState extends State<Calendar> {
         );
       }),
     );
+  }
+
+  bool _isLastDayOfMonth(DateTime date) {
+    int nextMonth = date.month == 12 ? 1 : date.month + 1;
+    int year = date.month == 12 ? date.year + 1 : date.year;
+    DateTime firstDayOfNextMonth = DateTime(year, nextMonth, 1);
+    DateTime lastDayOfCurrentMonth =
+        firstDayOfNextMonth.subtract(const Duration(days: 1));
+
+    return date.day == lastDayOfCurrentMonth.day;
   }
 }
