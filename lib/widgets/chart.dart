@@ -86,7 +86,8 @@ class _ChartState extends State<Chart> {
       if (!isOnlyNaN(entrySpots))
         _createLineChartBarData(
           spots: entrySpots,
-          gradientColors: _createGradientColors(entrySpots),
+          gradientColors: gradientColorsStopsMap.values.toList(),
+          colorStops: gradientColorsStopsMap.keys.toList(),
           dotColor: CustomColors.primaryColor,
           opacity: 1.0,
           isFactor: false,
@@ -113,6 +114,7 @@ class _ChartState extends State<Chart> {
   LineChartBarData _createLineChartBarData({
     required List<FlSpot> spots,
     required List<Color> gradientColors,
+    List<double>? colorStops,
     required Color dotColor,
     required double opacity,
     required bool isFactor,
@@ -122,7 +124,7 @@ class _ChartState extends State<Chart> {
       isCurved: true,
       preventCurveOverShooting: true,
       gradient: gradientColors.length > 1
-          ? LinearGradient(colors: gradientColors)
+          ? LinearGradient(colors: gradientColors, stops: colorStops)
           : null,
       color: gradientColors.isEmpty ? dotColor : null,
       barWidth: 3,
@@ -245,18 +247,5 @@ class _ChartState extends State<Chart> {
 // Check if all spots contain NaN values
   bool isOnlyNaN(List<FlSpot> spots) {
     return spots.every((spot) => spot.y.isNaN);
-  }
-
-  List<Color> _createGradientColors(List<FlSpot> spotsList) {
-    List<Color> result = spotsList
-        .where((spot) => !spot.y.isNaN)
-        .map((spot) => moodColors[spot.y.round()])
-        .toList();
-
-    if (result.length <= 1) {
-      result = [Colors.transparent, Colors.transparent];
-    }
-
-    return result;
   }
 }
