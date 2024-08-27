@@ -331,7 +331,7 @@ class _EntryCreateState extends State<EntryCreate> {
       entryProvider.addEntry(entry);
     }
 
-    Navigator.pop(context, 'Create entry');
+    GoRouter.of(context).go('/home');
     emotionProvider.resetEmotions();
     tagProvider.resetTags();
   }
@@ -388,7 +388,7 @@ class _EntryCreateState extends State<EntryCreate> {
   }
 
   void _navigateBack(BuildContext context) {
-    Navigator.pop(context, 'Previous page');
+    GoRouter.of(context).go('/home');
     Provider.of<EmotionProvider>(context, listen: false).resetEmotions();
     Provider.of<TagProvider>(context, listen: false).resetTags();
   }

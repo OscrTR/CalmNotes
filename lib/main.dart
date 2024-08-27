@@ -1,6 +1,5 @@
 import 'package:calm_notes/providers/emotion_provider.dart';
 import 'package:calm_notes/providers/entry_provider.dart';
-import 'package:calm_notes/providers/factor_provider.dart';
 import 'package:calm_notes/providers/reminder_provider.dart';
 import 'package:calm_notes/providers/tag_provider.dart';
 import 'package:calm_notes/services/notification_service.dart';
@@ -36,7 +35,6 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => TagProvider()),
         ChangeNotifierProvider(create: (context) => ReminderProvider()),
         ChangeNotifierProvider(create: (context) => EntryProvider()),
-        ChangeNotifierProvider(create: (context) => FactorProvider()),
       ],
       child: MaterialApp.router(
         routerConfig: router,

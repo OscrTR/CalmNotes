@@ -7,7 +7,6 @@ import 'package:calm_notes/widgets/chart.dart';
 import 'package:calm_notes/widgets/pie_chart.dart';
 import 'package:calm_notes/models/entry.dart';
 import 'package:calm_notes/providers/entry_provider.dart';
-import 'package:calm_notes/providers/factor_provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -51,7 +50,6 @@ class _StatisticsPageState extends State<StatisticsPage> {
   @override
   Widget build(BuildContext context) {
     final entryProvider = context.watch<EntryProvider>();
-    final factorProvider = context.watch<FactorProvider>();
     final entries = entryProvider.filteredEntries;
     _selectedStartDate = entryProvider.startDate;
 
@@ -67,7 +65,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
             const SizedBox(height: 10),
             _buildDateSelector(context, entryProvider),
             const SizedBox(height: 20),
-            _buildFactorSelection(factorProvider, entries, context),
+            _buildFactorSelection(entryProvider, entries, context),
             const SizedBox(height: 10),
             const Chart(),
             const SizedBox(height: 30),
@@ -86,9 +84,9 @@ class _StatisticsPageState extends State<StatisticsPage> {
     );
   }
 
-  Widget _buildFactorSelection(FactorProvider factorProvider,
-      List<Entry> entries, BuildContext context) {
-    return factorProvider.selectedFactor.isEmpty
+  Widget _buildFactorSelection(
+      EntryProvider entryProvider, List<Entry> entries, BuildContext context) {
+    return entryProvider.selectedFactor.isEmpty
         ? Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -107,9 +105,9 @@ class _StatisticsPageState extends State<StatisticsPage> {
               const SizedBox(width: 10),
               FilledButton(
                 onPressed: () {
-                  factorProvider.removeFactor();
+                  entryProvider.removeFactor();
                 },
-                child: Text(factorProvider.selectedFactor),
+                child: Text(entryProvider.selectedFactor),
               ),
             ],
           );
@@ -140,7 +138,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
     return factorsList.map((factor) {
       return OutlinedButton(
         onPressed: () {
-          context.read<FactorProvider>().selectFactor(factor);
+          context.read<EntryProvider>().selectFactor(factor);
           Navigator.pop(context, 'Add factor');
         },
         child: Text(factor),
