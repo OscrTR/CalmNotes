@@ -119,6 +119,10 @@ class _ChartState extends State<Chart> {
     required double opacity,
     required bool isFactor,
   }) {
+    if (gradientColors.length == 1) {
+      gradientColors.add(gradientColors[0]);
+      colorStops = [0, 1];
+    }
     return LineChartBarData(
       spots: spots,
       isCurved: true,
