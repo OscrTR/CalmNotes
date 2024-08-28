@@ -128,6 +128,14 @@ class EntryProvider extends ChangeNotifier {
   Future<void> updateStatistics() async {
     _filteredEntries = await _filterEntriesBetweenDates(_startDate, _endDate);
     _factorsList = await _extractFactors(_filteredEntries);
+    if (_selectedFactor != '') {
+      if (!_factorsList.contains(_selectedFactor)) {
+        _factorSpots = [];
+      } else {
+        _factorSpots =
+            _convertFactorsToSpots(_entries, _selectedFactor, _spotsDate);
+      }
+    }
     _entrySpots = await _convertEntriesToSpots(_entries, spotsDate);
     _gradientColorsStopsMap = await _createGradientColorStopsMap(_entrySpots);
     _moodDistribution = await _getMoodDistribution();
