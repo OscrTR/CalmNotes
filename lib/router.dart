@@ -79,11 +79,14 @@ final router = GoRouter(
           ),
         ],
         builder: (context, state, child) {
+          final bool isEntryPage = state.uri.toString() == '/entry';
           return Scaffold(
-              body: SafeArea(
-                child: child,
-              ),
-              bottomNavigationBar: const CustomNavigationBar());
+            body: SafeArea(
+              child: child,
+            ),
+            bottomNavigationBar:
+                isEntryPage ? null : const CustomNavigationBar(),
+          );
         })
   ],
 );
