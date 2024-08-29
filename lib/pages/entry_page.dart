@@ -1,5 +1,6 @@
 import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:calm_notes/colors.dart';
+import 'package:calm_notes/providers/animation_provider.dart';
 import 'package:calm_notes/widgets/emotions.dart';
 import 'package:calm_notes/widgets/slider.dart';
 import 'package:calm_notes/widgets/tags.dart';
@@ -63,6 +64,12 @@ class _EntryCreateState extends State<EntryCreate> {
     } else {
       _selectedMood = 5;
     }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future.delayed(const Duration(milliseconds: 100), () {
+        Provider.of<AnimationStateNotifier>(context, listen: false)
+            .setAnimate(true);
+      });
+    });
     super.initState();
   }
 

@@ -1,7 +1,7 @@
 import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:calm_notes/colors.dart';
-import 'package:calm_notes/widgets/animated_button/animated_button.dart';
-import 'package:calm_notes/widgets/animated_button/transition_type.dart';
+import 'package:calm_notes/providers/animation_provider.dart';
+import 'package:calm_notes/widgets/anim_btn.dart';
 import 'package:calm_notes/widgets/calendar.dart';
 import 'package:calm_notes/widgets/chart.dart';
 import 'package:calm_notes/widgets/pie_chart.dart';
@@ -43,6 +43,13 @@ class _StatisticsPageState extends State<StatisticsPage> {
         initialScrollOffset: entryProvider.initialWeeksListOffset);
     _scrollControllerMonths = ScrollController(
         initialScrollOffset: entryProvider.initialMonthsListOffset);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future.delayed(const Duration(milliseconds: 100), () {
+        Provider.of<AnimationStateNotifier>(context, listen: false)
+            .setAnimate(true);
+      });
+    });
   }
 
   @override
@@ -145,20 +152,22 @@ class _StatisticsPageState extends State<StatisticsPage> {
   }
 
   Widget _buildRangeTypeButtons(BuildContext context, EntryProvider provider) {
+    final ValueNotifier<bool> isWeekSelected =
+        ValueNotifier<bool>(provider.isWeekSelected);
+
+    final ValueNotifier<bool> isMonthSelected =
+        ValueNotifier<bool>(!provider.isWeekSelected);
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Expanded(
-          child: AnimatedButton(
-              text: context.tr('statistics_week'),
-              isSelected: provider.isWeekSelected,
-              height: 40,
-              selectedTextColor: CustomColors.backgroundColor,
-              selectedBackgroundColor: CustomColors.primaryColor,
-              backgroundColor: CustomColors.backgroundColor,
+          child: AnimBtn(
+              btnText: context.tr('statistics_week'),
+              isSelectedNotifier: isWeekSelected,
+              borderWidth: 1,
               borderRadius: 5,
-              textStyle: const TextStyle(color: CustomColors.primaryColor),
-              transitionType: TransitionType.leftToRight,
+              width: MediaQuery.of(context).size.width / 2,
+              borderColor: Colors.transparent,
               onPress: () {
                 provider.changeRangeTypeSelection();
                 provider.setDefaultWeekDate();
@@ -166,16 +175,13 @@ class _StatisticsPageState extends State<StatisticsPage> {
               }),
         ),
         Expanded(
-          child: AnimatedButton(
-              text: context.tr('statistics_month'),
-              isSelected: !provider.isWeekSelected,
-              height: 40,
-              selectedTextColor: CustomColors.backgroundColor,
-              selectedBackgroundColor: CustomColors.primaryColor,
-              backgroundColor: CustomColors.backgroundColor,
+          child: AnimBtn(
+              btnText: context.tr('statistics_month'),
+              isSelectedNotifier: isMonthSelected,
+              borderWidth: 1,
               borderRadius: 5,
-              textStyle: const TextStyle(color: CustomColors.primaryColor),
-              transitionType: TransitionType.leftToRight,
+              width: MediaQuery.of(context).size.width / 2,
+              borderColor: Colors.transparent,
               onPress: () {
                 provider.changeRangeTypeSelection();
                 provider.setDefaultMonthDate();
@@ -202,34 +208,29 @@ class _StatisticsPageState extends State<StatisticsPage> {
         itemCount: dateList.length,
         itemBuilder: (context, index) {
           final date = dateList[index];
-          final isSelected = _isDateSelected(date, provider);
           final label = _formatDateLabel(context, date, provider);
 
+          final ValueNotifier<bool> isSelectedNotifier = ValueNotifier<bool>(
+              _isDateSelected(date, provider) ? true : false);
+
           return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4.0),
-            child: AnimatedButton(
-              text: label,
-              height: 40,
-              width: 90,
-              isSelected: isSelected,
-              selectedTextColor: CustomColors.backgroundColor,
-              selectedBackgroundColor: CustomColors.primaryColor,
-              backgroundColor: CustomColors.backgroundColor,
-              borderColor: isSelected
-                  ? CustomColors.primaryColor
-                  : CustomColors.secondaryColor,
-              borderRadius: 5,
-              borderWidth: 1,
-              textStyle: const TextStyle(color: CustomColors.primaryColor),
-              transitionType: TransitionType.leftToRight,
-              onPress: () {
-                setState(() {
-                  _selectedStartDate = date;
-                  provider.setStartEndDate(date, _getEndDate(date, provider));
-                });
-              },
-            ),
-          );
+              padding: const EdgeInsets.symmetric(horizontal: 4.0),
+              child: AnimBtn(
+                btnText: label,
+                isSelectedNotifier: isSelectedNotifier,
+                borderWidth: 1,
+                borderRadius: 5,
+                borderColor: isSelectedNotifier.value
+                    ? CustomColors.primaryColor
+                    : CustomColors.secondaryColor,
+                width: 90,
+                onPress: () {
+                  setState(() {
+                    _selectedStartDate = date;
+                    provider.setStartEndDate(date, _getEndDate(date, provider));
+                  });
+                },
+              ));
         },
       ),
     );

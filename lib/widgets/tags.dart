@@ -1,8 +1,7 @@
 import 'package:calm_notes/colors.dart';
 import 'package:calm_notes/models/tag.dart';
 import 'package:calm_notes/providers/tag_provider.dart';
-import 'package:calm_notes/widgets/animated_button/animated_button.dart';
-import 'package:calm_notes/widgets/animated_button/transition_type.dart';
+import 'package:calm_notes/widgets/anim_btn.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -51,38 +50,36 @@ class _TagsState extends State<Tags> {
 
   List<Widget> _buildTagButtonList(List<Tag> tags) {
     return tags.map((tag) {
-      final bool isSelected = tag.selectedCount > 0 ? true : false;
+      final ValueNotifier<bool> isSelectedNotifier =
+          ValueNotifier<bool>(tag.selectedCount > 0 ? true : false);
       return ConstrainedBox(
-        constraints:
-            BoxConstraints(maxWidth: MediaQuery.of(context).size.width / 2),
-        child: AnimatedButton(
-          text: isSelected ? '${tag.name} (${tag.selectedCount})' : tag.name,
-          isSelected: isSelected,
-          height: 40,
-          width: _getTextWidth(
-                  isSelected ? '${tag.name} (${tag.selectedCount})' : tag.name,
-                  const TextStyle(
-                    fontSize: 14,
-                  )) +
-              40,
-          selectedTextColor: CustomColors.backgroundColor,
-          selectedBackgroundColor: CustomColors.primaryColor,
-          backgroundColor: CustomColors.backgroundColor,
-          borderRadius: 5,
-          borderColor: isSelected
-              ? CustomColors.primaryColor
-              : CustomColors.secondaryColor,
-          borderWidth: 1,
-          textStyle: const TextStyle(color: CustomColors.primaryColor),
-          transitionType: TransitionType.leftToRight,
-          onPress: () {
-            context.read<TagProvider>().incrementTag(tag);
-          },
-          onLongPress: () {
-            context.read<TagProvider>().resetSelectedTag(tag);
-          },
-        ),
-      );
+          constraints:
+              BoxConstraints(maxWidth: MediaQuery.of(context).size.width / 2),
+          child: AnimBtn(
+            btnText: isSelectedNotifier.value
+                ? '${tag.name} (${tag.selectedCount})'
+                : tag.name,
+            isSelectedNotifier: isSelectedNotifier,
+            borderWidth: 1,
+            borderRadius: 5,
+            borderColor: isSelectedNotifier.value
+                ? CustomColors.primaryColor
+                : CustomColors.secondaryColor,
+            width: _getTextWidth(
+                    isSelectedNotifier.value
+                        ? '${tag.name} (${tag.selectedCount})'
+                        : tag.name,
+                    const TextStyle(
+                      fontSize: 14,
+                    )) +
+                40,
+            onPress: () {
+              context.read<TagProvider>().incrementTag(tag);
+            },
+            onLongPress: () {
+              context.read<TagProvider>().resetSelectedTag(tag);
+            },
+          ));
     }).toList();
   }
 

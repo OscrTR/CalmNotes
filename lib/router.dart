@@ -1,5 +1,6 @@
 import 'package:calm_notes/models/entry.dart';
 import 'package:calm_notes/pages/entry_page.dart';
+import 'package:calm_notes/providers/animation_provider.dart';
 import 'package:calm_notes/services/database_service.dart';
 import 'package:calm_notes/widgets/navigation_bar.dart';
 import 'package:calm_notes/pages/home_page.dart';
@@ -8,6 +9,7 @@ import 'package:calm_notes/pages/statistics_page.dart';
 import 'package:calm_notes/widgets/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 final DatabaseService _databaseService = DatabaseService.instance;
 // GoRouter configuration
@@ -23,14 +25,19 @@ final router = GoRouter(
     ShellRoute(
         routes: [
           GoRoute(
-            path: '/home',
-            pageBuilder: (context, state) => CustomTransitionPage(
-                child: const HomePage(),
-                transitionsBuilder:
-                    (context, animation, secondaryAnimation, child) {
-                  return child;
-                }),
-          ),
+              path: '/home',
+              pageBuilder: (context, state) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  Provider.of<AnimationStateNotifier>(context, listen: false)
+                      .setAnimate(false);
+                });
+                return CustomTransitionPage(
+                    child: const HomePage(),
+                    transitionsBuilder:
+                        (context, animation, secondaryAnimation, child) {
+                      return child;
+                    });
+              }),
           GoRoute(
             path: '/statistics',
             pageBuilder: (context, state) => CustomTransitionPage(
