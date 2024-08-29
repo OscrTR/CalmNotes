@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:calm_notes/colors.dart';
 import 'package:calm_notes/providers/animation_provider.dart';
@@ -205,12 +206,14 @@ class _EntryCreateState extends State<EntryCreate> {
       children: [
         _buildBackButton(context),
         Container(
+          width: MediaQuery.of(context).size.width - 136,
           padding: const EdgeInsets.only(bottom: 6),
-          child: Text(
+          child: AutoSizeText(
             context.tr(
                 widget.entry != null ? 'edit_page_title' : 'create_page_title'),
             style:
                 Theme.of(context).textTheme.headlineMedium?.copyWith(height: 1),
+            maxLines: 1,
           ),
         ),
         widget.entry != null
