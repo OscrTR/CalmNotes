@@ -10,8 +10,6 @@
 .svn/
 migrate_working_dir/
 
-**/gradle.properties
-
 # IntelliJ related
 *.iml
 *.ipr

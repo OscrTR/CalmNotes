@@ -11,6 +11,7 @@ dependencies:
   auto_size_text: ^3.0.0
   awesome_notifications: ^0.9.3+1
   back_button_interceptor: ^7.0.3
+  cupertino_icons: ^1.0.8
   easy_localization: ^3.0.7
   fl_chart: ^0.68.0
   flutter:
