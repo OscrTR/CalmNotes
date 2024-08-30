@@ -209,6 +209,7 @@ class _EntryCreateState extends State<EntryCreate> {
           width: MediaQuery.of(context).size.width - 136,
           padding: const EdgeInsets.only(bottom: 6),
           child: AutoSizeText(
+            textAlign: TextAlign.center,
             context.tr(
                 widget.entry != null ? 'edit_page_title' : 'create_page_title'),
             style:
