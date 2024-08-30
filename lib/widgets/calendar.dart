@@ -27,6 +27,8 @@ class _CalendarState extends State<Calendar> {
     final lastDayOfRange =
         _getLastDayOfRange(provider.startDate, provider.endDate);
 
+    print(lastDayOfRange);
+
     final firstDayOfWeek = _mostRecentMonday(provider.startDate);
     final totalDays = _isLastDayOfMonth(lastDayOfRange)
         ? lastDayOfRange.difference(firstDayOfWeek).inDays + 1
@@ -80,9 +82,13 @@ class _CalendarState extends State<Calendar> {
   }
 
   DateTime _getLastDayOfRange(DateTime startDate, DateTime endDate) {
-    return endDate.isBefore(DateTime(startDate.year, startDate.month + 1, 0))
-        ? endDate
-        : DateTime(startDate.year, startDate.month + 1, 0);
+    if (endDate.difference(startDate).inDays == 6) {
+      return endDate;
+    } else {
+      return endDate.isBefore(DateTime(startDate.year, startDate.month + 1, 0))
+          ? endDate
+          : DateTime(startDate.year, startDate.month + 1, 0);
+    }
   }
 
   DateTime _mostRecentMonday(DateTime date) =>
