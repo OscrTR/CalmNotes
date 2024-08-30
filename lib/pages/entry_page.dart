@@ -56,21 +56,20 @@ class _EntryCreateState extends State<EntryCreate> {
       _selectedTime = parseTimeOfDay(widget.entry!.date);
       _titleController.text = widget.entry!.title!;
       _descriptionController.text = widget.entry!.description!;
-      Future.microtask(() {
-        Provider.of<EmotionProvider>(context, listen: false)
-            .setEmotions(widget.entry!.id!);
-        Provider.of<TagProvider>(context, listen: false)
-            .setTags(widget.entry!.id!);
-      });
+      Provider.of<EmotionProvider>(context, listen: false)
+          .setEmotions(widget.entry!.id!);
+      Provider.of<TagProvider>(context, listen: false)
+          .setTags(widget.entry!.id!);
     } else {
       _selectedMood = 5;
     }
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Future.delayed(const Duration(milliseconds: 100), () {
-        Provider.of<AnimationStateNotifier>(context, listen: false)
-            .setAnimate(true);
-      });
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await Future.delayed(const Duration(milliseconds: 100));
+      if (mounted) {
+        await context.read<AnimationStateNotifier>().setAnimate(true);
+      }
     });
+
     super.initState();
   }
 

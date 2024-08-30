@@ -225,9 +225,9 @@ class _SettingsPageState extends State<SettingsPage> {
       setState(() {
         selectedTime = picked;
       });
-      Future.microtask(() {
+      if (context.mounted) {
         _addReminder(context);
-      });
+      }
     }
   }
 

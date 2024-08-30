@@ -27,9 +27,12 @@ final router = GoRouter(
           GoRoute(
               path: '/home',
               pageBuilder: (context, state) {
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  Provider.of<AnimationStateNotifier>(context, listen: false)
-                      .setAnimate(false);
+                WidgetsBinding.instance.addPostFrameCallback((_) async {
+                  if (context.mounted) {
+                    await context
+                        .read<AnimationStateNotifier>()
+                        .setAnimate(false);
+                  }
                 });
                 return CustomTransitionPage(
                     child: const HomePage(),

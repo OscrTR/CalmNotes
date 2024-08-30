@@ -44,11 +44,11 @@ class _StatisticsPageState extends State<StatisticsPage> {
     _scrollControllerMonths = ScrollController(
         initialScrollOffset: entryProvider.initialMonthsListOffset);
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Future.delayed(const Duration(milliseconds: 100), () {
-        Provider.of<AnimationStateNotifier>(context, listen: false)
-            .setAnimate(true);
-      });
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await Future.delayed(const Duration(milliseconds: 100));
+      if (mounted) {
+        await context.read<AnimationStateNotifier>().setAnimate(true);
+      }
     });
   }
 

@@ -1,3 +1,4 @@
+import 'package:calm_notes/providers/animation_provider.dart';
 import 'package:calm_notes/providers/emotion_provider.dart';
 import 'package:calm_notes/providers/tag_provider.dart';
 import 'package:flutter/material.dart';
@@ -26,8 +27,15 @@ class CustomNavigationBar extends StatelessWidget {
           ),
           IconButton(
               onPressed: () async {
-                if (GoRouterState.of(context).uri.toString() != '/entry') {
-                  GoRouter.of(context).go('/entry');
+                if (context.mounted) {
+                  await context.read<AnimationStateNotifier>().setAnimate(true);
+                }
+                if (context.mounted) {
+                  context.read<EmotionProvider>().resetEmotions();
+                  context.read<TagProvider>().resetTags();
+                  if (GoRouterState.of(context).uri.toString() != '/entry') {
+                    GoRouter.of(context).go('/entry');
+                  }
                 }
               },
               icon: const Icon(

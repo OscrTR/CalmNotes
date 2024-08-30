@@ -5,7 +5,7 @@ class AnimationStateNotifier extends ChangeNotifier {
 
   bool get animate => _animate;
 
-  void setAnimate(bool value) {
+  Future<void> setAnimate(bool value) async {
     _animate = value;
     notifyListeners();
   }
