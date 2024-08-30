@@ -24,15 +24,9 @@ class _CalendarState extends State<Calendar> {
 
     Map<DateTime, int> entryMap = _convertEntriesToMap(entries);
 
-    final lastDayOfRange =
-        _getLastDayOfRange(provider.startDate, provider.endDate);
-
-    print(lastDayOfRange);
-
     final firstDayOfWeek = _mostRecentMonday(provider.startDate);
-    final totalDays = _isLastDayOfMonth(lastDayOfRange)
-        ? lastDayOfRange.difference(firstDayOfWeek).inDays + 1
-        : lastDayOfRange.difference(firstDayOfWeek).inDays;
+    final totalDays = provider.calendarDays;
+
     final numberOfRows = (totalDays / 7).ceil();
 
     final localizedDays = _getLocalizedDays(context);
@@ -43,22 +37,37 @@ class _CalendarState extends State<Calendar> {
           _showSmileys = !_showSmileys;
         });
       },
-      child: Container(
-        width: 352.7,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          color: Colors.white,
+      child: Stack(children: [
+        Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            color: Colors.white,
+          ),
+          padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
+          child: Column(
+            children: [
+              _buildDayOfWeekHeader(localizedDays),
+              const SizedBox(height: 14),
+              _buildCalendarGrid(entryMap, totalDays, firstDayOfWeek,
+                  provider.startDate, provider.endDate, numberOfRows),
+            ],
+          ),
         ),
-        padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
-        child: Column(
-          children: [
-            _buildDayOfWeekHeader(localizedDays),
-            const SizedBox(height: 14),
-            _buildCalendarGrid(entryMap, totalDays, firstDayOfWeek,
-                provider.startDate, provider.endDate, numberOfRows),
-          ],
-        ),
-      ),
+        if (entries.isEmpty)
+          Positioned.fill(
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: CustomColors.primaryColor.withOpacity(0.3),
+              ),
+              child: Center(
+                child: Text(
+                  tr('statistics_no_data'),
+                ),
+              ),
+            ),
+          ),
+      ]),
     );
   }
 
@@ -79,16 +88,6 @@ class _CalendarState extends State<Calendar> {
 
     return moodTotalMap.map((date, totalMood) =>
         MapEntry(date, (totalMood / moodCountMap[date]!).round()));
-  }
-
-  DateTime _getLastDayOfRange(DateTime startDate, DateTime endDate) {
-    if (endDate.difference(startDate).inDays == 6) {
-      return endDate;
-    } else {
-      return endDate.isBefore(DateTime(startDate.year, startDate.month + 1, 0))
-          ? endDate
-          : DateTime(startDate.year, startDate.month + 1, 0);
-    }
   }
 
   DateTime _mostRecentMonday(DateTime date) =>
@@ -176,15 +175,5 @@ class _CalendarState extends State<Calendar> {
         );
       }),
     );
-  }
-
-  bool _isLastDayOfMonth(DateTime date) {
-    int nextMonth = date.month == 12 ? 1 : date.month + 1;
-    int year = date.month == 12 ? date.year + 1 : date.year;
-    DateTime firstDayOfNextMonth = DateTime(year, nextMonth, 1);
-    DateTime lastDayOfCurrentMonth =
-        firstDayOfNextMonth.subtract(const Duration(days: 1));
-
-    return date.day == lastDayOfCurrentMonth.day;
   }
 }

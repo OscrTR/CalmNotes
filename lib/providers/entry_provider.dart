@@ -23,13 +23,12 @@ class EntryProvider extends ChangeNotifier {
   List<DateTime> _months = [];
   bool _isWeekSelected = true;
   Map<int, int> _moodDistribution = {};
-
-  // Properties to hold the start and end dates for filtering
   DateTime _startDate =
       DateTime.now().subtract(Duration(days: DateTime.now().weekday - 1));
   DateTime _endDate = DateTime.now()
       .subtract(Duration(days: DateTime.now().weekday - 1))
       .add(const Duration(days: 6));
+  int _calendarDays = 7;
 
   List<Entry> get entries => _entries;
   List<Entry> get filteredEntries => _filteredEntries;
@@ -48,6 +47,7 @@ class EntryProvider extends ChangeNotifier {
   List<DateTime> get months => _months;
   bool get isWeekSelected => _isWeekSelected;
   Map<int, int> get moodDistribution => _moodDistribution;
+  int get calendarDays => _calendarDays;
 
   EntryProvider() {
     fetchEntries();
@@ -64,6 +64,7 @@ class EntryProvider extends ChangeNotifier {
       _error = e.toString();
     } finally {
       _spotsDate = await _generateFullDateRange(_startDate, _endDate);
+      _calendarDays = _getCalendarDays();
       await updateStatistics();
       notifyListeners();
     }
@@ -73,6 +74,7 @@ class EntryProvider extends ChangeNotifier {
     _startDate = startDate;
     _endDate = endDate;
     _spotsDate = await _generateFullDateRange(_startDate, _endDate);
+    _calendarDays = _getCalendarDays();
     await updateStatistics();
     notifyListeners();
   }
@@ -84,6 +86,7 @@ class EntryProvider extends ChangeNotifier {
         .subtract(Duration(days: DateTime.now().weekday - 1))
         .add(const Duration(days: 6));
     _spotsDate = await _generateFullDateRange(_startDate, _endDate);
+    _calendarDays = _getCalendarDays();
     await updateStatistics();
     notifyListeners();
   }
@@ -93,6 +96,7 @@ class EntryProvider extends ChangeNotifier {
     _startDate = DateTime(now.year, now.month, 1);
     _endDate = DateTime(now.year, now.month + 1, 0);
     _spotsDate = await _generateFullDateRange(_startDate, _endDate);
+    _calendarDays = _getCalendarDays();
     await updateStatistics();
     notifyListeners();
   }
@@ -380,4 +384,22 @@ class EntryProvider extends ChangeNotifier {
       }
     }
   }
+
+  int _getCalendarDays() {
+    if (endDate.difference(startDate).inDays == 6) {
+      return 7;
+    } else {
+      final monday = _mostRecentMonday(startDate);
+      final nextMonth = endDate.month == 12 ? 1 : endDate.month + 1;
+      final nextMonthYear =
+          endDate.month == 12 ? endDate.year + 1 : endDate.year;
+      final firstDayOfNextMonth = DateTime(nextMonthYear, nextMonth, 1);
+      final lastDayOfMonth =
+          firstDayOfNextMonth.subtract(const Duration(days: 1));
+      return lastDayOfMonth.difference(monday).inDays + 1;
+    }
+  }
+
+  DateTime _mostRecentMonday(DateTime date) =>
+      DateTime(date.year, date.month, date.day - (date.weekday - 1));
 }
