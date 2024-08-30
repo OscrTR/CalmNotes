@@ -326,19 +326,34 @@ class EntryProvider extends ChangeNotifier {
   List<DateTime> _generateDateRanges(Duration duration,
       [bool byMonth = false]) {
     List<DateTime> ranges = [];
-    DateTime currentDate = DateTime(DateTime.now().year, 1, 1);
-
-    // Calculate the last day of the current week (Sunday)
+    DateTime incrementedDate = DateTime(DateTime.now().year, 1, 1);
     DateTime now = DateTime.now();
-    int daysUntilEndOfWeek = DateTime.sunday - now.weekday;
-    DateTime endDate = now.add(Duration(days: daysUntilEndOfWeek));
 
-    while (currentDate.isBefore(endDate) ||
-        currentDate.isAtSameMomentAs(endDate)) {
-      ranges.add(currentDate);
-      currentDate = byMonth
-          ? DateTime(currentDate.year, currentDate.month + 1, 1)
-          : currentDate.add(duration);
+    // Month logic
+    int nextMonth = now.month == 12 ? 1 : now.month + 1;
+    int nextMonthYear = now.month == 12 ? now.year + 1 : now.year;
+    DateTime firstDayOfNextMonth = DateTime(nextMonthYear, nextMonth, 1);
+    DateTime lastDayOfMonth =
+        firstDayOfNextMonth.subtract(const Duration(days: 1));
+
+    // Week logic
+    DateTime endOfDay = DateTime(now.year, now.month, now.day, 23, 59, 59, 999);
+    int daysUntilEndOfWeek = DateTime.sunday - endOfDay.weekday;
+    DateTime endDate = endOfDay.add(Duration(days: daysUntilEndOfWeek));
+
+    if (!byMonth) {
+      while (incrementedDate.isBefore(endDate) ||
+          incrementedDate.isAtSameMomentAs(endDate)) {
+        ranges.add(incrementedDate);
+        incrementedDate = incrementedDate.add(duration);
+      }
+    } else if (byMonth) {
+      while (incrementedDate.isBefore(lastDayOfMonth) ||
+          incrementedDate.isAtSameMomentAs(lastDayOfMonth)) {
+        ranges.add(incrementedDate);
+        incrementedDate =
+            DateTime(incrementedDate.year, incrementedDate.month + 1, 1);
+      }
     }
 
     return ranges;

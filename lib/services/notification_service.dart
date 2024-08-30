@@ -63,15 +63,6 @@ class NotificationService {
 
   static Future<void> showNotification(
       TimeOfDay time, int notificationId) async {
-    DateTime date = DateTime.now();
-    DateTime scheduleTime = DateTime(
-      date.year,
-      date.month,
-      date.day,
-      time.hour,
-      time.minute,
-    );
-
     await AwesomeNotifications().createNotification(
         content: NotificationContent(
           id: notificationId,
@@ -81,9 +72,9 @@ class NotificationService {
           color: CustomColors.primaryColor,
           wakeUpScreen: true,
           category: NotificationCategory.Reminder,
-          autoDismissible: false,
+          autoDismissible: true,
         ),
-        schedule: NotificationCalendar.fromDate(
-            date: scheduleTime, preciseAlarm: true, repeats: true));
+        schedule: NotificationCalendar(
+            hour: time.hour, minute: time.minute, second: 0, repeats: true));
   }
 }
