@@ -162,6 +162,7 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget _buildLanguageDialogContent(BuildContext context) {
     return Wrap(
       spacing: 10,
+      runSpacing: 10,
       children: [
         buildLanguageOption(
           context,

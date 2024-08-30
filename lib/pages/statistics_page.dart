@@ -132,6 +132,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
         const SizedBox(height: 10),
         Wrap(
           spacing: 10,
+          runSpacing: 10,
           children: _buildFactorButtonList(entries, context, factorsList),
         ),
       ],
