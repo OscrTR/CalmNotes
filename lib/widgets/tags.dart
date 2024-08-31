@@ -49,35 +49,37 @@ class _TagsState extends State<Tags> {
   }
 
   List<Widget> _buildTagButtonList(List<Tag> tags) {
+    final double maxButtonWidth = MediaQuery.of(context).size.width / 2;
+    final tagProvider = context.read<TagProvider>();
+
     return tags.map((tag) {
+      final bool isSelected = tag.selectedCount > 0;
       final ValueNotifier<bool> isSelectedNotifier =
           ValueNotifier<bool>(tag.selectedCount > 0 ? true : false);
+
+      final String btnText = tag.name;
+      final String fullText =
+          isSelected ? '$btnText (${tag.selectedCount})' : btnText;
+      final double textWidth =
+          _getTextWidth(fullText, const TextStyle(fontSize: 14));
+
       return ConstrainedBox(
-          constraints:
-              BoxConstraints(maxWidth: MediaQuery.of(context).size.width / 2),
+          constraints: BoxConstraints(maxWidth: maxButtonWidth),
           child: AnimBtn(
-            btnText: isSelectedNotifier.value
-                ? '${tag.name} (${tag.selectedCount})'
-                : tag.name,
+            btnText: btnText,
+            countText: ' (${tag.selectedCount})',
             isSelectedNotifier: isSelectedNotifier,
             borderWidth: 1,
             borderRadius: 5,
-            borderColor: isSelectedNotifier.value
+            borderColor: isSelected
                 ? CustomColors.primaryColor
                 : CustomColors.secondaryColor,
-            width: _getTextWidth(
-                    isSelectedNotifier.value
-                        ? '${tag.name} (${tag.selectedCount})'
-                        : tag.name,
-                    const TextStyle(
-                      fontSize: 14,
-                    )) +
-                40,
+            width: textWidth + 40,
             onPress: () {
-              context.read<TagProvider>().incrementTag(tag);
+              tagProvider.incrementTag(tag);
             },
             onLongPress: () {
-              context.read<TagProvider>().resetSelectedTag(tag);
+              tagProvider.resetSelectedTag(tag);
             },
           ));
     }).toList();
@@ -88,8 +90,7 @@ class _TagsState extends State<Tags> {
       text: TextSpan(text: text, style: style),
       textDirection: ui.TextDirection.ltr,
     )..layout(minWidth: 0, maxWidth: double.infinity);
-
-    return textPainter.size.width;
+    return textPainter.size.width.clamp(12.0, double.infinity);
   }
 
   Widget _buildOutlinedTagButton(

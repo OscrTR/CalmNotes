@@ -49,35 +49,37 @@ class _EmotionsState extends State<Emotions> {
   }
 
   List<Widget> _buildEmotionButtonList(List<Emotion> emotions) {
+    final double maxButtonWidth = MediaQuery.of(context).size.width / 2;
+    final emotionProvider = context.read<EmotionProvider>();
+
     return emotions.map((emotion) {
+      final bool isSelected = emotion.selectedCount > 0;
       final ValueNotifier<bool> isSelectedNotifier =
           ValueNotifier<bool>(emotion.selectedCount > 0 ? true : false);
+
+      final String btnText = emotion.name;
+      final String fullText =
+          isSelected ? '$btnText (${emotion.selectedCount})' : btnText;
+      final double textWidth =
+          _getTextWidth(fullText, const TextStyle(fontSize: 14));
+
       return ConstrainedBox(
-          constraints:
-              BoxConstraints(maxWidth: MediaQuery.of(context).size.width / 2),
+          constraints: BoxConstraints(maxWidth: maxButtonWidth),
           child: AnimBtn(
-            btnText: isSelectedNotifier.value
-                ? '${emotion.name} (${emotion.selectedCount})'
-                : emotion.name,
+            btnText: emotion.name,
+            countText: ' (${emotion.selectedCount})',
             isSelectedNotifier: isSelectedNotifier,
             borderWidth: 1,
             borderRadius: 5,
             borderColor: isSelectedNotifier.value
                 ? CustomColors.primaryColor
                 : CustomColors.secondaryColor,
-            width: _getTextWidth(
-                    isSelectedNotifier.value
-                        ? '${emotion.name} (${emotion.selectedCount})'
-                        : emotion.name,
-                    const TextStyle(
-                      fontSize: 14,
-                    )) +
-                40,
+            width: textWidth + 40,
             onPress: () {
-              context.read<EmotionProvider>().incrementEmotion(emotion);
+              emotionProvider.incrementEmotion(emotion);
             },
             onLongPress: () {
-              context.read<EmotionProvider>().resetSelectedEmotion(emotion);
+              emotionProvider.resetSelectedEmotion(emotion);
             },
           ));
     }).toList();
@@ -88,8 +90,7 @@ class _EmotionsState extends State<Emotions> {
       text: TextSpan(text: text, style: style),
       textDirection: ui.TextDirection.ltr,
     )..layout(minWidth: 0, maxWidth: double.infinity);
-
-    return textPainter.size.width;
+    return textPainter.size.width.clamp(12.0, double.infinity);
   }
 
   Widget _buildAddEmotionButton() {

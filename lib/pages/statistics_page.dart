@@ -158,6 +158,8 @@ class _StatisticsPageState extends State<StatisticsPage> {
 
     final ValueNotifier<bool> isMonthSelected =
         ValueNotifier<bool>(!provider.isWeekSelected);
+
+    final double maxButtonWidth = MediaQuery.of(context).size.width / 2;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -167,7 +169,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
               isSelectedNotifier: isWeekSelected,
               borderWidth: 1,
               borderRadius: 5,
-              width: MediaQuery.of(context).size.width / 2,
+              width: maxButtonWidth,
               borderColor: Colors.transparent,
               onPress: () {
                 provider.changeRangeTypeSelection();
@@ -181,7 +183,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
               isSelectedNotifier: isMonthSelected,
               borderWidth: 1,
               borderRadius: 5,
-              width: MediaQuery.of(context).size.width / 2,
+              width: maxButtonWidth,
               borderColor: Colors.transparent,
               onPress: () {
                 provider.changeRangeTypeSelection();
@@ -210,26 +212,30 @@ class _StatisticsPageState extends State<StatisticsPage> {
         itemBuilder: (context, index) {
           final date = dateList[index];
           final label = _formatDateLabel(context, date, provider);
-
-          final ValueNotifier<bool> isSelectedNotifier = ValueNotifier<bool>(
-              _isDateSelected(date, provider) ? true : false);
+          final isSelected = _isDateSelected(date, provider);
 
           return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 4.0),
-              child: AnimBtn(
-                btnText: label,
-                isSelectedNotifier: isSelectedNotifier,
-                borderWidth: 1,
-                borderRadius: 5,
-                borderColor: isSelectedNotifier.value
-                    ? CustomColors.primaryColor
-                    : CustomColors.secondaryColor,
-                width: 90,
-                onPress: () {
-                  setState(() {
-                    _selectedStartDate = date;
-                    provider.setStartEndDate(date, _getEndDate(date, provider));
-                  });
+              child: ValueListenableBuilder<bool>(
+                valueListenable: ValueNotifier<bool>(isSelected),
+                builder: (context, isSelected, child) {
+                  return AnimBtn(
+                    btnText: label,
+                    isSelectedNotifier: ValueNotifier<bool>(isSelected),
+                    borderWidth: 1,
+                    borderRadius: 5,
+                    borderColor: isSelected
+                        ? CustomColors.primaryColor
+                        : CustomColors.secondaryColor,
+                    width: 90,
+                    onPress: () {
+                      setState(() {
+                        _selectedStartDate = date;
+                        provider.setStartEndDate(
+                            date, _getEndDate(date, provider));
+                      });
+                    },
+                  );
                 },
               ));
         },

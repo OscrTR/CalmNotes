@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 class AnimBtn extends StatefulWidget {
   final String btnText;
+  final String countText;
   final ValueNotifier<bool> isSelectedNotifier;
   final VoidCallback? onPress;
   final VoidCallback? onLongPress;
@@ -17,6 +18,7 @@ class AnimBtn extends StatefulWidget {
   const AnimBtn({
     super.key,
     required this.btnText,
+    this.countText = '',
     required this.isSelectedNotifier,
     this.onPress,
     this.onLongPress,
@@ -39,58 +41,73 @@ class _AnimBtnState extends State<AnimBtn> {
     return ValueListenableBuilder<bool>(
       valueListenable: widget.isSelectedNotifier,
       builder: (context, isSelected, child) {
+        final borderRadius = BorderRadius.circular(widget.borderRadius);
+        final animationDuration = animationProvider.animate
+            ? const Duration(milliseconds: 300)
+            : Duration.zero;
+
         return InkWell(
-          onTap: () => onPressed(),
-          onLongPress: () => onLongPressed(),
-          borderRadius: BorderRadius.circular(widget.borderRadius),
+          onTap: onPressed,
+          onLongPress: onLongPressed,
+          borderRadius: borderRadius,
           child: ClipRRect(
-            borderRadius:
-                BorderRadius.all(Radius.circular(widget.borderRadius)),
+            borderRadius: borderRadius,
             child: Stack(children: [
               AnimatedContainer(
-                duration: animationProvider.animate
-                    ? const Duration(milliseconds: 300)
-                    : Duration.zero,
+                duration: animationDuration,
                 height: widget.height,
                 width: widget.width,
                 decoration: BoxDecoration(
                   color: CustomColors.backgroundColor,
                   border: Border.all(
                       color: widget.borderColor, width: widget.borderWidth),
-                  borderRadius:
-                      BorderRadius.all(Radius.circular(widget.borderRadius)),
+                  borderRadius: borderRadius,
                 ),
               ),
               AnimatedPositioned(
-                duration: animationProvider.animate
-                    ? const Duration(milliseconds: 300)
-                    : Duration.zero,
+                duration: animationDuration,
                 left: isSelected ? 0 : -widget.width,
                 child: Container(
                   height: widget.height,
                   width: widget.width,
                   decoration: BoxDecoration(
-                      color: CustomColors.primaryColor,
-                      border: Border.all(color: CustomColors.primaryColor),
-                      borderRadius: const BorderRadius.all(Radius.circular(5))),
+                    color: CustomColors.primaryColor,
+                    border: Border.all(color: CustomColors.primaryColor),
+                    borderRadius: BorderRadius.circular(5),
+                  ),
                 ),
               ),
               AnimatedContainer(
-                duration: animationProvider.animate
-                    ? const Duration(milliseconds: 300)
-                    : Duration.zero,
+                duration: animationDuration,
                 padding:
                     const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                 height: widget.height,
                 width: widget.width,
-                child: Align(
-                  child: Text(
-                    widget.btnText,
-                    style: TextStyle(
-                        color: isSelected
-                            ? CustomColors.backgroundColor
-                            : CustomColors.primaryColor,
-                        overflow: TextOverflow.ellipsis),
+                child: IntrinsicWidth(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Flexible(
+                        child: Text(
+                          widget.btnText,
+                          style: TextStyle(
+                            color: isSelected
+                                ? CustomColors.backgroundColor
+                                : CustomColors.primaryColor,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ),
+                      ),
+                      if (isSelected)
+                        Text(
+                          widget.countText,
+                          style: const TextStyle(
+                            color: CustomColors.backgroundColor,
+                          ),
+                        ),
+                    ],
                   ),
                 ),
               ),
