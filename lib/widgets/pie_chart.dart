@@ -33,8 +33,7 @@ class _CustomPieChartState extends State<CustomPieChart> {
             borderRadius: BorderRadius.circular(10),
             color: Colors.white,
           ),
-          padding:
-              const EdgeInsets.only(top: 24, bottom: 24, left: 0, right: 20),
+          padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
           child: PieChart(
             PieChartData(
               sectionsSpace: 2,
