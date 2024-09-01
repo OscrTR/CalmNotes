@@ -245,9 +245,8 @@ class EntryProvider extends ChangeNotifier {
       DateTime startDate, DateTime endDate) async {
     DateTime startOfDay =
         DateTime(startDate.year, startDate.month, startDate.day);
-    DateTime endOfDay =
-        DateTime(endDate.year, endDate.month, endDate.day, 23, 59, 59, 999, 999)
-            .subtract(const Duration(days: 1));
+    DateTime endOfDay = DateTime(
+        endDate.year, endDate.month, endDate.day, 23, 59, 59, 999, 999);
 
     return _entries.where((entry) {
       DateTime entryDate =
