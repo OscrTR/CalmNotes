@@ -12,8 +12,8 @@ import 'router.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await NotificationService.initializeNotification();
   await EasyLocalization.ensureInitialized();
+  await NotificationService.initializeNotifications();
   runApp(
     EasyLocalization(
       supportedLocales: const [Locale('en', 'US'), Locale('fr', 'FR')],

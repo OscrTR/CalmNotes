@@ -1,5 +1,5 @@
-import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:calm_notes/models/reminder.dart';
+import 'package:calm_notes/services/notification_service.dart';
 import 'package:flutter/material.dart';
 import 'package:calm_notes/services/database_service.dart';
 
@@ -28,7 +28,7 @@ class ReminderProvider with ChangeNotifier {
   }
 
   Future<void> deleteReminder(Reminder reminder) async {
-    await AwesomeNotifications().cancel(reminder.id!);
+    await NotificationService.deleteNotification(reminder.id);
     await _databaseService.deleteReminder(reminder.id!);
     await _fetchReminders();
   }

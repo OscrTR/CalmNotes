@@ -1,80 +1,84 @@
-import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:calm_notes/colors.dart';
-import 'package:calm_notes/router.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_timezone/flutter_timezone.dart';
+import 'package:timezone/data/latest_all.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 
 class NotificationService {
-  static Future<void> initializeNotification() async {
-    await AwesomeNotifications().initialize(
-      'resource://drawable/res_notification_icon',
-      [
-        NotificationChannel(
-          channelKey: 'scheduled_channel',
-          channelName: 'Scheduled Notifications',
-          channelDescription: 'Notification channel for reminders.',
-          importance: NotificationImportance.High,
-          channelShowBadge: true,
-          playSound: true,
-        )
-      ],
+  static Future<void> initializeNotifications() async {
+    tz.initializeTimeZones();
+    final String currentTimeZone = await FlutterTimezone.getLocalTimezone();
+    tz.setLocalLocation(tz.getLocation(currentTimeZone));
+// initialise the plugin. app_icon needs to be a added as a drawable resource to the Android head project
+    const AndroidInitializationSettings initializationSettingsAndroid =
+        AndroidInitializationSettings('ic_stat_notif');
+
+    const InitializationSettings initializationSettings =
+        InitializationSettings(
+      android: initializationSettingsAndroid,
     );
 
-    // Request permission to send notifications if not already allowed
-    await AwesomeNotifications().isNotificationAllowed().then(
-      (isAllowed) async {
-        if (!isAllowed) {
-          await AwesomeNotifications().requestPermissionToSendNotifications();
-        }
-      },
-    );
-
-    await AwesomeNotifications().setListeners(
-      onActionReceivedMethod: onActionReceivedMethod,
-      onNotificationCreatedMethod: onNotificationCreatedMethod,
-      onNotificationDisplayedMethod: onNotificationDisplayedMethod,
-      onDismissActionReceivedMethod: onDismissActionReceivedMethod,
-    );
+    await FlutterLocalNotificationsPlugin().initialize(initializationSettings);
+    askNotificationPermission();
   }
 
-  static Future<void> onNotificationCreatedMethod(
-      ReceivedNotification receivedNotification) async {
-    debugPrint('onNotificationCreatedMethod');
+  static Future<void> askNotificationPermission() async {
+    FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+        FlutterLocalNotificationsPlugin();
+    await flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.requestNotificationsPermission();
   }
 
-  static Future<void> onNotificationDisplayedMethod(
-      ReceivedNotification receivedNotification) async {
-    debugPrint('onNotificationDisplayedMethod');
+  static Future<void> deleteNotification(id) async {
+    await FlutterLocalNotificationsPlugin().cancel(id);
   }
 
-  static Future<void> onDismissActionReceivedMethod(
-      ReceivedAction receivedAction) async {
-    debugPrint('onDismissActionReceivedMethod');
-  }
-
-  static Future<void> onActionReceivedMethod(
-      ReceivedAction receivedAction) async {
-    debugPrint('onActionReceivedMethod');
-    final payload = receivedAction.payload ?? {};
-    if (payload["navigate"] == "true") {
-      router.go('/home');
-    }
-  }
-
-  static Future<void> showNotification(
-      TimeOfDay time, int notificationId) async {
-    await AwesomeNotifications().createNotification(
-        content: NotificationContent(
-          id: notificationId,
-          channelKey: 'scheduled_channel',
-          title: tr('notification_title'),
-          body: tr('notification_description'),
+  static Future<void> scheduleDailyNotification(
+      TimeOfDay scheduledTime, int id) async {
+    final now = tz.TZDateTime.now(tz.local);
+    final time = tz.TZDateTime(tz.local, now.year, now.month, now.day,
+        scheduledTime.hour, scheduledTime.minute);
+    await FlutterLocalNotificationsPlugin().zonedSchedule(
+        id,
+        'Good Morning!',
+        'This is your daily reminder.',
+        time,
+        const NotificationDetails(
+            android: AndroidNotificationDetails(
+          'daily_notifications',
+          'Daily notifications',
+          importance: Importance.max,
+          priority: Priority.high,
           color: CustomColors.primaryColor,
-          wakeUpScreen: true,
-          category: NotificationCategory.Reminder,
-          autoDismissible: true,
-        ),
-        schedule: NotificationCalendar(
-            hour: time.hour, minute: time.minute, second: 0, repeats: true));
+          playSound: true,
+          enableVibration: true,
+          showWhen: false,
+        )),
+        payload: 'Daily notification payload',
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+        matchDateTimeComponents: DateTimeComponents.time);
+  }
+
+  static Future<void> showNotification(int id) async {
+    await FlutterLocalNotificationsPlugin().show(
+        id,
+        'Good Morning!',
+        'This is your daily reminder.',
+        const NotificationDetails(
+            android: AndroidNotificationDetails(
+          'daily_notifications',
+          'Daily notifications',
+          importance: Importance.max,
+          priority: Priority.high,
+          color: CustomColors.primaryColor,
+          playSound: true,
+          enableVibration: true,
+          showWhen: false,
+        )),
+        payload: 'Daily notification payload');
   }
 }

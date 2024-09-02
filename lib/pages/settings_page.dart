@@ -49,6 +49,9 @@ class _SettingsPageState extends State<SettingsPage> {
               context.tr('settings_title'),
               style: Theme.of(context).textTheme.headlineMedium,
             ),
+            OutlinedButton(
+                onPressed: () => NotificationService.showNotification(0),
+                child: Text('data')),
             const SizedBox(height: 24),
             _buildRemindersSection(context),
             const SizedBox(height: 24),
@@ -82,7 +85,12 @@ class _SettingsPageState extends State<SettingsPage> {
         ),
         const SizedBox(height: 10),
         FilledButton(
-          onPressed: () => _selectTime(context),
+          onPressed: () async {
+            await NotificationService.askNotificationPermission();
+            if (context.mounted) {
+              _selectTime(context);
+            }
+          },
           child: Text(context.tr('settings_reminders_add')),
         ),
       ],
@@ -243,6 +251,6 @@ class _SettingsPageState extends State<SettingsPage> {
         DateTime.now().millisecondsSinceEpoch.remainder(100000);
 
     reminderProvider.addReminder(formattedTime, notificationId);
-    NotificationService.showNotification(selectedTime, notificationId);
+    NotificationService.scheduleDailyNotification(selectedTime, notificationId);
   }
 }
