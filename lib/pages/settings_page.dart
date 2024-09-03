@@ -49,9 +49,6 @@ class _SettingsPageState extends State<SettingsPage> {
               context.tr('settings_title'),
               style: Theme.of(context).textTheme.headlineMedium,
             ),
-            OutlinedButton(
-                onPressed: () => NotificationService.showNotification(0),
-                child: Text('data')),
             const SizedBox(height: 24),
             _buildRemindersSection(context),
             const SizedBox(height: 24),

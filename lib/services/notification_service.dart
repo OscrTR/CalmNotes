@@ -1,4 +1,5 @@
 import 'package:calm_notes/colors.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
@@ -43,8 +44,8 @@ class NotificationService {
         scheduledTime.hour, scheduledTime.minute);
     await FlutterLocalNotificationsPlugin().zonedSchedule(
         id,
-        'Good Morning!',
-        'This is your daily reminder.',
+        tr('notification_title'),
+        tr('notification_description'),
         time,
         const NotificationDetails(
             android: AndroidNotificationDetails(
@@ -61,24 +62,5 @@ class NotificationService {
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime,
         matchDateTimeComponents: DateTimeComponents.time);
-  }
-
-  static Future<void> showNotification(int id) async {
-    await FlutterLocalNotificationsPlugin().show(
-        id,
-        'Good Morning!',
-        'This is your daily reminder.',
-        const NotificationDetails(
-            android: AndroidNotificationDetails(
-          'daily_notifications',
-          'Daily notifications',
-          importance: Importance.max,
-          priority: Priority.high,
-          color: CustomColors.primaryColor,
-          playSound: true,
-          enableVibration: true,
-          showWhen: false,
-        )),
-        payload: 'Daily notification payload');
   }
 }
