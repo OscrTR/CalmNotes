@@ -3,12 +3,10 @@
 
 **Calm Notes** is a mental health journaling application designed to help users track and improve their emotional well-being daily. Built with Flutter, this open-source app is user-friendly and customizable.
 
-
-
-
 ## Project Overview
 
 Calm Notes was created to provide a safe and intuitive space for users to record their thoughts, emotions, and experiences. The goal is to facilitate mental state tracking and provide tools for better introspection and mental health management.
+
 ## Features
 
 - **Daily Journal**: Write daily journal entries to track your thoughts and emotions.
@@ -59,7 +57,7 @@ Contributions are welcome! Here's how you can help:
 
 ## License
 
-This project is licensed under the MIT License. See the LICENSE file for more details.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
 
 
 ## Contact
