@@ -1,4 +1,5 @@
 import 'package:calm_notes/models/entry.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:calm_notes/providers/entry_provider.dart';
 import 'package:calm_notes/services/database_service.dart';
@@ -29,6 +30,7 @@ void main() {
     for (var table in tables) {
       await db.delete(table);
     }
+    await Future.delayed(const Duration(milliseconds: 100));
   });
 
   tearDownAll(() async {
@@ -36,8 +38,11 @@ void main() {
     await db.close();
   });
 
+  final DateTime now = DateTime.now();
+  final String formattedDate = DateFormat('yyyy-MM-dd|HH:mm').format(now);
+
   final entryToAdd = Entry(
-    date: '2024-08-19|18:00',
+    date: formattedDate,
     mood: 10,
     emotions: 'sad:1,happy:2',
     title: 'Cool title',
@@ -67,7 +72,7 @@ void main() {
 
     expect(entryProvider.entries.first.id, 1);
     expect(entryProvider.entries.first.mood, 10);
-    expect(entryProvider.entries.first.date, '2024-08-19|18:00');
+    expect(entryProvider.entries.first.date, formattedDate);
     expect(entryProvider.entries.first.emotions, 'sad:1,happy:2');
     expect(entryProvider.entries.first.title, 'Cool title');
     expect(entryProvider.entries.first.description, 'My description.');
@@ -76,7 +81,7 @@ void main() {
   });
 
   test('Add entry updates the entries list', () async {
-    final newEntry = Entry(id: 3, mood: 8, date: '2024-08-22|00:00:00');
+    final newEntry = Entry(id: 3, mood: 8, date: formattedDate);
 
     await entryProvider.addEntry(newEntry);
 
@@ -106,8 +111,8 @@ void main() {
   });
 
   test('Update entry updates the entries list', () async {
-    final entryToUpdate = Entry(id: 1, mood: 5, date: '2024-08-20|00:00:00');
-    final updatedEntry = Entry(id: 1, mood: 9, date: '2024-08-20|00:00:00');
+    final entryToUpdate = Entry(id: 1, mood: 5, date: formattedDate);
+    final updatedEntry = Entry(id: 1, mood: 9, date: formattedDate);
     await entryProvider.addEntry(entryToUpdate);
 
     await entryProvider.updateEntry(updatedEntry);
@@ -118,25 +123,32 @@ void main() {
   });
 
   test('Set start and end date filters entries', () async {
-    final entry1 = Entry(id: 1, mood: 5, date: '2024-08-19|00:00:00');
-    final entry2 = Entry(id: 2, mood: 7, date: '2024-08-21|00:00:00');
+    final DateTime now = DateTime.now();
+    final DateFormat formatter = DateFormat('yyyy-MM-dd|HH:mm:ss');
+
+    final entry1 = Entry(id: 1, mood: 5, date: formatter.format(now));
+    final entry2 = Entry(
+        id: 2,
+        mood: 7,
+        date: formatter.format(now.add(const Duration(days: 2))));
     await entryProvider.addEntry(entry1);
     await entryProvider.addEntry(entry2);
 
-    entryProvider.setStartEndDate(DateTime(2024, 8, 20), DateTime(2024, 8, 21));
-
-    expect(
-        entryProvider.filteredEntries.any((entry) =>
-            entry.id == entry2.id &&
-            entry.mood == entry2.mood &&
-            entry.date == entry2.date),
-        isTrue);
+    await entryProvider.setStartEndDate(DateTime(now.year, now.month, now.day),
+        DateTime(now.year, now.month, now.day + 1));
 
     expect(
         entryProvider.filteredEntries.any((entry) =>
             entry.id == entry1.id &&
             entry.mood == entry1.mood &&
             entry.date == entry1.date),
+        isTrue);
+
+    expect(
+        entryProvider.filteredEntries.any((entry) =>
+            entry.id == entry2.id &&
+            entry.mood == entry2.mood &&
+            entry.date == entry2.date),
         isFalse);
   });
 
@@ -165,12 +177,20 @@ void main() {
   });
 
   test('Getting mood distribution', () async {
-    final entry1 = Entry(mood: 2, date: '2024-08-19|00:00:00');
-    final entry2 = Entry(mood: 4, date: '2024-08-19|00:00:00');
-    final entry3 = Entry(mood: 5, date: '2024-08-20|00:00:00');
-    final entry4 = Entry(mood: 5, date: '2024-08-20|00:00:00');
-    final entry5 = Entry(mood: 8, date: '2024-08-21|00:00:00');
-    final entry6 = Entry(mood: 9, date: '2024-08-22|00:00:00');
+    final DateTime now = DateTime.now();
+    final DateFormat formatter = DateFormat('yyyy-MM-dd|HH:mm:ss');
+
+    final entry1 = Entry(mood: 2, date: formatter.format(now));
+    final entry2 = Entry(mood: 4, date: formatter.format(now));
+    final entry3 = Entry(
+        mood: 5, date: formatter.format(now.add(const Duration(days: 1))));
+    final entry4 = Entry(
+        mood: 5, date: formatter.format(now.add(const Duration(days: 1))));
+    final entry5 = Entry(
+        mood: 8, date: formatter.format(now.add(const Duration(days: 2))));
+    final entry6 = Entry(
+        mood: 9, date: formatter.format(now.add(const Duration(days: 3))));
+
     await entryProvider.addEntry(entry1);
     await entryProvider.addEntry(entry2);
     await entryProvider.addEntry(entry3);

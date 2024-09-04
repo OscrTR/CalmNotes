@@ -270,11 +270,13 @@ void main() {
       await dbService.addEmotion('Excited');
 
       final initialEmotions = await dbService.fetchEmotions();
+
       expect(initialEmotions[0].selectedCount, 0);
       expect(initialEmotions[1].selectedCount, 0);
 
       await dbService.setSelectedEmotionsCount(entryId);
       final updatedEmotions = await dbService.fetchEmotions();
+      updatedEmotions.sort((a, b) => a.name.compareTo(b.name));
 
       expect(updatedEmotions[0].selectedCount, 2);
       expect(updatedEmotions[1].selectedCount, 1);
@@ -342,14 +344,19 @@ void main() {
       await dbService.addTag('work');
 
       final initialTags = await dbService.fetchTags();
+
       expect(initialTags[0].selectedCount, 0);
       expect(initialTags[1].selectedCount, 0);
 
       await dbService.setSelectedTagsCount(entryId);
+      Future.delayed(const Duration(seconds: 1));
       final updatedTags = await dbService.fetchTags();
+      updatedTags.sort((a, b) => a.name.compareTo(b.name));
 
-      expect(updatedTags[0].selectedCount, 3);
-      expect(updatedTags[1].selectedCount, 1);
+      expect(updatedTags[0].name, 'personal');
+      expect(updatedTags[0].selectedCount, 1);
+      expect(updatedTags[1].name, 'work');
+      expect(updatedTags[1].selectedCount, 3);
     });
   });
 }
