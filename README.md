@@ -1,4 +1,3 @@
-
 # Calm Notes
 
 **Calm Notes** is a mental health journaling application designed to help users track and improve their emotional well-being daily. Built with Flutter, this open-source app is user-friendly and customizable.
@@ -7,6 +6,14 @@
 
 Calm Notes was created to provide a safe and intuitive space for users to record their thoughts, emotions, and experiences. The goal is to facilitate mental state tracking and provide tools for better introspection and mental health management.
 
+<p align="center">
+  <img alt="screenshot 1" src="./screenshots/Screenshot 1.png" width="30%">
+&nbsp;
+     <img alt="screenshot 2" src="./screenshots/Screenshot 2.png" width="30%">
+&nbsp;
+    <img alt="screenshot 3" src="./screenshots/Screenshot 3.png" width="30%">
+</p>
+
 ## Features
 
 - **Daily Journal**: Write daily journal entries to track your thoughts and emotions.
@@ -14,8 +21,8 @@ Calm Notes was created to provide a safe and intuitive space for users to record
 - **Custom Reminders**: Receive notifications to remind you to write in your journal.
 - **Data Export**: Export your entries in PDF or text format for backup or sharing. (To Be Implemented)
 
-
 ## Installation
+
 ### Prerequsite
 
 - Flutter
@@ -23,26 +30,31 @@ Calm Notes was created to provide a safe and intuitive space for users to record
 - A code editor like VSCode or Android Studio
 
 ### Installation
+
 1. Clone the repository:
+
 ```bash
 git clone https://github.com/OscrTR/CalmNotes.git
 cd CalmNotes
 ```
+
 2. Install dependencies:
+
 ```bash
 flutter pub get
 ```
+
 3. Run the application:
+
 ```bash
 flutter run
 ```
-    
+
 ## Usage
 
 1. Open the app on your emulator or device.
 
 2. Start writing your journal entries and tracking your mood!
-
 
 ## Contributing
 
@@ -54,13 +66,12 @@ Contributions are welcome! Here's how you can help:
 4. Push to the branch (git push origin feature/new-feature)
 5. Open a Pull Request
 
-
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
 
-
 ## Contact
+
 Oscar Thiébaut-Rizzoni - [@OscrTR](https://github.com/OscrTR) - contact@oscarthiebaut.dev
 
 Project Link : https://github.com/OscrTR/CalmNotes
