@@ -1,4 +1,4 @@
-package com.example.calm_notes
+package com.oscarthiebaut.calmnotes
 
 import io.flutter.embedding.android.FlutterActivity
 
