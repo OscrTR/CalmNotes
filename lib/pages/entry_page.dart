@@ -251,32 +251,50 @@ class _EntryCreateState extends State<EntryCreate> {
   }
 
   Widget _buildTitleField(BuildContext context) {
-    return TextField(
-      controller: _titleController,
-      decoration: InputDecoration(
-        border: const OutlineInputBorder(borderSide: BorderSide.none),
-        hintText: context.tr('create_title'),
-        hintStyle: Theme.of(context).textTheme.titleMedium,
-        contentPadding: EdgeInsets.zero,
-        isDense: true,
-      ),
-      style: Theme.of(context).textTheme.titleMedium,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          context.tr('create_title'),
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+        TextField(
+          controller: _titleController,
+          decoration: InputDecoration(
+            border: const OutlineInputBorder(borderSide: BorderSide.none),
+            hintText: context.tr('create_title_hint'),
+            hintStyle: Theme.of(context).textTheme.bodyMedium,
+            contentPadding: EdgeInsets.zero,
+            isDense: true,
+          ),
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+      ],
     );
   }
 
   Widget _buildDescriptionField(BuildContext context) {
-    return TextField(
-      controller: _descriptionController,
-      decoration: InputDecoration(
-        border: const OutlineInputBorder(borderSide: BorderSide.none),
-        hintText: context.tr('create_description'),
-        hintStyle: Theme.of(context).textTheme.bodyMedium,
-        contentPadding: EdgeInsets.zero,
-        isDense: true,
-      ),
-      style: Theme.of(context).textTheme.bodyMedium,
-      maxLines: null,
-      keyboardType: TextInputType.multiline,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          context.tr('create_description'),
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+        TextField(
+          controller: _descriptionController,
+          decoration: InputDecoration(
+            border: const OutlineInputBorder(borderSide: BorderSide.none),
+            hintText: context.tr('create_description_hint'),
+            hintStyle: Theme.of(context).textTheme.bodyMedium,
+            contentPadding: EdgeInsets.zero,
+            isDense: true,
+          ),
+          style: Theme.of(context).textTheme.bodyMedium,
+          maxLines: null,
+          keyboardType: TextInputType.multiline,
+        ),
+      ],
     );
   }
 
