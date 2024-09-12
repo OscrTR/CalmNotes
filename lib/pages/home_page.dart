@@ -202,41 +202,63 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildEntryDetails(Entry entry) {
-    return Expanded(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    bool hasTitle = entry.title != '';
+
+    Widget buildText(String text, TextStyle style, {int maxLines = 1}) {
+      return Expanded(
+        child: Padding(
+          padding: const EdgeInsets.only(right: 5),
+          child: Text(
+            text,
+            maxLines: maxLines,
+            overflow: TextOverflow.ellipsis,
+            style: style,
+          ),
+        ),
+      );
+    }
+
+    Widget buildRow(String text, TextStyle style, int maxLines) {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 5),
-                  child: Text(
+          buildText(text, style, maxLines: maxLines),
+        ],
+      );
+    }
+
+    return Expanded(
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (hasTitle)
+                  buildRow(
                     entry.title ?? '',
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
+                    const TextStyle(
                       color: CustomColors.primaryColor,
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
                     ),
+                    1,
                   ),
+                buildRow(
+                  entry.description ?? '',
+                  const TextStyle(
+                    fontSize: 12,
+                    color: CustomColors.ternaryColor,
+                  ),
+                  hasTitle ? 1 : 2,
                 ),
-              ),
-              SvgPicture.asset(
-                'assets/images/mood${entry.mood}.svg',
-                height: 18,
-                width: 18,
-              ),
-            ],
-          ),
-          Text(
-            entry.description ?? '',
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              fontSize: 12,
-              color: CustomColors.ternaryColor,
+              ],
             ),
+          ),
+          SvgPicture.asset(
+            'assets/images/mood${entry.mood}.svg',
+            height: 18,
+            width: 18,
           ),
         ],
       ),
