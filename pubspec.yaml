@@ -1,7 +1,7 @@
 name: calm_notes
 description: "A mental health journaling app."
 publish_to: "none"
-version: 0.1.0
+version: 1.1.0+2
 
 environment:
   sdk: ">=3.4.4 <4.0.0"
@@ -49,7 +49,7 @@ flutter:
         - asset: assets/fonts/PlayfairDisplay-Bold.ttf
           weight: 600
   assets:
-  - assets/images/
-  - assets/translations/
-  - assets/lottie/
-  - assets/icons/
+    - assets/images/
+    - assets/translations/
+    - assets/lottie/
+    - assets/icons/
