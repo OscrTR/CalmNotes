@@ -267,7 +267,7 @@ class _EntryCreateState extends State<EntryCreate> {
             contentPadding: EdgeInsets.zero,
             isDense: true,
           ),
-          style: Theme.of(context).textTheme.titleMedium,
+          style: Theme.of(context).textTheme.bodyMedium,
         ),
       ],
     );
