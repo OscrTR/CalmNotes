@@ -1,6 +1,5 @@
 {
   "global_dialog_cancel": "Cancel",
-  "basic_emotions": ["sad", "happy"],
 
   "notification_title": "How is your day going?",
   "notification_description": "Add an entry to your journal.",
