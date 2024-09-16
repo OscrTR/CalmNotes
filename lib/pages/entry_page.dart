@@ -263,7 +263,10 @@ class _EntryCreateState extends State<EntryCreate> {
           decoration: InputDecoration(
             border: const OutlineInputBorder(borderSide: BorderSide.none),
             hintText: context.tr('create_title_hint'),
-            hintStyle: Theme.of(context).textTheme.bodyMedium,
+            hintStyle: Theme.of(context)
+                .textTheme
+                .bodyMedium
+                ?.copyWith(color: CustomColors.secondaryColor),
             contentPadding: EdgeInsets.zero,
             isDense: true,
           ),
@@ -286,7 +289,10 @@ class _EntryCreateState extends State<EntryCreate> {
           decoration: InputDecoration(
             border: const OutlineInputBorder(borderSide: BorderSide.none),
             hintText: context.tr('create_description_hint'),
-            hintStyle: Theme.of(context).textTheme.bodyMedium,
+            hintStyle: Theme.of(context)
+                .textTheme
+                .bodyMedium
+                ?.copyWith(color: CustomColors.secondaryColor),
             contentPadding: EdgeInsets.zero,
             isDense: true,
           ),

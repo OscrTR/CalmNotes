@@ -203,6 +203,7 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildEntryDetails(Entry entry) {
     bool hasTitle = entry.title != '';
+    bool hasDescription = entry.description != '';
 
     Widget buildText(String text, TextStyle style, {int maxLines = 1}) {
       return Expanded(
@@ -244,14 +245,15 @@ class _HomePageState extends State<HomePage> {
                     ),
                     1,
                   ),
-                buildRow(
-                  entry.description ?? '',
-                  const TextStyle(
-                    fontSize: 12,
-                    color: CustomColors.ternaryColor,
+                if (hasDescription)
+                  buildRow(
+                    entry.description ?? '',
+                    const TextStyle(
+                      fontSize: 12,
+                      color: CustomColors.ternaryColor,
+                    ),
+                    hasTitle ? 1 : 2,
                   ),
-                  hasTitle ? 1 : 2,
-                ),
               ],
             ),
           ),
