@@ -54,8 +54,6 @@ class _TagsState extends State<Tags> {
 
     return tags.map((tag) {
       final bool isSelected = tag.selectedCount > 0;
-      final ValueNotifier<bool> isSelectedNotifier =
-          ValueNotifier<bool>(tag.selectedCount > 0 ? true : false);
 
       final String btnText = tag.name;
       final String fullText =
@@ -68,7 +66,7 @@ class _TagsState extends State<Tags> {
           child: AnimBtn(
             btnText: btnText,
             countText: ' (${tag.selectedCount})',
-            isSelectedNotifier: isSelectedNotifier,
+            isSelected: isSelected,
             borderWidth: 1,
             borderRadius: 5,
             borderColor: isSelected

@@ -60,8 +60,6 @@ class _EmotionsState extends State<Emotions> {
 
     return emotions.map((emotion) {
       final bool isSelected = emotion.selectedCount > 0;
-      final ValueNotifier<bool> isSelectedNotifier =
-          ValueNotifier<bool>(emotion.selectedCount > 0 ? true : false);
 
       final String btnText =
           currentLocale == 'en_US' ? emotion.nameEn : emotion.nameFr;
@@ -75,10 +73,10 @@ class _EmotionsState extends State<Emotions> {
           child: AnimBtn(
             btnText: currentLocale == 'en_US' ? emotion.nameEn : emotion.nameFr,
             countText: ' (${emotion.selectedCount})',
-            isSelectedNotifier: isSelectedNotifier,
+            isSelected: isSelected,
             borderWidth: 1,
             borderRadius: 5,
-            borderColor: isSelectedNotifier.value
+            borderColor: isSelected
                 ? CustomColors.primaryColor
                 : CustomColors.secondaryColor,
             width: textWidth + 40,
@@ -273,30 +271,21 @@ class _EmotionsState extends State<Emotions> {
         const TextStyle(fontSize: 14));
 
     final isSelected = _isEmotionSelected(emotion, emotionProvider);
-    // print(isSelected);
 
-    return ValueListenableBuilder<bool>(
-      valueListenable: ValueNotifier<bool>(isSelected),
-      builder: (context, isSelected, child) {
-        return AnimBtn(
-          btnText: currentLocale == 'en_US' ? emotion.nameEn : emotion.nameFr,
-          isSelectedNotifier: ValueNotifier<bool>(isSelected),
-          borderWidth: 1,
-          borderRadius: 5,
-          padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
-          borderColor: isSelected
-              ? CustomColors.primaryColor
-              : CustomColors.secondaryColor,
-          width: textWidth + 30,
-          onPress: () {
-            // Update _selectedEmotion and notifier accordingly
-            emotionProvider.setSelectedEmotion(emotion);
-          },
-          onLongPress: () {
-            // Clear the selection and update the notifier
-            emotionProvider.setDefaultSelectedEmotion();
-          },
-        );
+    return AnimBtn(
+      btnText: currentLocale == 'en_US' ? emotion.nameEn : emotion.nameFr,
+      isSelected: isSelected,
+      borderWidth: 1,
+      borderRadius: 5,
+      padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
+      borderColor:
+          isSelected ? CustomColors.primaryColor : CustomColors.secondaryColor,
+      width: textWidth + 30,
+      onPress: () {
+        emotionProvider.setSelectedEmotion(emotion);
+      },
+      onLongPress: () {
+        emotionProvider.setDefaultSelectedEmotion();
       },
     );
   }
