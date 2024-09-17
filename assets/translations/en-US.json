@@ -57,10 +57,17 @@
 
   "create_page_title": "Add an entry",
   "create_title": "Title",
-  "create_title_hint": "My title...",
+  "create_title_hint": "Embracing the journey, one step at a time",
   "create_description": "Description",
-  "create_description_hint": "My description...",
+  "create_description_hint": "Today felt like a blend of productivity and moments...",
   "create_emotions": "How do you feel?",
   "create_tags": "What is it about?",
-  "create_save": "Save"
+  "create_save": "Save",
+
+  "entry_emotion_tooltip": "Clicking repeatedly increases the intensity of the emotion to a maximum of 10. Clicking and holding resets the emotion and deselects it.",
+  "entry_tags_tooltip": "Indicate the key elements related to this entry. For example: friends, family, work, sport...",
+  "entry_basic_emotions": "Basic emotions",
+  "entry_intermediate_emotions": "Intermediate emotions",
+  "entry_advanced_emotions": "Advanced emotions",
+  "entry_add_button": "Add : {}"
 }

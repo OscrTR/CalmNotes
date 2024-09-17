@@ -29,6 +29,18 @@ class _EntryCreateState extends State<EntryCreate> {
   DateTime _selectedDate = DateTime.now();
   TimeOfDay _selectedTime = TimeOfDay.now();
   int? _selectedMood;
+  final GlobalKey _emotionTooltipKey = GlobalKey();
+  final GlobalKey _tagsTooltipKey = GlobalKey();
+
+  void _showEmotionTooltip() {
+    final dynamic tooltip = _emotionTooltipKey.currentState;
+    tooltip.ensureTooltipVisible();
+  }
+
+  void _showTagTooltip() {
+    final dynamic tooltip = _tagsTooltipKey.currentState;
+    tooltip.ensureTooltipVisible();
+  }
 
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
@@ -246,6 +258,12 @@ class _EntryCreateState extends State<EntryCreate> {
             style: Theme.of(context).textTheme.bodyMedium,
           ),
         ),
+        const SizedBox(width: 5),
+        const Icon(
+          Icons.edit,
+          color: CustomColors.primaryColor,
+          size: 16,
+        )
       ],
     );
   }
@@ -308,8 +326,33 @@ class _EntryCreateState extends State<EntryCreate> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(context.tr('create_emotions'),
-            style: Theme.of(context).textTheme.titleMedium),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(context.tr('create_emotions'),
+                style: Theme.of(context).textTheme.titleMedium),
+            const SizedBox(width: 5),
+            Column(
+              children: [
+                const SizedBox(height: 1),
+                GestureDetector(
+                  onTap: _showEmotionTooltip,
+                  child: Tooltip(
+                    key: _emotionTooltipKey,
+                    margin: const EdgeInsets.symmetric(horizontal: 20),
+                    verticalOffset: 15,
+                    message: context.tr('entry_emotion_tooltip'),
+                    child: const Icon(
+                      Icons.info_outline,
+                      color: CustomColors.primaryColor,
+                      size: 16,
+                    ),
+                  ),
+                ),
+              ],
+            )
+          ],
+        ),
         const SizedBox(height: 10),
         const Emotions(),
       ],
@@ -320,8 +363,32 @@ class _EntryCreateState extends State<EntryCreate> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(context.tr('create_tags'),
-            style: Theme.of(context).textTheme.titleMedium),
+        Row(
+          children: [
+            Text(context.tr('create_tags'),
+                style: Theme.of(context).textTheme.titleMedium),
+            const SizedBox(width: 5),
+            Column(
+              children: [
+                const SizedBox(height: 1),
+                GestureDetector(
+                  onTap: _showTagTooltip,
+                  child: Tooltip(
+                    key: _tagsTooltipKey,
+                    margin: const EdgeInsets.symmetric(horizontal: 20),
+                    verticalOffset: 15,
+                    message: context.tr('entry_tags_tooltip'),
+                    child: const Icon(
+                      Icons.info_outline,
+                      color: CustomColors.primaryColor,
+                      size: 16,
+                    ),
+                  ),
+                ),
+              ],
+            )
+          ],
+        ),
         const SizedBox(height: 10),
         const Tags(),
       ],

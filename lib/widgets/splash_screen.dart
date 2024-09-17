@@ -26,7 +26,7 @@ class _SplashScreenState extends State<SplashScreen> {
       ),
       asyncNavigationCallback: () async {
         await Provider.of<EntryProvider>(context, listen: false).fetchEntries();
-        await Future.delayed(const Duration(seconds: 3));
+        await Future.delayed(const Duration(milliseconds: 1900));
         if (context.mounted) {
           GoRouter.of(context).go("/home", extra: 'splash');
         }

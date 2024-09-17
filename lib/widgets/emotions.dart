@@ -110,14 +110,14 @@ class _EmotionsState extends State<Emotions> {
     );
   }
 
-  void _showAddEmotionDialog() {
-    showDialog<String>(
+  Future<void> _showAddEmotionDialog() async {
+    String? result = await showDialog<String>(
       context: context,
       builder: (BuildContext context) {
         String currentLocale = context.locale.toString();
-        // Fetch the selected emotion once to avoid multiple unnecessary calls
-        final selectedEmotion =
-            context.watch<EmotionProvider>().selectedEmotion;
+        final EmotionProvider emotionProvider =
+            context.watch<EmotionProvider>();
+        final selectedEmotion = emotionProvider.selectedEmotion;
 
         return AlertDialog(
           backgroundColor: CustomColors.backgroundColor,
@@ -131,20 +131,26 @@ class _EmotionsState extends State<Emotions> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 TextButton(
-                  onPressed: () => Navigator.pop(context, 'Cancel'),
+                  onPressed: () {
+                    emotionProvider.setDefaultSelectedEmotion();
+                    Navigator.pop(context, 'Cancel');
+                  },
                   child: Text(context.tr('global_dialog_cancel')),
                 ),
                 if (selectedEmotion != null)
                   TextButton(
                     onPressed: () {
-                      // Use read to perform the action
-                      context
-                          .read<EmotionProvider>()
-                          .incrementEmotion(selectedEmotion);
+                      emotionProvider.incrementEmotion(selectedEmotion);
+                      emotionProvider.setDefaultSelectedEmotion();
                       Navigator.pop(context, 'Add emotion');
                     },
                     child: Text(
-                        'Add ${currentLocale == 'en_US' ? selectedEmotion.nameEn : selectedEmotion.nameFr} emotion'),
+                      context.tr('entry_add_button', args: [
+                        (currentLocale == 'en_US'
+                            ? selectedEmotion.nameEn
+                            : selectedEmotion.nameFr)
+                      ]),
+                    ),
                   ),
               ],
             ),
@@ -152,12 +158,18 @@ class _EmotionsState extends State<Emotions> {
         );
       },
     );
+    if (result == null) {
+      if (mounted) {
+        final emotionProvider = context.read<EmotionProvider>();
+        emotionProvider.setDefaultSelectedEmotion();
+      }
+    }
   }
 
   Widget _buildAddEmotionDialogContent(BuildContext context) {
     final provider = context.watch<EmotionProvider>();
     final emotions = provider.emotions;
-    const double height = 500;
+    const double height = 470;
 
     return _buildEmotionsListDialogContent(emotions, height, context);
   }
@@ -172,21 +184,21 @@ class _EmotionsState extends State<Emotions> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Basic emotions',
+              context.tr('entry_basic_emotions'),
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 10),
             _buildBasicEmotionList(emotions, context),
             const SizedBox(height: 20),
             Text(
-              'Intermediate emotions',
+              context.tr('entry_intermediate_emotions'),
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 10),
             _buildIntermediateEmotionList(emotions, context),
             const SizedBox(height: 20),
             Text(
-              'Advanced emotions',
+              context.tr('entry_advanced_emotions'),
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 10),
@@ -261,6 +273,7 @@ class _EmotionsState extends State<Emotions> {
         const TextStyle(fontSize: 14));
 
     final isSelected = _isEmotionSelected(emotion, emotionProvider);
+    // print(isSelected);
 
     return ValueListenableBuilder<bool>(
       valueListenable: ValueNotifier<bool>(isSelected),
@@ -281,7 +294,7 @@ class _EmotionsState extends State<Emotions> {
           },
           onLongPress: () {
             // Clear the selection and update the notifier
-            emotionProvider.setSelectedEmotion(null);
+            emotionProvider.setDefaultSelectedEmotion();
           },
         );
       },
@@ -289,6 +302,6 @@ class _EmotionsState extends State<Emotions> {
   }
 
   bool _isEmotionSelected(Emotion emotion, EmotionProvider emotionProvider) {
-    return emotionProvider.selectedEmotion == emotion;
+    return emotionProvider.selectedEmotion!.nameEn == emotion.nameEn;
   }
 }

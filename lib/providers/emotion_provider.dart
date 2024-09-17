@@ -23,6 +23,13 @@ class EmotionProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> setDefaultSelectedEmotion() async {
+    if (_selectedEmotion == null) {
+      _selectedEmotion = _emotions.first;
+      notifyListeners();
+    }
+  }
+
   // Combines two lists of emotions, updating existing ones and adding new ones.
   List<Emotion> _mergeEmotionLists(List<Emotion> list1, List<Emotion> list2) {
     Map<int, Emotion> map2 = {for (var e in list2) e.id!: e};
@@ -60,6 +67,9 @@ class EmotionProvider extends ChangeNotifier {
     _emotionsToDisplay = _mergeEmotionLists(
         _emotionsToDisplay, await _databaseService.fetchEmotionsToDisplay());
     _updateDisplayedAndDialogEmotions();
+    if (_selectedEmotion == null) {
+      setDefaultSelectedEmotion();
+    }
     notifyListeners();
   }
 

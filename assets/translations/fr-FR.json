@@ -57,10 +57,17 @@
 
   "create_page_title": "Ajouter une entrée",
   "create_title": "Titre",
-  "create_title_hint": "Mon titre...",
+  "create_title_hint": "Accepter le chemin, une étape à la fois",
   "create_description": "Description",
-  "create_description_hint": "Ma description...",
-  "create_emotions": "Que ressens-tu?",
+  "create_description_hint": "Aujourd'hui a été un mélange de productivité et de...",
+  "create_emotions": "Comment te sens-tu?",
   "create_tags": "À quel sujet est-ce?",
-  "create_save": "Enregistrer"
+  "create_save": "Enregistrer",
+
+  "entry_emotion_tooltip": "Cliquer plusieurs fois augmente l'intensité de l'émotion jusqu'à un maximum de 10. Cliquer longtemps permet de réinitialiser l'émotion et de la désélectionner.",
+  "entry_tags_tooltip": "Indiques les éléments clés en lien avec cette entrée. Par exemple : amis, famille, travail, sport...",
+  "entry_basic_emotions": "Emotions de base",
+  "entry_intermediate_emotions": "Emotions intermédiaires",
+  "entry_advanced_emotions": "Emotions avancées",
+  "entry_add_button": "Ajouter : {}"
 }
