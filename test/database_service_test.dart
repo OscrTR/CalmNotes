@@ -213,31 +213,19 @@ void main() {
   });
 
   group('Emotion Methods', () {
-    test('Add and fetch Emotion', () async {
-      await dbService.addEmotion('Happy');
-      final emotions = await dbService.fetchEmotions();
-
-      expect(emotions.length, 1);
-      expect(emotions.first.name, 'Happy');
-    });
-
     test('Increment selected count and fetch Emotion', () async {
-      final emotionId = await dbService.addEmotion('Happy');
-      await dbService.incrementSelectedEmotionCount(emotionId);
+      await dbService.incrementSelectedEmotionCount(0);
 
-      final emotion = await dbService.getEmotion(emotionId);
+      final emotion = await dbService.getEmotion(0);
       expect(emotion.selectedCount, 1);
     });
 
     test('Reset selected counts', () async {
-      final happyId = await dbService.addEmotion('Happy');
-      await dbService.addEmotion('Sad');
-
-      await dbService.incrementSelectedEmotionCount(happyId);
+      await dbService.incrementSelectedEmotionCount(0);
 
       await dbService.fetchEmotions();
 
-      Emotion updatedEmotion = await dbService.getEmotion(happyId);
+      Emotion updatedEmotion = await dbService.getEmotion(0);
       expect(updatedEmotion.selectedCount, 1);
 
       await dbService.resetSelectedEmotionsCount();
@@ -245,12 +233,12 @@ void main() {
       final updatedEmotions = await dbService.fetchEmotions();
       expect(updatedEmotions.every((e) => e.selectedCount == 0), isTrue);
 
-      await dbService.incrementSelectedEmotionCount(happyId);
-      updatedEmotion = await dbService.getEmotion(happyId);
+      await dbService.incrementSelectedEmotionCount(0);
+      updatedEmotion = await dbService.getEmotion(0);
       expect(updatedEmotion.selectedCount, 1);
 
-      await dbService.resetSelectedEmotionCount(happyId);
-      updatedEmotion = await dbService.getEmotion(happyId);
+      await dbService.resetSelectedEmotionCount(0);
+      updatedEmotion = await dbService.getEmotion(0);
       expect(updatedEmotion.selectedCount, 0);
     });
 
@@ -258,16 +246,13 @@ void main() {
       final entry = Entry(
         date: '2024-08-20',
         mood: 5,
-        emotions: 'Happy:1,Excited:2',
+        emotions: 'happy:1,excited:2',
         title: 'Great Day',
         description: 'Had a wonderful day!',
         tags: 'personal:1,work:3',
       );
 
       final entryId = await dbService.addEntry(entry);
-
-      await dbService.addEmotion('Happy');
-      await dbService.addEmotion('Excited');
 
       final initialEmotions = await dbService.fetchEmotions();
 
@@ -276,7 +261,7 @@ void main() {
 
       await dbService.setSelectedEmotionsCount(entryId);
       final updatedEmotions = await dbService.fetchEmotions();
-      updatedEmotions.sort((a, b) => a.name.compareTo(b.name));
+      updatedEmotions.sort((a, b) => a.nameEn.compareTo(b.nameEn));
 
       expect(updatedEmotions[0].selectedCount, 2);
       expect(updatedEmotions[1].selectedCount, 1);

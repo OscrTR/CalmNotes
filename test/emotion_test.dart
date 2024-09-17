@@ -4,8 +4,15 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   group('Emotion', () {
     test('toMap converts Emotion to Map correctly', () {
-      final emotion =
-          Emotion(id: 1, name: 'Happy', lastUse: 1627848123, selectedCount: 10);
+      final emotion = Emotion(
+          id: 1,
+          nameEn: 'happy',
+          nameFr: 'heureux·se',
+          level: 0,
+          basicEmotion: '',
+          intermediateEmotion: '',
+          lastUse: 1627848123,
+          selectedCount: 10);
       final map = emotion.toMap();
 
       expect(map, {
@@ -26,21 +33,35 @@ void main() {
       final emotion = Emotion.fromMap(map);
 
       expect(emotion.id, 1);
-      expect(emotion.name, 'Sad');
+      expect(emotion.nameEn, 'sad');
       expect(emotion.lastUse, 1627848123);
       expect(emotion.selectedCount, 5);
     });
 
     test('updateFrom creates a new Emotion with updated fields', () {
-      final emotion1 =
-          Emotion(id: 1, name: 'Happy', lastUse: 1627848123, selectedCount: 10);
+      final emotion1 = Emotion(
+          id: 1,
+          nameEn: 'happy',
+          nameFr: 'heureux·se',
+          level: 0,
+          basicEmotion: '',
+          intermediateEmotion: '',
+          lastUse: 1627848123,
+          selectedCount: 10);
       final emotion2 = Emotion(
-          id: 2, name: 'Excited', lastUse: 1627858123, selectedCount: 15);
+          id: 2,
+          nameEn: 'excited',
+          nameFr: 'enthousiaste',
+          level: 1,
+          basicEmotion: 'surprised',
+          intermediateEmotion: '',
+          lastUse: 1627858123,
+          selectedCount: 15);
 
       final updatedEmotion = emotion1.updateFrom(emotion2);
 
       expect(updatedEmotion.id, 1);
-      expect(updatedEmotion.name, 'Happy');
+      expect(updatedEmotion.nameEn, 'happy');
       expect(updatedEmotion.lastUse, 1627858123);
       expect(updatedEmotion.selectedCount, 15);
     });

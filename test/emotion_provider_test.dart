@@ -43,59 +43,32 @@ void main() {
     expect(emotionProvider.emotionsInDialog, []);
   });
 
-  test('addEmotion adds a new emotion', () async {
-    await emotionProvider.addEmotion('Happy');
-
-    expect(emotionProvider.emotions.first.id, 1);
-    expect(emotionProvider.emotions.first.name, 'Happy');
-    expect(emotionProvider.emotions.first.selectedCount, 0);
-  });
-
   test('fetchEmotions updates emotions list', () async {
-    await emotionProvider.addEmotion('Happy');
-    await emotionProvider.addAndIncrementEmotion('Sad');
-    await emotionProvider.addAndIncrementEmotion('Angry');
-    await emotionProvider.addAndIncrementEmotion('Cheerful');
-
     await emotionProvider.fetchEmotions();
 
-    expect(emotionProvider.emotions[0].name, 'Cheerful');
+    expect(emotionProvider.emotions[0].nameEn, 'Cheerful');
     expect(emotionProvider.emotions[0].selectedCount, 1);
-    expect(emotionProvider.emotions[3].name, 'Happy');
+    expect(emotionProvider.emotions[3].nameEn, 'Happy');
     expect(emotionProvider.emotions[3].selectedCount, 0);
-    expect(emotionProvider.emotionsToDisplay.first.name, 'Sad');
-    expect(emotionProvider.emotionsInDialog[0].name, 'Happy');
-  });
-
-  test('deleteEmotion removes the emotion', () async {
-    await emotionProvider.addEmotion('Happy');
-    await emotionProvider.deleteEmotion(emotionProvider.emotions.first);
-
-    expect(emotionProvider.emotions, []);
+    expect(emotionProvider.emotionsToDisplay.first.nameEn, 'Sad');
+    expect(emotionProvider.emotionsInDialog[0].nameEn, 'Happy');
   });
 
   test(
       'fetchDisplayedemotions updates _emotionsToDisplay and _emotionsInDialog correctly',
       () async {
-    await emotionProvider.addEmotion('work');
-    await emotionProvider.addEmotion('friends');
-    await emotionProvider.addEmotion('sleep');
-    await emotionProvider.addEmotion('sport');
-
     final emotions = await dbService.fetchEmotions();
 
     List<Emotion> shouldBeDisplayedemotions = emotions.sublist(0, 3);
     List<Emotion> shouldBeDialogemotions = emotions.sublist(3);
     await emotionProvider.fetchDisplayedEmotions();
-    expect(emotionProvider.emotionsToDisplay.map((emotion) => emotion.name),
-        shouldBeDisplayedemotions.map((emotion) => emotion.name));
-    expect(emotionProvider.emotionsInDialog.map((emotion) => emotion.name),
-        shouldBeDialogemotions.map((emotion) => emotion.name));
+    expect(emotionProvider.emotionsToDisplay.map((emotion) => emotion.nameEn),
+        shouldBeDisplayedemotions.map((emotion) => emotion.nameEn));
+    expect(emotionProvider.emotionsInDialog.map((emotion) => emotion.nameEn),
+        shouldBeDialogemotions.map((emotion) => emotion.nameEn));
   });
 
   test('Increment emotion then reset', () async {
-    await emotionProvider.addEmotion('work');
-    await emotionProvider.addEmotion('friends');
     expect(emotionProvider.emotions[0].selectedCount, 0);
     expect(emotionProvider.emotions[1].selectedCount, 0);
 
@@ -121,9 +94,6 @@ void main() {
   });
 
   test('Set emotions', () async {
-    await emotionProvider.addEmotion('sad');
-    await emotionProvider.addEmotion('happy');
-
     final entryToAdd = Entry(
       date: '2024-08-19|18:00',
       mood: 10,
@@ -135,15 +105,15 @@ void main() {
 
     final entryId = await dbService.addEntry(entryToAdd);
 
-    expect(emotionProvider.emotions[0].name, 'happy');
+    expect(emotionProvider.emotions[0].nameEn, 'happy');
     expect(emotionProvider.emotions[0].selectedCount, 0);
     expect(emotionProvider.emotions[1].selectedCount, 0);
-    expect(emotionProvider.emotions[1].name, 'sad');
+    expect(emotionProvider.emotions[1].nameEn, 'sad');
 
     await emotionProvider.setEmotions(entryId);
-    expect(emotionProvider.emotions[0].name, 'happy');
+    expect(emotionProvider.emotions[0].nameEn, 'happy');
     expect(emotionProvider.emotions[0].selectedCount, 2);
     expect(emotionProvider.emotions[1].selectedCount, 1);
-    expect(emotionProvider.emotions[1].name, 'sad');
+    expect(emotionProvider.emotions[1].nameEn, 'sad');
   });
 }
