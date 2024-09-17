@@ -7,13 +7,20 @@ class EmotionProvider extends ChangeNotifier {
   List<Emotion> _emotions = [];
   List<Emotion> _emotionsToDisplay = [];
   List<Emotion> _emotionsInDialog = [];
+  Emotion? _selectedEmotion;
 
   List<Emotion> get emotions => _emotions;
   List<Emotion> get emotionsToDisplay => _emotionsToDisplay;
   List<Emotion> get emotionsInDialog => _emotionsInDialog;
+  Emotion? get selectedEmotion => _selectedEmotion;
 
   EmotionProvider() {
     fetchEmotions();
+  }
+
+  Future<void> setSelectedEmotion(Emotion? emotion) async {
+    _selectedEmotion = emotion;
+    notifyListeners();
   }
 
   // Combines two lists of emotions, updating existing ones and adding new ones.
@@ -62,11 +69,6 @@ class EmotionProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> addEmotion(String name) async {
-    await _databaseService.addEmotion(name);
-    await fetchEmotions();
-  }
-
   Future<void> deleteEmotion(Emotion emotion) async {
     await _databaseService.deleteEmotion(emotion.id!);
     await fetchEmotions();
@@ -74,12 +76,6 @@ class EmotionProvider extends ChangeNotifier {
 
   Future<void> incrementEmotion(Emotion emotion) async {
     await _databaseService.incrementSelectedEmotionCount(emotion.id!);
-    await fetchEmotions();
-  }
-
-  Future<void> addAndIncrementEmotion(String emotionName) async {
-    final int emotionId = await _databaseService.addEmotion(emotionName);
-    await _databaseService.incrementSelectedEmotionCount(emotionId);
     await fetchEmotions();
   }
 

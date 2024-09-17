@@ -4,6 +4,7 @@ import 'package:calm_notes/models/reminder.dart';
 import 'package:calm_notes/models/tag.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
+import '../emotions_list.dart';
 
 class DatabaseService {
   static Database? _db;
@@ -23,7 +24,7 @@ class DatabaseService {
     return openDatabase(
       databasePath,
       version: 1,
-      onCreate: (db, version) {
+      onCreate: (db, version) async {
         db.execute('''
         CREATE TABLE entries (
           id INTEGER PRIMARY KEY,
@@ -46,7 +47,10 @@ class DatabaseService {
         db.execute('''
         CREATE TABLE emotions (
           id INTEGER PRIMARY KEY,
-          name TEXT NOT NULL,
+          name_en TEXT NOT NULL,
+          name_fr TEXT NOT NULL,
+          level INTEGER NOT NULL,
+          linkedEmotion TEXT,
           lastUse INTEGER NOT NULL,
           selectedCount INTEGER NOT NULL
         )
@@ -60,6 +64,8 @@ class DatabaseService {
           selectedCount INTEGER NOT NULL
         )
         ''');
+
+        await _insertInitialEmotions(db);
       },
     );
   }
@@ -90,6 +96,66 @@ class DatabaseService {
     final db = await database;
     final result = await db.query(table, where: 'id = ?', whereArgs: [id]);
     return result.isNotEmpty ? result.first : null;
+  }
+
+  Future<void> checkIfColumnExists() async {
+    final db = await database;
+    List<Map<String, dynamic>> columns =
+        await db.rawQuery('PRAGMA table_info(emotions);');
+
+    bool isUpToDate = false;
+    for (var column in columns) {
+      if (column['name'] == 'level') {
+        isUpToDate = true;
+      }
+    }
+
+    if (!isUpToDate) {
+      await db.transaction((txn) async {
+        await txn.execute('ALTER TABLE emotions RENAME TO old_emotions;');
+
+        await txn.execute('''
+        CREATE TABLE emotions (
+          id INTEGER PRIMARY KEY,
+          name_en TEXT NOT NULL,
+          name_fr TEXT NOT NULL,
+          level INTEGER NOT NULL,
+          linkedEmotion TEXT,
+          lastUse INTEGER NOT NULL,
+          selectedCount INTEGER NOT NULL
+        )
+        ''');
+
+        await txn.execute('DROP TABLE old_emotions;');
+      });
+
+      _insertInitialEmotions(db);
+    }
+  }
+
+  Future<void> setOldTable() async {
+    final db = await database;
+    await db.transaction((txn) async {
+      await txn.execute('ALTER TABLE emotions RENAME TO old_emotions;');
+
+      await txn.execute('''
+        CREATE TABLE emotions (
+          id INTEGER PRIMARY KEY,
+          name TEXT NOT NULL,
+          lastUse INTEGER NOT NULL,
+          selectedCount INTEGER NOT NULL
+        )
+        ''');
+
+      await txn.execute('DROP TABLE old_emotions;');
+    });
+  }
+
+  Future<void> _insertInitialEmotions(Database db) async {
+    for (var emotion in emotions) {
+      // emotions come from emontions_list.dart
+      await db.insert('emotions', emotion);
+    }
   }
 
   // Entry methods
@@ -138,19 +204,13 @@ class DatabaseService {
 
   // Emotion methods
 
-  Future<int> addEmotion(String name) async {
-    final lastUse = DateTime.now().toUtc().millisecondsSinceEpoch;
-    final emotion = Emotion(name: name, lastUse: lastUse, selectedCount: 0);
-    final db = await database;
-    return db.insert('emotions', emotion.toMap());
-  }
-
   Future<void> deleteEmotion(int id) async {
     await _delete('emotions', id);
   }
 
   Future<List<Emotion>> fetchEmotions() async {
     final data = await _query('emotions', orderBy: 'lastUse DESC');
+    print(data);
     return data.map((e) => Emotion.fromMap(e)).toList();
   }
 
@@ -202,7 +262,7 @@ class DatabaseService {
     final entry = await getEntry(entryId);
     final emotionMap = _convertStringToMap(entry.emotions!);
     final emotions = await fetchEmotions();
-    final emotionMapFromDb = {for (var e in emotions) e.name: e};
+    final emotionMapFromDb = {for (var e in emotions) e.name_en: e};
 
     for (var entry in emotionMap.entries) {
       final name = entry.key;
