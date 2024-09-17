@@ -378,7 +378,7 @@ class _EntryCreateState extends State<EntryCreate> {
   String _convertEmotionsToString(List<Emotion> emotions) {
     return emotions
         .where((emotion) => emotion.selectedCount > 0)
-        .map((emotion) => '${emotion.name_en} : ${emotion.selectedCount}')
+        .map((emotion) => '${emotion.nameEn} : ${emotion.selectedCount}')
         .join(', ');
   }
 

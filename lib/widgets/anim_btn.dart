@@ -14,6 +14,7 @@ class AnimBtn extends StatefulWidget {
   final double borderWidth;
   final double borderRadius;
   final Color borderColor;
+  final EdgeInsetsGeometry? padding;
 
   const AnimBtn({
     super.key,
@@ -27,6 +28,7 @@ class AnimBtn extends StatefulWidget {
     this.borderWidth = 0,
     this.borderRadius = 0,
     this.borderColor = Colors.transparent,
+    this.padding,
   });
 
   @override
@@ -79,7 +81,7 @@ class _AnimBtnState extends State<AnimBtn> {
               ),
               AnimatedContainer(
                 duration: animationDuration,
-                padding:
+                padding: widget.padding ??
                     const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                 height: widget.height,
                 width: widget.width,

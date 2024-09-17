@@ -47,7 +47,8 @@ class _EmotionsState extends State<Emotions> {
         ..._buildEmotionButtonList(emotionsToDisplay),
         _buildAddEmotionButton(),
         FilledButton(
-            onPressed: _databaseService.setOldTable, child: Text('old table'))
+            onPressed: _databaseService.setOldTable,
+            child: const Text('old table'))
       ],
     );
   }
@@ -55,13 +56,15 @@ class _EmotionsState extends State<Emotions> {
   List<Widget> _buildEmotionButtonList(List<Emotion> emotions) {
     final double maxButtonWidth = MediaQuery.of(context).size.width / 2;
     final emotionProvider = context.read<EmotionProvider>();
+    String currentLocale = context.locale.toString();
 
     return emotions.map((emotion) {
       final bool isSelected = emotion.selectedCount > 0;
       final ValueNotifier<bool> isSelectedNotifier =
           ValueNotifier<bool>(emotion.selectedCount > 0 ? true : false);
 
-      final String btnText = emotion.name_en;
+      final String btnText =
+          currentLocale == 'en_US' ? emotion.nameEn : emotion.nameFr;
       final String fullText =
           isSelected ? '$btnText (${emotion.selectedCount})' : btnText;
       final double textWidth =
@@ -70,7 +73,7 @@ class _EmotionsState extends State<Emotions> {
       return ConstrainedBox(
           constraints: BoxConstraints(maxWidth: maxButtonWidth),
           child: AnimBtn(
-            btnText: emotion.name_en,
+            btnText: currentLocale == 'en_US' ? emotion.nameEn : emotion.nameFr,
             countText: ' (${emotion.selectedCount})',
             isSelectedNotifier: isSelectedNotifier,
             borderWidth: 1,
@@ -111,6 +114,7 @@ class _EmotionsState extends State<Emotions> {
     showDialog<String>(
       context: context,
       builder: (BuildContext context) {
+        String currentLocale = context.locale.toString();
         // Fetch the selected emotion once to avoid multiple unnecessary calls
         final selectedEmotion =
             context.watch<EmotionProvider>().selectedEmotion;
@@ -139,7 +143,8 @@ class _EmotionsState extends State<Emotions> {
                           .incrementEmotion(selectedEmotion);
                       Navigator.pop(context, 'Add emotion');
                     },
-                    child: Text('Add ${selectedEmotion.name_en} emotion'),
+                    child: Text(
+                        'Add ${currentLocale == 'en_US' ? selectedEmotion.nameEn : selectedEmotion.nameFr} emotion'),
                   ),
               ],
             ),
@@ -177,6 +182,15 @@ class _EmotionsState extends State<Emotions> {
               'Intermediate emotions',
               style: Theme.of(context).textTheme.titleMedium,
             ),
+            const SizedBox(height: 10),
+            _buildIntermediateEmotionList(emotions, context),
+            const SizedBox(height: 20),
+            Text(
+              'Advanced emotions',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(height: 10),
+            _buildAdvancedEmotionList(emotions, context),
           ],
         ),
       ),
@@ -195,10 +209,56 @@ class _EmotionsState extends State<Emotions> {
     );
   }
 
+  Widget _buildIntermediateEmotionList(
+      List<Emotion> emotions, BuildContext context) {
+    EmotionProvider emotionProvider = context.watch<EmotionProvider>();
+    return Wrap(
+      spacing: 10,
+      runSpacing: 10,
+      children: [
+        ...emotions
+            .where((emotion) =>
+                emotion.level == 1 &&
+                (emotionProvider.selectedEmotion?.nameEn ==
+                        emotion.basicEmotion ||
+                    emotionProvider.selectedEmotion?.basicEmotion ==
+                        emotion.basicEmotion ||
+                    emotionProvider.selectedEmotion?.nameEn ==
+                        emotion.intermediateEmotion))
+            .map((emotion) {
+          return _buildAddEmotionButtonInDialog(emotion, context);
+        })
+      ],
+    );
+  }
+
+  Widget _buildAdvancedEmotionList(
+      List<Emotion> emotions, BuildContext context) {
+    EmotionProvider emotionProvider = context.watch<EmotionProvider>();
+    return Wrap(
+      spacing: 10,
+      runSpacing: 10,
+      children: [
+        ...emotions
+            .where((emotion) =>
+                emotion.level == 2 &&
+                (emotionProvider.selectedEmotion?.intermediateEmotion ==
+                        emotion.intermediateEmotion ||
+                    emotionProvider.selectedEmotion?.nameEn ==
+                        emotion.intermediateEmotion))
+            .map((emotion) {
+          return _buildAddEmotionButtonInDialog(emotion, context);
+        })
+      ],
+    );
+  }
+
   Widget _buildAddEmotionButtonInDialog(Emotion emotion, BuildContext context) {
     final emotionProvider = context.watch<EmotionProvider>();
-    final double textWidth =
-        _getTextWidth(emotion.name_en, const TextStyle(fontSize: 14));
+    String currentLocale = context.locale.toString();
+    final double textWidth = _getTextWidth(
+        currentLocale == 'en_US' ? emotion.nameEn : emotion.nameFr,
+        const TextStyle(fontSize: 14));
 
     final isSelected = _isEmotionSelected(emotion, emotionProvider);
 
@@ -206,14 +266,15 @@ class _EmotionsState extends State<Emotions> {
       valueListenable: ValueNotifier<bool>(isSelected),
       builder: (context, isSelected, child) {
         return AnimBtn(
-          btnText: emotion.name_en,
+          btnText: currentLocale == 'en_US' ? emotion.nameEn : emotion.nameFr,
           isSelectedNotifier: ValueNotifier<bool>(isSelected),
           borderWidth: 1,
           borderRadius: 5,
+          padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
           borderColor: isSelected
               ? CustomColors.primaryColor
               : CustomColors.secondaryColor,
-          width: textWidth + 40,
+          width: textWidth + 30,
           onPress: () {
             // Update _selectedEmotion and notifier accordingly
             emotionProvider.setSelectedEmotion(emotion);

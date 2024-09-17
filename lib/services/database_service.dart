@@ -47,10 +47,11 @@ class DatabaseService {
         db.execute('''
         CREATE TABLE emotions (
           id INTEGER PRIMARY KEY,
-          name_en TEXT NOT NULL,
-          name_fr TEXT NOT NULL,
+          nameEn TEXT NOT NULL,
+          nameFr TEXT NOT NULL,
           level INTEGER NOT NULL,
-          linkedEmotion TEXT,
+          basicEmotion TEXT,
+          intermediateEmotion TEXT,
           lastUse INTEGER NOT NULL,
           selectedCount INTEGER NOT NULL
         )
@@ -117,10 +118,11 @@ class DatabaseService {
         await txn.execute('''
         CREATE TABLE emotions (
           id INTEGER PRIMARY KEY,
-          name_en TEXT NOT NULL,
-          name_fr TEXT NOT NULL,
+          nameEn TEXT NOT NULL,
+          nameFr TEXT NOT NULL,
           level INTEGER NOT NULL,
-          linkedEmotion TEXT,
+          basicEmotion TEXT,
+          intermediateEmotion TEXT,
           lastUse INTEGER NOT NULL,
           selectedCount INTEGER NOT NULL
         )
@@ -210,7 +212,6 @@ class DatabaseService {
 
   Future<List<Emotion>> fetchEmotions() async {
     final data = await _query('emotions', orderBy: 'lastUse DESC');
-    print(data);
     return data.map((e) => Emotion.fromMap(e)).toList();
   }
 
@@ -262,7 +263,7 @@ class DatabaseService {
     final entry = await getEntry(entryId);
     final emotionMap = _convertStringToMap(entry.emotions!);
     final emotions = await fetchEmotions();
-    final emotionMapFromDb = {for (var e in emotions) e.name_en: e};
+    final emotionMapFromDb = {for (var e in emotions) e.nameEn: e};
 
     for (var entry in emotionMap.entries) {
       final name = entry.key;
