@@ -271,12 +271,15 @@ class _EmotionsState extends State<Emotions> {
         const TextStyle(fontSize: 14));
 
     final isSelected = _isEmotionSelected(emotion, emotionProvider);
+    final isPreviousSelected =
+        _isEmotionPreviousSelected(emotion, emotionProvider);
 
     return AnimBtn(
       btnText: currentLocale == 'en_US' ? emotion.nameEn : emotion.nameFr,
       isSelected: isSelected,
       borderWidth: 1,
       borderRadius: 5,
+      enableAnimation: isSelected == true || isPreviousSelected == true,
       padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
       borderColor:
           isSelected ? CustomColors.primaryColor : CustomColors.secondaryColor,
@@ -292,5 +295,14 @@ class _EmotionsState extends State<Emotions> {
 
   bool _isEmotionSelected(Emotion emotion, EmotionProvider emotionProvider) {
     return emotionProvider.selectedEmotion!.nameEn == emotion.nameEn;
+  }
+
+  bool _isEmotionPreviousSelected(
+      Emotion emotion, EmotionProvider emotionProvider) {
+    if (emotionProvider.previousSelectedEmotion != null) {
+      return emotionProvider.previousSelectedEmotion!.nameEn == emotion.nameEn;
+    } else {
+      return false;
+    }
   }
 }

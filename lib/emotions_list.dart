@@ -3,7 +3,7 @@ final lastUse = DateTime.now().toUtc().millisecondsSinceEpoch;
 List<Map<String, dynamic>> emotions = [
   {
     'nameEn': 'happy',
-    'nameFr': 'heureux·se',
+    'nameFr': 'bonheur',
     'level': 0,
     'basicEmotion': '',
     'intermediateEmotion': '',
@@ -12,7 +12,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'playful',
-    'nameFr': 'enjoué·e',
+    'nameFr': 'ludisme',
     'level': 1,
     'basicEmotion': 'happy',
     'intermediateEmotion': '',
@@ -21,7 +21,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'aroused',
-    'nameFr': 'excité·e',
+    'nameFr': 'désir',
     'level': 2,
     'basicEmotion': 'happy',
     'intermediateEmotion': 'playful',
@@ -30,7 +30,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'cheeky',
-    'nameFr': 'effronté·e',
+    'nameFr': 'malice',
     'level': 2,
     'basicEmotion': 'happy',
     'intermediateEmotion': 'playful',
@@ -39,7 +39,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'content',
-    'nameFr': 'satisfait·e',
+    'nameFr': 'satisfaction',
     'level': 1,
     'basicEmotion': 'happy',
     'intermediateEmotion': '',
@@ -48,7 +48,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'free',
-    'nameFr': 'libre',
+    'nameFr': 'liberté',
     'level': 2,
     'basicEmotion': 'happy',
     'intermediateEmotion': 'content',
@@ -57,7 +57,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'joyful',
-    'nameFr': 'joyeux·se',
+    'nameFr': 'joie',
     'level': 2,
     'basicEmotion': 'happy',
     'intermediateEmotion': 'content',
@@ -66,7 +66,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'interested',
-    'nameFr': 'intéressé·e',
+    'nameFr': 'intérêt',
     'level': 1,
     'basicEmotion': 'happy',
     'intermediateEmotion': '',
@@ -75,7 +75,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'curious',
-    'nameFr': 'curieux·se',
+    'nameFr': 'curiosité',
     'level': 2,
     'basicEmotion': 'happy',
     'intermediateEmotion': 'interested',
@@ -84,7 +84,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'inquisitive',
-    'nameFr': 'inquisiteur·rice',
+    'nameFr': 'indiscret',
     'level': 2,
     'basicEmotion': 'happy',
     'intermediateEmotion': 'interested',
@@ -93,7 +93,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'proud',
-    'nameFr': 'fier·e',
+    'nameFr': 'fierté',
     'level': 1,
     'basicEmotion': 'happy',
     'intermediateEmotion': '',
@@ -102,7 +102,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'successful',
-    'nameFr': 'performant·e',
+    'nameFr': 'réalisation',
     'level': 2,
     'basicEmotion': 'happy',
     'intermediateEmotion': 'proud',
@@ -111,7 +111,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'confident',
-    'nameFr': 'confiant·e',
+    'nameFr': 'confiance',
     'level': 2,
     'basicEmotion': 'happy',
     'intermediateEmotion': 'proud',
@@ -120,7 +120,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'accepted',
-    'nameFr': 'accepté·e',
+    'nameFr': 'acceptation',
     'level': 1,
     'basicEmotion': 'happy',
     'intermediateEmotion': '',
@@ -129,7 +129,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'respected',
-    'nameFr': 'respecté·e',
+    'nameFr': 'respect',
     'level': 2,
     'basicEmotion': 'happy',
     'intermediateEmotion': 'accepted',
@@ -138,7 +138,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'valued',
-    'nameFr': 'valorisé·e',
+    'nameFr': 'valorisation',
     'level': 2,
     'basicEmotion': 'happy',
     'intermediateEmotion': 'accepted',
@@ -147,7 +147,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'powerful',
-    'nameFr': 'puissant·e',
+    'nameFr': 'puissance',
     'level': 1,
     'basicEmotion': 'happy',
     'intermediateEmotion': '',
@@ -156,7 +156,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'courageous',
-    'nameFr': 'courageux·se',
+    'nameFr': 'courage',
     'level': 2,
     'basicEmotion': 'happy',
     'intermediateEmotion': 'powerful',
@@ -165,7 +165,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'creative',
-    'nameFr': 'creatif·ve',
+    'nameFr': 'creativité',
     'level': 2,
     'basicEmotion': 'happy',
     'intermediateEmotion': 'powerful',
@@ -174,7 +174,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'peaceful',
-    'nameFr': 'paisible',
+    'nameFr': 'paix',
     'level': 1,
     'basicEmotion': 'happy',
     'intermediateEmotion': '',
@@ -183,7 +183,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'loving',
-    'nameFr': 'aimant·e',
+    'nameFr': 'affection',
     'level': 2,
     'basicEmotion': 'happy',
     'intermediateEmotion': 'peaceful',
@@ -192,7 +192,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'thankful',
-    'nameFr': 'reconaissant·e',
+    'nameFr': 'reconaissance',
     'level': 2,
     'basicEmotion': 'happy',
     'intermediateEmotion': 'peaceful',
@@ -201,7 +201,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'trusting',
-    'nameFr': 'confiant·e',
+    'nameFr': 'confiance',
     'level': 1,
     'basicEmotion': 'happy',
     'intermediateEmotion': '',
@@ -210,7 +210,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'sensitive',
-    'nameFr': 'sensible',
+    'nameFr': 'sensibilité',
     'level': 2,
     'basicEmotion': 'happy',
     'intermediateEmotion': 'trusting',
@@ -219,7 +219,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'intimate',
-    'nameFr': 'intime',
+    'nameFr': 'intimité',
     'level': 2,
     'basicEmotion': 'happy',
     'intermediateEmotion': 'trusting',
@@ -228,7 +228,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'optimistic',
-    'nameFr': 'optimiste',
+    'nameFr': 'optimisme',
     'level': 1,
     'basicEmotion': 'happy',
     'intermediateEmotion': '',
@@ -237,7 +237,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'hopeful',
-    'nameFr': "plein·e d/'espoir",
+    'nameFr': 'espoir',
     'level': 2,
     'basicEmotion': 'happy',
     'intermediateEmotion': 'optimistic',
@@ -246,7 +246,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'inspired',
-    'nameFr': 'inspiré·e',
+    'nameFr': 'inspiration',
     'level': 2,
     'basicEmotion': 'happy',
     'intermediateEmotion': 'optimistic',
@@ -255,7 +255,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'sad',
-    'nameFr': 'triste',
+    'nameFr': 'tristesse',
     'level': 0,
     'basicEmotion': '',
     'intermediateEmotion': '',
@@ -264,7 +264,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'lonely',
-    'nameFr': 'seul·e',
+    'nameFr': 'solitude',
     'level': 1,
     'basicEmotion': 'sad',
     'intermediateEmotion': '',
@@ -273,7 +273,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'abandoned',
-    'nameFr': 'abandonné·e',
+    'nameFr': 'abandon',
     'level': 2,
     'basicEmotion': 'sad',
     'intermediateEmotion': 'lonely',
@@ -282,7 +282,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'isolated',
-    'nameFr': 'isolé·e',
+    'nameFr': 'isolation',
     'level': 2,
     'basicEmotion': 'sad',
     'intermediateEmotion': 'lonely',
@@ -291,7 +291,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'vulnerable',
-    'nameFr': 'vulnerable',
+    'nameFr': 'vulnerabilité',
     'level': 1,
     'basicEmotion': 'sad',
     'intermediateEmotion': '',
@@ -300,7 +300,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'fragile',
-    'nameFr': 'fragile',
+    'nameFr': 'fragilité',
     'level': 2,
     'basicEmotion': 'sad',
     'intermediateEmotion': 'vulnerable',
@@ -309,7 +309,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'victimised',
-    'nameFr': 'victimisé·e',
+    'nameFr': 'victimisation',
     'level': 2,
     'basicEmotion': 'sad',
     'intermediateEmotion': 'vulnerable',
@@ -318,7 +318,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'despair',
-    'nameFr': 'désespéré·e',
+    'nameFr': 'désespoir',
     'level': 1,
     'basicEmotion': 'sad',
     'intermediateEmotion': '',
@@ -327,7 +327,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'powerless',
-    'nameFr': 'impuissant·e',
+    'nameFr': 'impuissance',
     'level': 2,
     'basicEmotion': 'sad',
     'intermediateEmotion': 'despair',
@@ -336,7 +336,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'grief',
-    'nameFr': 'chagriné·e',
+    'nameFr': 'chagrin',
     'level': 2,
     'basicEmotion': 'sad',
     'intermediateEmotion': 'despair',
@@ -345,7 +345,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'guilty',
-    'nameFr': 'coupable',
+    'nameFr': 'culpabilité',
     'level': 1,
     'basicEmotion': 'sad',
     'intermediateEmotion': '',
@@ -354,7 +354,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'ashamed',
-    'nameFr': 'honteux·se',
+    'nameFr': 'honte',
     'level': 2,
     'basicEmotion': 'sad',
     'intermediateEmotion': 'guilty',
@@ -363,7 +363,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'remorseful',
-    'nameFr': 'plein·e de remords',
+    'nameFr': 'remord',
     'level': 2,
     'basicEmotion': 'sad',
     'intermediateEmotion': 'guilty',
@@ -372,7 +372,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'depressed',
-    'nameFr': 'deprimé·e',
+    'nameFr': 'depression',
     'level': 1,
     'basicEmotion': 'sad',
     'intermediateEmotion': '',
@@ -390,7 +390,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'inferior',
-    'nameFr': 'inférieur·e',
+    'nameFr': 'infériorité',
     'level': 2,
     'basicEmotion': 'sad',
     'intermediateEmotion': 'depressed',
@@ -399,7 +399,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'hurt',
-    'nameFr': 'blessé·e',
+    'nameFr': 'peine',
     'level': 1,
     'basicEmotion': 'sad',
     'intermediateEmotion': '',
@@ -408,7 +408,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'disappointed',
-    'nameFr': 'déçu·e',
+    'nameFr': 'déception',
     'level': 2,
     'basicEmotion': 'sad',
     'intermediateEmotion': 'hurt',
@@ -417,7 +417,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'embarassed',
-    'nameFr': 'embarassé·e',
+    'nameFr': 'embaras',
     'level': 2,
     'basicEmotion': 'sad',
     'intermediateEmotion': 'hurt',
@@ -426,7 +426,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'disgusted',
-    'nameFr': 'dégoûté·e',
+    'nameFr': 'dégoût',
     'level': 0,
     'basicEmotion': '',
     'intermediateEmotion': '',
@@ -435,7 +435,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'repelled',
-    'nameFr': 'repoussé·e',
+    'nameFr': 'repulsion',
     'level': 1,
     'basicEmotion': 'disgusted',
     'intermediateEmotion': '',
@@ -444,7 +444,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'hesitant',
-    'nameFr': 'hesitant·e',
+    'nameFr': 'hesitation',
     'level': 2,
     'basicEmotion': 'disgusted',
     'intermediateEmotion': 'repelled',
@@ -453,7 +453,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'horrified',
-    'nameFr': 'horrifié·e',
+    'nameFr': 'horreur',
     'level': 2,
     'basicEmotion': 'disgusted',
     'intermediateEmotion': 'repelled',
@@ -462,7 +462,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'awful',
-    'nameFr': 'terrible',
+    'nameFr': 'détresse',
     'level': 1,
     'basicEmotion': 'disgusted',
     'intermediateEmotion': '',
@@ -471,7 +471,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'detestable',
-    'nameFr': 'détestable',
+    'nameFr': 'haine',
     'level': 2,
     'basicEmotion': 'disgusted',
     'intermediateEmotion': 'awful',
@@ -480,7 +480,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'nauseated',
-    'nameFr': 'nauséeux·se',
+    'nameFr': 'malaise',
     'level': 2,
     'basicEmotion': 'disgusted',
     'intermediateEmotion': 'awful',
@@ -489,7 +489,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'uncomfortable',
-    'nameFr': 'repoussé·e',
+    'nameFr': 'gêne',
     'level': 1,
     'basicEmotion': 'disgusted',
     'intermediateEmotion': '',
@@ -498,7 +498,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'revolted',
-    'nameFr': 'revolté·e',
+    'nameFr': 'revolte',
     'level': 2,
     'basicEmotion': 'disgusted',
     'intermediateEmotion': 'uncomfortable',
@@ -507,7 +507,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'appalled',
-    'nameFr': 'atterré·e',
+    'nameFr': 'consternation',
     'level': 2,
     'basicEmotion': 'disgusted',
     'intermediateEmotion': 'uncomfortable',
@@ -516,7 +516,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'disapproving',
-    'nameFr': 'désaprobateur·rice',
+    'nameFr': 'désaprobation',
     'level': 1,
     'basicEmotion': 'disgusted',
     'intermediateEmotion': '',
@@ -525,7 +525,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'condemned',
-    'nameFr': 'condamné·e',
+    'nameFr': 'blâme',
     'level': 2,
     'basicEmotion': 'disgusted',
     'intermediateEmotion': 'disapproving',
@@ -534,7 +534,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'judgmental',
-    'nameFr': 'critique',
+    'nameFr': 'jugement',
     'level': 2,
     'basicEmotion': 'disgusted',
     'intermediateEmotion': 'disapproving',
@@ -543,7 +543,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'surprised',
-    'nameFr': 'surpris·e',
+    'nameFr': 'surprise',
     'level': 0,
     'basicEmotion': '',
     'intermediateEmotion': '',
@@ -552,7 +552,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'excited',
-    'nameFr': 'enthousiaste',
+    'nameFr': 'enthousiasme',
     'level': 1,
     'basicEmotion': 'surprised',
     'intermediateEmotion': '',
@@ -561,7 +561,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'energetic',
-    'nameFr': 'énergique',
+    'nameFr': 'dynamisme',
     'level': 2,
     'basicEmotion': 'surprised',
     'intermediateEmotion': 'excited',
@@ -570,7 +570,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'eager',
-    'nameFr': 'désireux·se',
+    'nameFr': 'désir',
     'level': 2,
     'basicEmotion': 'surprised',
     'intermediateEmotion': 'excited',
@@ -579,7 +579,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'amazed',
-    'nameFr': 'émerveillé·e',
+    'nameFr': 'émerveillement',
     'level': 1,
     'basicEmotion': 'surprised',
     'intermediateEmotion': '',
@@ -588,7 +588,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'awe',
-    'nameFr': 'admiratif·ve',
+    'nameFr': 'admiration',
     'level': 2,
     'basicEmotion': 'surprised',
     'intermediateEmotion': 'amazed',
@@ -597,7 +597,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'astonished',
-    'nameFr': 'étonné·e',
+    'nameFr': 'étonnement',
     'level': 2,
     'basicEmotion': 'surprised',
     'intermediateEmotion': 'amazed',
@@ -606,7 +606,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'confused',
-    'nameFr': 'confus·e',
+    'nameFr': 'confusion',
     'level': 1,
     'basicEmotion': 'surprised',
     'intermediateEmotion': '',
@@ -615,7 +615,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'perplexed',
-    'nameFr': 'perplexe',
+    'nameFr': 'perplexité',
     'level': 2,
     'basicEmotion': 'surprised',
     'intermediateEmotion': 'confused',
@@ -624,7 +624,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'disillusioned',
-    'nameFr': 'désillusionné·e',
+    'nameFr': 'désillusion',
     'level': 2,
     'basicEmotion': 'surprised',
     'intermediateEmotion': 'confused',
@@ -633,7 +633,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'startled',
-    'nameFr': 'surpris·e',
+    'nameFr': 'surprise',
     'level': 1,
     'basicEmotion': 'surprised',
     'intermediateEmotion': '',
@@ -642,7 +642,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'dismayed',
-    'nameFr': 'consterné·e',
+    'nameFr': 'consternation',
     'level': 2,
     'basicEmotion': 'surprised',
     'intermediateEmotion': 'startled',
@@ -651,7 +651,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'shocked',
-    'nameFr': 'choqué·e',
+    'nameFr': 'choc',
     'level': 2,
     'basicEmotion': 'surprised',
     'intermediateEmotion': 'startled',
@@ -660,7 +660,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'bad',
-    'nameFr': 'mal',
+    'nameFr': 'mal-être',
     'level': 0,
     'basicEmotion': '',
     'intermediateEmotion': '',
@@ -669,7 +669,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'tired',
-    'nameFr': 'fatigué·e',
+    'nameFr': 'fatigue',
     'level': 1,
     'basicEmotion': 'bad',
     'intermediateEmotion': '',
@@ -678,7 +678,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'sleepy',
-    'nameFr': 'somnolent·e',
+    'nameFr': 'somnolence',
     'level': 2,
     'basicEmotion': 'bad',
     'intermediateEmotion': 'tired',
@@ -687,7 +687,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'unfocused',
-    'nameFr': 'déconcentré·e',
+    'nameFr': 'distraction',
     'level': 2,
     'basicEmotion': 'bad',
     'intermediateEmotion': 'tired',
@@ -696,7 +696,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'stressed',
-    'nameFr': 'stressé·e',
+    'nameFr': 'stress',
     'level': 1,
     'basicEmotion': 'bad',
     'intermediateEmotion': '',
@@ -705,7 +705,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'out of control',
-    'nameFr': 'hors de contrôle',
+    'nameFr': 'panique',
     'level': 2,
     'basicEmotion': 'bad',
     'intermediateEmotion': 'stressed',
@@ -714,7 +714,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'overwhelmed',
-    'nameFr': 'débordé·e',
+    'nameFr': 'submersion',
     'level': 2,
     'basicEmotion': 'bad',
     'intermediateEmotion': 'stressed',
@@ -723,7 +723,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'busy',
-    'nameFr': 'occupé·e',
+    'nameFr': 'préoccupation',
     'level': 1,
     'basicEmotion': 'bad',
     'intermediateEmotion': '',
@@ -732,7 +732,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'rushed',
-    'nameFr': 'précipité·e',
+    'nameFr': 'précipitation',
     'level': 2,
     'basicEmotion': 'bad',
     'intermediateEmotion': 'busy',
@@ -741,7 +741,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'pressured',
-    'nameFr': 'sous pression',
+    'nameFr': 'tension',
     'level': 2,
     'basicEmotion': 'bad',
     'intermediateEmotion': 'busy',
@@ -750,7 +750,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'bored',
-    'nameFr': 'ennuyé·e',
+    'nameFr': 'ennui',
     'level': 1,
     'basicEmotion': 'bad',
     'intermediateEmotion': '',
@@ -759,7 +759,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'apathetic',
-    'nameFr': 'apathique',
+    'nameFr': 'apathie',
     'level': 2,
     'basicEmotion': 'bad',
     'intermediateEmotion': 'bored',
@@ -768,7 +768,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'indifferent',
-    'nameFr': 'indifférent·e',
+    'nameFr': 'indifférence',
     'level': 2,
     'basicEmotion': 'bad',
     'intermediateEmotion': 'bored',
@@ -777,7 +777,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'fearful',
-    'nameFr': 'craintif·ve',
+    'nameFr': 'crainte',
     'level': 0,
     'basicEmotion': '',
     'intermediateEmotion': '',
@@ -786,7 +786,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'scared',
-    'nameFr': 'effrayé·e',
+    'nameFr': 'effroi',
     'level': 1,
     'basicEmotion': 'fearful',
     'intermediateEmotion': '',
@@ -795,7 +795,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'helpless',
-    'nameFr': 'sans défense',
+    'nameFr': 'impuissance',
     'level': 2,
     'basicEmotion': 'fearful',
     'intermediateEmotion': 'scared',
@@ -804,7 +804,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'frightened',
-    'nameFr': 'terrifié·e',
+    'nameFr': 'détresse',
     'level': 2,
     'basicEmotion': 'fearful',
     'intermediateEmotion': 'scared',
@@ -813,7 +813,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'anxious',
-    'nameFr': 'anxieux·se',
+    'nameFr': 'anxiété',
     'level': 1,
     'basicEmotion': 'fearful',
     'intermediateEmotion': '',
@@ -822,7 +822,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'overwhelmed',
-    'nameFr': 'submergé·e',
+    'nameFr': 'submersion',
     'level': 2,
     'basicEmotion': 'fearful',
     'intermediateEmotion': 'anxious',
@@ -831,7 +831,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'worried',
-    'nameFr': 'inquiet·e',
+    'nameFr': 'inquiétude',
     'level': 2,
     'basicEmotion': 'fearful',
     'intermediateEmotion': 'anxious',
@@ -840,7 +840,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'insecure',
-    'nameFr': 'incertain·e',
+    'nameFr': 'doute',
     'level': 1,
     'basicEmotion': 'fearful',
     'intermediateEmotion': '',
@@ -849,7 +849,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'inadequate',
-    'nameFr': 'inadapté·e',
+    'nameFr': 'inadéquation',
     'level': 2,
     'basicEmotion': 'fearful',
     'intermediateEmotion': 'insecure',
@@ -858,7 +858,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'inferior',
-    'nameFr': 'inférieur·e',
+    'nameFr': 'infériorité',
     'level': 2,
     'basicEmotion': 'fearful',
     'intermediateEmotion': 'insecure',
@@ -867,7 +867,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'weak',
-    'nameFr': 'faible',
+    'nameFr': 'faiblesse',
     'level': 1,
     'basicEmotion': 'fearful',
     'intermediateEmotion': '',
@@ -876,7 +876,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'worthless',
-    'nameFr': 'inutile',
+    'nameFr': 'inutilité',
     'level': 2,
     'basicEmotion': 'fearful',
     'intermediateEmotion': 'weak',
@@ -885,7 +885,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'insignificant',
-    'nameFr': 'insignifiant·e',
+    'nameFr': 'insignifiance',
     'level': 2,
     'basicEmotion': 'fearful',
     'intermediateEmotion': 'weak',
@@ -894,7 +894,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'rejected',
-    'nameFr': 'rejeté·e',
+    'nameFr': 'rejet',
     'level': 1,
     'basicEmotion': 'fearful',
     'intermediateEmotion': '',
@@ -903,7 +903,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'excluded',
-    'nameFr': 'exclu·e',
+    'nameFr': 'exclusion',
     'level': 2,
     'basicEmotion': 'fearful',
     'intermediateEmotion': 'rejected',
@@ -912,7 +912,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'persecuted',
-    'nameFr': 'persécuté·e',
+    'nameFr': 'persécution',
     'level': 2,
     'basicEmotion': 'fearful',
     'intermediateEmotion': 'rejected',
@@ -921,7 +921,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'threatened',
-    'nameFr': 'menacé·e',
+    'nameFr': 'menace',
     'level': 1,
     'basicEmotion': 'fearful',
     'intermediateEmotion': '',
@@ -930,7 +930,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'nervous',
-    'nameFr': 'nerveux·se',
+    'nameFr': 'nervosité',
     'level': 2,
     'basicEmotion': 'fearful',
     'intermediateEmotion': 'threatened',
@@ -939,7 +939,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'exposed',
-    'nameFr': 'exposé·e',
+    'nameFr': 'vulnérabilité',
     'level': 2,
     'basicEmotion': 'fearful',
     'intermediateEmotion': 'threatened',
@@ -948,7 +948,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'angry',
-    'nameFr': 'en colère',
+    'nameFr': 'colère',
     'level': 0,
     'basicEmotion': '',
     'intermediateEmotion': '',
@@ -957,7 +957,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'let down',
-    'nameFr': 'déçu·e',
+    'nameFr': 'déception',
     'level': 1,
     'basicEmotion': 'angry',
     'intermediateEmotion': '',
@@ -966,7 +966,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'betrayed',
-    'nameFr': 'trahi·e',
+    'nameFr': 'trahison',
     'level': 2,
     'basicEmotion': 'angry',
     'intermediateEmotion': 'let down',
@@ -975,7 +975,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'resentful',
-    'nameFr': 'rancunier·e',
+    'nameFr': 'rancune',
     'level': 2,
     'basicEmotion': 'angry',
     'intermediateEmotion': 'let down',
@@ -984,7 +984,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'humilated',
-    'nameFr': 'humilié·e',
+    'nameFr': 'humiliation',
     'level': 1,
     'basicEmotion': 'angry',
     'intermediateEmotion': '',
@@ -993,7 +993,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'disrespected',
-    'nameFr': 'non respecté·e',
+    'nameFr': 'frustration',
     'level': 2,
     'basicEmotion': 'angry',
     'intermediateEmotion': 'humilated',
@@ -1002,7 +1002,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'ridiculed',
-    'nameFr': 'ridiculisé·e',
+    'nameFr': 'ridicule',
     'level': 2,
     'basicEmotion': 'angry',
     'intermediateEmotion': 'humilated',
@@ -1011,7 +1011,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'bitter',
-    'nameFr': 'amer·e',
+    'nameFr': 'amertume',
     'level': 1,
     'basicEmotion': 'angry',
     'intermediateEmotion': '',
@@ -1020,7 +1020,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'indignant',
-    'nameFr': 'indigné·e',
+    'nameFr': 'indignation',
     'level': 2,
     'basicEmotion': 'angry',
     'intermediateEmotion': 'bitter',
@@ -1029,7 +1029,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'violated',
-    'nameFr': 'violé·e',
+    'nameFr': 'trahison',
     'level': 2,
     'basicEmotion': 'angry',
     'intermediateEmotion': 'bitter',
@@ -1038,7 +1038,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'mad',
-    'nameFr': 'fou·lle',
+    'nameFr': 'folie',
     'level': 1,
     'basicEmotion': 'angry',
     'intermediateEmotion': '',
@@ -1047,7 +1047,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'furious',
-    'nameFr': 'furieux·se',
+    'nameFr': 'fureur',
     'level': 2,
     'basicEmotion': 'angry',
     'intermediateEmotion': 'mad',
@@ -1056,7 +1056,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'jealous',
-    'nameFr': 'jaloux·se',
+    'nameFr': 'jalousie',
     'level': 2,
     'basicEmotion': 'angry',
     'intermediateEmotion': 'mad',
@@ -1065,7 +1065,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'aggressive',
-    'nameFr': 'aggressif·ve',
+    'nameFr': 'aggressivité',
     'level': 1,
     'basicEmotion': 'angry',
     'intermediateEmotion': '',
@@ -1074,7 +1074,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'provoked',
-    'nameFr': 'provoqué·e',
+    'nameFr': 'irritation',
     'level': 2,
     'basicEmotion': 'angry',
     'intermediateEmotion': 'aggressive',
@@ -1083,7 +1083,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'hostile',
-    'nameFr': 'hostile',
+    'nameFr': 'hostilité',
     'level': 2,
     'basicEmotion': 'angry',
     'intermediateEmotion': 'aggressive',
@@ -1092,7 +1092,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'frustrated',
-    'nameFr': 'frustré·e',
+    'nameFr': 'frustration',
     'level': 1,
     'basicEmotion': 'angry',
     'intermediateEmotion': '',
@@ -1101,7 +1101,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'infuriated',
-    'nameFr': 'excédé·e',
+    'nameFr': 'rage',
     'level': 2,
     'basicEmotion': 'angry',
     'intermediateEmotion': 'frustrated',
@@ -1110,7 +1110,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'annoyed',
-    'nameFr': 'agacé·e',
+    'nameFr': 'agacement',
     'level': 2,
     'basicEmotion': 'angry',
     'intermediateEmotion': 'frustrated',
@@ -1119,7 +1119,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'distant',
-    'nameFr': 'distant·e',
+    'nameFr': 'froideur',
     'level': 1,
     'basicEmotion': 'angry',
     'intermediateEmotion': '',
@@ -1128,7 +1128,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'withdrawn',
-    'nameFr': 'retiré·e',
+    'nameFr': 'repli sur soi',
     'level': 2,
     'basicEmotion': 'angry',
     'intermediateEmotion': 'distant',
@@ -1137,7 +1137,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'numb',
-    'nameFr': 'engourdi·e',
+    'nameFr': 'insensibilité',
     'level': 2,
     'basicEmotion': 'angry',
     'intermediateEmotion': 'distant',
@@ -1146,7 +1146,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'critical',
-    'nameFr': 'critique',
+    'nameFr': 'sévérité',
     'level': 1,
     'basicEmotion': 'angry',
     'intermediateEmotion': '',
@@ -1155,7 +1155,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'sceptical',
-    'nameFr': 'sceptique',
+    'nameFr': 'scepticité',
     'level': 2,
     'basicEmotion': 'angry',
     'intermediateEmotion': 'critical',
@@ -1164,7 +1164,7 @@ List<Map<String, dynamic>> emotions = [
   },
   {
     'nameEn': 'dismissive',
-    'nameFr': 'dédaigneux·se',
+    'nameFr': 'dédain',
     'level': 2,
     'basicEmotion': 'angry',
     'intermediateEmotion': 'critical',

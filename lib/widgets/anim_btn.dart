@@ -15,6 +15,7 @@ class AnimBtn extends StatefulWidget {
   final double borderRadius;
   final Color borderColor;
   final EdgeInsetsGeometry? padding;
+  final bool? enableAnimation;
 
   const AnimBtn({
     super.key,
@@ -29,6 +30,7 @@ class AnimBtn extends StatefulWidget {
     this.borderRadius = 0,
     this.borderColor = Colors.transparent,
     this.padding,
+    this.enableAnimation,
   });
 
   @override
@@ -39,6 +41,11 @@ class _AnimBtnState extends State<AnimBtn> {
   @override
   Widget build(BuildContext context) {
     final animationProvider = context.watch<AnimationStateNotifier>();
+    bool animationDisabled = false;
+
+    if (widget.enableAnimation != null && widget.enableAnimation == false) {
+      animationDisabled = true;
+    }
 
     final borderRadius = BorderRadius.circular(widget.borderRadius);
     final animationDuration = animationProvider.animate
@@ -53,7 +60,7 @@ class _AnimBtnState extends State<AnimBtn> {
         borderRadius: borderRadius,
         child: Stack(children: [
           AnimatedContainer(
-            duration: animationDuration,
+            duration: animationDisabled ? Duration.zero : animationDuration,
             height: widget.height,
             width: widget.width,
             decoration: BoxDecoration(
@@ -64,7 +71,7 @@ class _AnimBtnState extends State<AnimBtn> {
             ),
           ),
           AnimatedPositioned(
-            duration: animationDuration,
+            duration: animationDisabled ? Duration.zero : animationDuration,
             left: widget.isSelected ? 0 : -widget.width,
             child: Container(
               height: widget.height,
@@ -77,7 +84,7 @@ class _AnimBtnState extends State<AnimBtn> {
             ),
           ),
           AnimatedContainer(
-            duration: animationDuration,
+            duration: animationDisabled ? Duration.zero : animationDuration,
             padding: widget.padding ??
                 const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
             height: widget.height,

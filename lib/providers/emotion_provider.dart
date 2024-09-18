@@ -8,23 +8,27 @@ class EmotionProvider extends ChangeNotifier {
   List<Emotion> _emotionsToDisplay = [];
   List<Emotion> _emotionsInDialog = [];
   Emotion? _selectedEmotion;
+  Emotion? _previousSelectedEmotion;
 
   List<Emotion> get emotions => _emotions;
   List<Emotion> get emotionsToDisplay => _emotionsToDisplay;
   List<Emotion> get emotionsInDialog => _emotionsInDialog;
   Emotion? get selectedEmotion => _selectedEmotion;
+  Emotion? get previousSelectedEmotion => _previousSelectedEmotion;
 
   EmotionProvider() {
     fetchEmotions();
   }
 
   Future<void> setSelectedEmotion(Emotion? emotion) async {
+    _previousSelectedEmotion = _selectedEmotion;
     _selectedEmotion = emotion;
     notifyListeners();
   }
 
   Future<void> setDefaultSelectedEmotion() async {
     if (_selectedEmotion == null) {
+      _previousSelectedEmotion = null;
       _selectedEmotion = _emotions.first;
       notifyListeners();
     }
