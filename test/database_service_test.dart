@@ -1,24 +1,28 @@
+import 'package:calm_notes/emotions_list.dart';
 import 'package:calm_notes/models/emotion.dart';
 import 'package:calm_notes/models/tag.dart';
+import 'package:calm_notes/providers/emotion_provider.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:calm_notes/models/entry.dart';
 import 'package:calm_notes/models/reminder.dart';
 import 'package:calm_notes/services/database_service.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
-void sqfliteTestInit() {
-  // Initialize ffi implementation
-  sqfliteFfiInit();
-  // Set global factory
-  databaseFactory = databaseFactoryFfi;
-}
-
 void main() {
-  sqfliteTestInit();
+  sqfliteFfiInit();
+  databaseFactory = databaseFactoryFfi;
+  late EmotionProvider emotionProvider;
   late DatabaseService dbService;
 
   setUp(() async {
     dbService = DatabaseService.instance;
+    emotionProvider = EmotionProvider();
+    final db = await dbService.database;
+
+    for (var emotion in emotions) {
+      // emotions come from emontions_list.dart
+      await db.insert('emotions', emotion);
+    }
   });
 
   tearDown(() async {
@@ -214,18 +218,19 @@ void main() {
 
   group('Emotion Methods', () {
     test('Increment selected count and fetch Emotion', () async {
-      await dbService.incrementSelectedEmotionCount(0);
-
-      final emotion = await dbService.getEmotion(0);
+      await emotionProvider.fetchEmotions();
+      await dbService.incrementSelectedEmotionCount(1);
+      final emotion = await dbService.getEmotion(1);
       expect(emotion.selectedCount, 1);
     });
 
     test('Reset selected counts', () async {
-      await dbService.incrementSelectedEmotionCount(0);
+      await emotionProvider.fetchEmotions();
+      await dbService.incrementSelectedEmotionCount(1);
 
       await dbService.fetchEmotions();
 
-      Emotion updatedEmotion = await dbService.getEmotion(0);
+      Emotion updatedEmotion = await dbService.getEmotion(1);
       expect(updatedEmotion.selectedCount, 1);
 
       await dbService.resetSelectedEmotionsCount();
@@ -233,12 +238,12 @@ void main() {
       final updatedEmotions = await dbService.fetchEmotions();
       expect(updatedEmotions.every((e) => e.selectedCount == 0), isTrue);
 
-      await dbService.incrementSelectedEmotionCount(0);
-      updatedEmotion = await dbService.getEmotion(0);
+      await dbService.incrementSelectedEmotionCount(1);
+      updatedEmotion = await dbService.getEmotion(1);
       expect(updatedEmotion.selectedCount, 1);
 
-      await dbService.resetSelectedEmotionCount(0);
-      updatedEmotion = await dbService.getEmotion(0);
+      await dbService.resetSelectedEmotionCount(1);
+      updatedEmotion = await dbService.getEmotion(1);
       expect(updatedEmotion.selectedCount, 0);
     });
 
@@ -246,7 +251,7 @@ void main() {
       final entry = Entry(
         date: '2024-08-20',
         mood: 5,
-        emotions: 'happy:1,excited:2',
+        emotions: 'happy:1,playful:2',
         title: 'Great Day',
         description: 'Had a wonderful day!',
         tags: 'personal:1,work:3',
@@ -260,11 +265,12 @@ void main() {
       expect(initialEmotions[1].selectedCount, 0);
 
       await dbService.setSelectedEmotionsCount(entryId);
-      final updatedEmotions = await dbService.fetchEmotions();
-      updatedEmotions.sort((a, b) => a.nameEn.compareTo(b.nameEn));
+      final happy = await dbService.getEmotion(1);
+      final playful = await dbService.getEmotion(2);
+      final updatedEmotions = [happy, playful];
 
-      expect(updatedEmotions[0].selectedCount, 2);
-      expect(updatedEmotions[1].selectedCount, 1);
+      expect(updatedEmotions[1].selectedCount, 2);
+      expect(updatedEmotions[0].selectedCount, 1);
     });
   });
 

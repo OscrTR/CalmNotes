@@ -1,7 +1,6 @@
 import 'package:calm_notes/colors.dart';
 import 'package:calm_notes/models/emotion.dart';
 import 'package:calm_notes/providers/emotion_provider.dart';
-import 'package:calm_notes/services/database_service.dart';
 import 'package:calm_notes/widgets/anim_btn.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -34,8 +33,6 @@ class _EmotionsState extends State<Emotions> {
     );
   }
 
-  final DatabaseService _databaseService = DatabaseService.instance;
-
   Widget _buildEmotionButtons(BuildContext context) {
     final provider = context.watch<EmotionProvider>();
     final emotionsToDisplay = provider.emotionsToDisplay;
@@ -45,10 +42,7 @@ class _EmotionsState extends State<Emotions> {
       runSpacing: 10,
       children: [
         ..._buildEmotionButtonList(emotionsToDisplay),
-        _buildAddEmotionButton(),
-        FilledButton(
-            onPressed: _databaseService.setOldTable,
-            child: const Text('old table'))
+        _buildAddEmotionButton()
       ],
     );
   }

@@ -41,7 +41,6 @@ void main() {
   test('Initial state is correct', () {
     expect(tagProvider.tags, []);
     expect(tagProvider.tagsToDisplay, []);
-    expect(tagProvider.tagsInDialog, []);
   });
 
   test('addTag adds a new tag', () async {
@@ -65,7 +64,6 @@ void main() {
     expect(tagProvider.tags[3].name, 'work');
     expect(tagProvider.tags[3].selectedCount, 0);
     expect(tagProvider.tagsToDisplay.first.name, 'friends');
-    expect(tagProvider.tagsInDialog[0].name, 'work');
   });
 
   test('deleteEmotion removes the emotion', () async {
@@ -85,12 +83,9 @@ void main() {
     final tags = await dbService.fetchTags();
 
     List<Tag> shouldBeDisplayedTags = tags.sublist(0, 3);
-    List<Tag> shouldBeDialogTags = tags.sublist(3);
     await tagProvider.fetchDisplayedTags();
     expect(tagProvider.tagsToDisplay.map((tag) => tag.name),
         shouldBeDisplayedTags.map((tag) => tag.name));
-    expect(tagProvider.tagsInDialog.map((tag) => tag.name),
-        shouldBeDialogTags.map((tag) => tag.name));
   });
 
   test('Increment tag then reset', () async {

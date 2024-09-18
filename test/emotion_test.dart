@@ -7,7 +7,7 @@ void main() {
       final emotion = Emotion(
           id: 1,
           nameEn: 'happy',
-          nameFr: 'heureux·se',
+          nameFr: 'joie',
           level: 0,
           basicEmotion: '',
           intermediateEmotion: '',
@@ -17,7 +17,11 @@ void main() {
 
       expect(map, {
         'id': 1,
-        'name': 'Happy',
+        'nameEn': 'happy',
+        'nameFr': 'joie',
+        'level': 0,
+        'basicEmotion': '',
+        'intermediateEmotion': '',
         'lastUse': 1627848123,
         'selectedCount': 10,
       });
@@ -26,16 +30,24 @@ void main() {
     test('fromMap creates Emotion from Map correctly', () {
       final map = {
         'id': 1,
-        'name': 'Sad',
+        'nameEn': 'happy',
+        'nameFr': 'joie',
+        'level': 0,
+        'basicEmotion': '',
+        'intermediateEmotion': '',
         'lastUse': 1627848123,
-        'selectedCount': 5,
+        'selectedCount': 10,
       };
       final emotion = Emotion.fromMap(map);
 
       expect(emotion.id, 1);
-      expect(emotion.nameEn, 'sad');
+      expect(emotion.nameEn, 'happy');
+      expect(emotion.nameFr, 'joie');
+      expect(emotion.level, 0);
+      expect(emotion.basicEmotion, '');
+      expect(emotion.intermediateEmotion, '');
       expect(emotion.lastUse, 1627848123);
-      expect(emotion.selectedCount, 5);
+      expect(emotion.selectedCount, 10);
     });
 
     test('updateFrom creates a new Emotion with updated fields', () {

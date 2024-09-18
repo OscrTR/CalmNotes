@@ -24,6 +24,7 @@ class Emotion {
       'id': id,
       'nameEn': nameEn,
       'nameFr': nameFr,
+      'level': level,
       'lastUse': lastUse,
       'basicEmotion': basicEmotion,
       'intermediateEmotion': intermediateEmotion,

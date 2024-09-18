@@ -27,7 +27,10 @@ class EmotionProvider extends ChangeNotifier {
   Future<void> setDefaultSelectedEmotion() async {
     if (_selectedEmotion == null) {
       _previousSelectedEmotion = null;
-      _selectedEmotion = _emotions.first;
+      if (_emotions.isNotEmpty) {
+        _selectedEmotion = _emotions.first;
+      }
+
       notifyListeners();
     }
   }
