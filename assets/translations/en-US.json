@@ -1,6 +1,9 @@
 {
   "global_dialog_cancel": "Cancel",
 
+  "navigation_entries": "Entries",
+  "navigation_statistics": "Stats",
+
   "notification_title": "How is your day going?",
   "notification_description": "Add an entry to your journal.",
 

@@ -1,6 +1,9 @@
 {
   "global_dialog_cancel": "Annuler",
 
+  "navigation_entries": "Entrées",
+  "navigation_statistics": "Stats",
+
   "notification_title": "Comment se passe ta journée ?",
   "notification_description": "Ajoute une entrée à ton journal.",
 
