@@ -7,6 +7,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -18,6 +19,7 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   TimeOfDay selectedTime = TimeOfDay.now();
+  String _appVersion = '';
 
   bool myInterceptor(bool stopDefaultButtonEvent, RouteInfo info) {
     GoRouter.of(context).go('/home');
@@ -28,12 +30,24 @@ class _SettingsPageState extends State<SettingsPage> {
   void initState() {
     super.initState();
     BackButtonInterceptor.add(myInterceptor);
+    _loadAppVersion();
   }
 
   @override
   void dispose() {
     BackButtonInterceptor.remove(myInterceptor);
     super.dispose();
+  }
+
+  Future<void> _loadAppVersion() async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+
+    String version = packageInfo.version;
+    String buildNumber = packageInfo.buildNumber;
+
+    setState(() {
+      _appVersion = '$version (Build $buildNumber)';
+    });
   }
 
   @override
@@ -53,9 +67,17 @@ class _SettingsPageState extends State<SettingsPage> {
             _buildRemindersSection(context),
             const SizedBox(height: 24),
             _buildLanguageSection(context),
+            const SizedBox(height: 24),
+            _buildVersionSection(context),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildVersionSection(BuildContext context) {
+    return Row(
+      children: [Text('Version : $_appVersion')],
     );
   }
 

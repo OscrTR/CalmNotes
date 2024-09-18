@@ -152,9 +152,9 @@ class _TagsState extends State<Tags> {
 
   Widget _buildAddTagDialogContent(BuildContext context) {
     final provider = context.watch<TagProvider>();
-    final tags = provider.tagsInDialog;
+    final tags = provider.tags;
 
-    final double height = tags.length < 5 ? tags.length * 48.0 + 66 : 200;
+    final double height = (tags.length * 48.0 + 66).clamp(0, 470);
 
     return tags.isEmpty
         ? _buildNoTagsContent(context)

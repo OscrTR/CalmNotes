@@ -6,13 +6,11 @@ class EmotionProvider extends ChangeNotifier {
   final DatabaseService _databaseService = DatabaseService.instance;
   List<Emotion> _emotions = [];
   List<Emotion> _emotionsToDisplay = [];
-  List<Emotion> _emotionsInDialog = [];
   Emotion? _selectedEmotion;
   Emotion? _previousSelectedEmotion;
 
   List<Emotion> get emotions => _emotions;
   List<Emotion> get emotionsToDisplay => _emotionsToDisplay;
-  List<Emotion> get emotionsInDialog => _emotionsInDialog;
   Emotion? get selectedEmotion => _selectedEmotion;
   Emotion? get previousSelectedEmotion => _previousSelectedEmotion;
 
@@ -58,19 +56,10 @@ class EmotionProvider extends ChangeNotifier {
     return updatedList;
   }
 
-  // Updates the list of emotions displayed and those in the dialog.
-  void _updateDisplayedAndDialogEmotions() {
-    _emotionsInDialog = _emotions
-        .where((emotion) => !_emotionsToDisplay
-            .any((displayedEmotion) => emotion.id == displayedEmotion.id))
-        .toList();
-  }
-
   Future<void> fetchEmotions() async {
     _emotions = await _databaseService.fetchEmotions();
     _emotionsToDisplay = _mergeEmotionLists(
         _emotionsToDisplay, await _databaseService.fetchEmotionsToDisplay());
-    _updateDisplayedAndDialogEmotions();
     if (_selectedEmotion == null) {
       setDefaultSelectedEmotion();
     }
@@ -79,7 +68,6 @@ class EmotionProvider extends ChangeNotifier {
 
   Future<void> fetchDisplayedEmotions() async {
     _emotionsToDisplay = await _databaseService.fetchEmotionsToDisplay();
-    _updateDisplayedAndDialogEmotions();
     notifyListeners();
   }
 

@@ -6,11 +6,9 @@ class TagProvider extends ChangeNotifier {
   final DatabaseService _databaseService = DatabaseService.instance;
   List<Tag> _tags = [];
   List<Tag> _tagsToDisplay = [];
-  List<Tag> _tagsInDialog = [];
 
   List<Tag> get tags => _tags;
   List<Tag> get tagsToDisplay => _tagsToDisplay;
-  List<Tag> get tagsInDialog => _tagsInDialog;
 
   TagProvider() {
     fetchTags();
@@ -52,20 +50,11 @@ class TagProvider extends ChangeNotifier {
 
     _tags = results[0];
     _tagsToDisplay = _combineLists(_tagsToDisplay, results[1]);
-
-    _tagsInDialog = _tags
-        .where((tag) =>
-            !_tagsToDisplay.any((displayedTag) => tag.id == displayedTag.id))
-        .toList();
     notifyListeners();
   }
 
   Future<void> fetchDisplayedTags() async {
     _tagsToDisplay = await _databaseService.fetchTagsToDisplay();
-    _tagsInDialog = _tags
-        .where((tag) =>
-            !_tagsToDisplay.any((displayedTag) => tag.id == displayedTag.id))
-        .toList();
     notifyListeners();
   }
 
