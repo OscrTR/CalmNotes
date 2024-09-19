@@ -1,5 +1,7 @@
 import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:calm_notes/colors.dart';
+import 'package:calm_notes/models/emotion.dart';
+import 'package:calm_notes/models/tag.dart';
 import 'package:calm_notes/providers/animation_provider.dart';
 import 'package:calm_notes/widgets/anim_btn.dart';
 import 'package:calm_notes/widgets/calendar.dart';
@@ -91,7 +93,15 @@ class _StatisticsPageState extends State<StatisticsPage> {
 
   Widget _buildFactorSelection(
       EntryProvider entryProvider, List<Entry> entries, BuildContext context) {
-    return entryProvider.selectedFactor.isEmpty
+    String currentLocale = context.locale.toString();
+    final bool isFactorSelected = entryProvider.selectedFactor != null;
+    final String btnText = isFactorSelected
+        ? currentLocale == 'en_US'
+            ? entryProvider.selectedFactor!.nameEn
+            : entryProvider.selectedFactor!.nameFr
+        : '';
+
+    return entryProvider.selectedFactorString.isEmpty
         ? Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -108,11 +118,17 @@ class _StatisticsPageState extends State<StatisticsPage> {
               Text(context.tr('statistics_mood_graph_vs'),
                   style: Theme.of(context).textTheme.titleMedium),
               const SizedBox(width: 10),
-              FilledButton(
-                onPressed: () {
-                  entryProvider.removeFactor();
-                },
-                child: Text(entryProvider.selectedFactor),
+              Flexible(
+                child: FilledButton(
+                  onPressed: () {
+                    entryProvider.removeFactor();
+                  },
+                  child: Text(
+                    btnText,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
               ),
             ],
           );
@@ -120,36 +136,58 @@ class _StatisticsPageState extends State<StatisticsPage> {
 
   Widget _buildFactorSelectionContent(
       EntryProvider entryProvider, BuildContext context) {
-    final factorsList = entryProvider.factorsList;
     final entries = entryProvider.filteredEntries;
+    final emotionFactors = entryProvider.emotionFactors;
+    final tagFactors = entryProvider.tagFactors;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(context.tr(factorsList.isEmpty
+        Text(context.tr(emotionFactors.isEmpty && tagFactors.isEmpty
             ? 'statistics_no_factor'
             : 'statistics_factor_dialog_subtitle')),
         const SizedBox(height: 10),
         Wrap(
           spacing: 10,
           runSpacing: 10,
-          children: _buildFactorButtonList(entries, context, factorsList),
+          children: _buildFactorButtonList(
+              entries, context, emotionFactors, tagFactors),
         ),
       ],
     );
   }
 
-  List<Widget> _buildFactorButtonList(
-      List<Entry> entries, BuildContext context, List<String> factorsList) {
-    return factorsList.map((factor) {
+  List<Widget> _buildFactorButtonList(List<Entry> entries, BuildContext context,
+      List<Emotion> emotionFactors, List<Tag> tagFactors) {
+    List<Widget> factorButtons = [];
+    String currentLocale = context.locale.toString();
+    List<Widget> emotionButtons = emotionFactors.map((emotion) {
+      final String btnText =
+          currentLocale == 'en_US' ? emotion.nameEn : emotion.nameFr;
       return OutlinedButton(
         onPressed: () {
-          context.read<EntryProvider>().selectFactor(factor);
-          Navigator.pop(context, 'Add factor');
+          context.read<EntryProvider>().selectFactor(emotion.nameEn);
+          Navigator.pop(context, 'Add emotion');
         },
-        child: Text(factor),
+        child: Text(btnText),
       );
     }).toList();
+
+    List<Widget> tagButtons = tagFactors.map((tag) {
+      return OutlinedButton(
+        onPressed: () {
+          context.read<EntryProvider>().selectFactor(tag.name);
+          Navigator.pop(context, 'Add tag');
+        },
+        child: Text(tag.name),
+      );
+    }).toList();
+
+    factorButtons.addAll(emotionButtons);
+    factorButtons.addAll(tagButtons);
+
+    return factorButtons;
   }
 
   Widget _buildRangeTypeButtons(BuildContext context, EntryProvider provider) {

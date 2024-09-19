@@ -1,6 +1,8 @@
 import 'package:calm_notes/colors.dart';
+import 'package:calm_notes/models/emotion.dart';
 import 'package:calm_notes/models/entry.dart';
 import 'package:calm_notes/models/factor.dart';
+import 'package:calm_notes/models/tag.dart';
 import 'package:calm_notes/services/database_service.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -14,8 +16,11 @@ class EntryProvider extends ChangeNotifier {
   List<String> _spotsDate = [];
   List<FlSpot> _entrySpots = [];
   Map<double, Color> _gradientColorsStopsMap = {};
-  String _selectedFactor = '';
+  String _selectedFactorString = '';
+  Factor? _selectedFactor = null;
   List<String> _factorsList = [];
+  List<Emotion> _emotionFactors = [];
+  List<Tag> _tagFactors = [];
   List<FlSpot> _factorSpots = [];
   double _initialWeeksListOffset = 0;
   double _initialMonthsListOffset = 0;
@@ -38,8 +43,11 @@ class EntryProvider extends ChangeNotifier {
   List<String> get spotsDate => _spotsDate;
   List<FlSpot> get entrySpots => _entrySpots;
   Map<double, Color> get gradientColorsStopsMap => _gradientColorsStopsMap;
-  String get selectedFactor => _selectedFactor;
+  String get selectedFactorString => _selectedFactorString;
+  Factor? get selectedFactor => _selectedFactor;
   List<String> get factorsList => _factorsList;
+  List<Emotion> get emotionFactors => _emotionFactors;
+  List<Tag> get tagFactors => _tagFactors;
   List<FlSpot> get factorSpots => _factorSpots;
   double get initialWeeksListOffset => _initialWeeksListOffset;
   double get initialMonthsListOffset => _initialMonthsListOffset;
@@ -132,12 +140,14 @@ class EntryProvider extends ChangeNotifier {
   Future<void> updateStatistics() async {
     _filteredEntries = await _filterEntriesBetweenDates(_startDate, _endDate);
     _factorsList = await _extractFactors(_filteredEntries);
-    if (_selectedFactor != '') {
-      if (!_factorsList.contains(_selectedFactor)) {
+    _emotionFactors = await _extractEmotions(_filteredEntries);
+    _tagFactors = await _extractTags(_filteredEntries);
+    if (_selectedFactorString != '') {
+      if (!_factorsList.contains(_selectedFactorString)) {
         _factorSpots = [];
       } else {
-        _factorSpots =
-            _convertFactorsToSpots(_entries, _selectedFactor, _spotsDate);
+        _factorSpots = await _convertFactorsToSpots(
+            _entries, _selectedFactorString, _spotsDate);
       }
     }
     _entrySpots = await _convertEntriesToSpots(_entries, spotsDate);
@@ -149,28 +159,42 @@ class EntryProvider extends ChangeNotifier {
     _isWeekSelected = !_isWeekSelected;
   }
 
-  void selectFactor(String factor) {
-    _selectedFactor = factor;
-    _factorSpots =
-        _convertFactorsToSpots(_entries, _selectedFactor, _spotsDate);
+  void selectFactor(String factor) async {
+    _selectedFactorString = factor;
+    final factorsList = await _createFactorsList(entries);
+
+    for (var factor in factorsList) {
+      if (factor.nameEn == _selectedFactorString) {
+        _selectedFactor = Factor(
+            date: DateTime.now(),
+            nameEn: factor.nameEn,
+            nameFr: factor.nameFr,
+            value: 0);
+        break;
+      }
+    }
+
+    _factorSpots = await _convertFactorsToSpots(
+        _entries, _selectedFactorString, _spotsDate);
     notifyListeners();
   }
 
   void removeFactor() {
-    _selectedFactor = '';
+    _selectedFactorString = '';
+    _selectedFactor = null;
     _factorSpots = [];
     notifyListeners();
   }
 
-  List<FlSpot> _convertFactorsToSpots(
-      List<Entry> entries, String factorName, List<String> spotsDate) {
-    final factorsList = _createFactorsList(entries);
+  Future<List<FlSpot>> _convertFactorsToSpots(
+      List<Entry> entries, String factorName, List<String> spotsDate) async {
+    final factorsList = await _createFactorsList(entries);
     final List<FlSpot> spots = [];
 
     double? findFactorValue(
         List<Factor> factors, DateTime date, String factorName) {
       for (var factor in factors) {
-        if (factor.date == date && factor.name == factorName) {
+        if (factor.date == date && factor.nameEn == factorName) {
           return factor.value;
         }
       }
@@ -193,51 +217,77 @@ class EntryProvider extends ChangeNotifier {
     return spots;
   }
 
-  List<Factor> _createFactorsList(List<Entry> entries) {
-    final List<Factor> tempFactorsList = [];
+  Future<List<Factor>> _createFactorsList(List<Entry> entries) async {
+    final List<Factor> factorsList = [];
+    final db = await _databaseService.database;
 
     for (var entry in entries) {
       final DateTime date = DateTime.parse(entry.date.split('|')[0]);
-      final List<String> factorsList = [
-        ...entry.emotions
-                ?.split(',')
-                .map((emotion) => emotion.trim())
-                .where((emotion) => emotion.isNotEmpty)
-                .toList() ??
-            [],
-        ...entry.tags
-                ?.split(',')
-                .map((tag) => tag.trim())
-                .where((tag) => tag.isNotEmpty)
-                .toList() ??
-            [],
-      ];
+      for (var emotion in entry.emotions!.split(',')) {
+        if (emotion != '') {
+          final emotionId = emotion.trim().split(' : ')[0];
+          final emotionCount = double.parse(emotion.trim().split(' : ')[1]);
 
-      for (var factor in factorsList.where((f) => f.isNotEmpty)) {
-        final parts = factor.split(':').map((e) => e.trim()).toList();
-        tempFactorsList.add(
-            Factor(date: date, name: parts[0], value: double.parse(parts[1])));
+          final List<Map<String, dynamic>> result = await db.query(
+            'emotions',
+            where: 'id = ?',
+            whereArgs: [emotionId],
+          );
+          if (result.isNotEmpty) {
+            final bool isAlreadyInList = factorsList.any((factor) =>
+                factor.nameEn == result.first['nameEn'] && factor.date == date);
+
+            if (isAlreadyInList) {
+              final Factor existingFactor = factorsList.firstWhere(
+                (factor) =>
+                    factor.nameEn == result.first['nameEn'] &&
+                    factor.date == date,
+              );
+              // If the factor exists, increase the selectedCount (value)
+              existingFactor.incrementValue(emotionCount);
+            } else {
+              factorsList.add(Factor(
+                  date: date,
+                  nameEn: result.first['nameEn'],
+                  nameFr: result.first['nameFr'],
+                  value: emotionCount));
+            }
+          }
+        }
+      }
+
+      for (var tag in entry.tags!.split(',')) {
+        final tagId = tag.trim().split(' : ')[0];
+        final tagCount = double.parse(tag.trim().split(' : ')[1]);
+
+        final List<Map<String, dynamic>> result = await db.query(
+          'tags',
+          where: 'id = ?',
+          whereArgs: [tagId],
+        );
+        if (result.isNotEmpty) {
+          final bool isAlreadyInList = factorsList.any((factor) =>
+              factor.nameEn == result.first['name'] && factor.date == date);
+
+          if (isAlreadyInList) {
+            final Factor existingFactor = factorsList.firstWhere(
+              (factor) =>
+                  factor.nameEn == result.first['name'] && factor.date == date,
+            );
+            // If the factor exists, increase the selectedCount (value)
+            existingFactor.incrementValue(tagCount);
+          } else {
+            factorsList.add(Factor(
+                date: date,
+                nameEn: result.first['name'],
+                nameFr: result.first['name'],
+                value: tagCount));
+          }
+        }
       }
     }
 
-    final Map<String, FactorSummary> summaryMap = {};
-    for (var factor in tempFactorsList) {
-      final key = '${factor.date},${factor.name}';
-      summaryMap.update(
-          key,
-          (summary) => summary
-            ..sum += factor.value.toInt()
-            ..count += 1,
-          ifAbsent: () => FactorSummary(sum: factor.value, count: 1));
-    }
-
-    return summaryMap.entries.map((entry) {
-      final keyParts = entry.key.split(',');
-      return Factor(
-          date: DateTime.parse(keyParts[0]),
-          name: keyParts[1],
-          value: entry.value.sum / entry.value.count);
-    }).toList();
+    return factorsList;
   }
 
   // Method to filter entries between specified dates
@@ -360,6 +410,40 @@ class EntryProvider extends ChangeNotifier {
     }
 
     return ranges;
+  }
+
+  // retourner la liste d'émotions
+  Future<List<Emotion>> _extractEmotions(List<Entry> entries) async {
+    // créer un set pour ne pas avoir de doublon avec l'id en key
+    Map<int, Emotion> emotionsMap = {};
+    for (var entry in entries) {
+      if (entry.emotions != null) {
+        for (var emotion in entry.emotions!.split(',')) {
+          if (emotion != '') {
+            final id = int.parse(emotion.trim().split(' : ')[0]);
+            final matchingEmotion = await _databaseService.getEmotion(id);
+            emotionsMap[id] = matchingEmotion;
+          }
+        }
+      }
+    }
+    return emotionsMap.values.toList();
+  }
+
+  // retourner la liste de tags
+  Future<List<Tag>> _extractTags(List<Entry> entries) async {
+    // créer un set pour ne pas avoir de doublon avec l'id en key
+    Map<int, Tag> tagMap = {};
+    for (var entry in entries) {
+      if (entry.tags != null) {
+        for (var tag in entry.tags!.split(',')) {
+          final id = int.parse(tag.trim().split(' : ')[0]);
+          final matchingTag = await _databaseService.getTag(id);
+          tagMap[id] = matchingTag;
+        }
+      }
+    }
+    return tagMap.values.toList();
   }
 
   Future<List<String>> _extractFactors(List<Entry> entries) async {

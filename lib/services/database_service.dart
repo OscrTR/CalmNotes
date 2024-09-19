@@ -99,6 +99,82 @@ class DatabaseService {
     return result.isNotEmpty ? result.first : null;
   }
 
+  // convert old emotion name to ids
+  Future<void> _convertEmotions(Entry entry) async {
+    final db = await database;
+    String emotionsString = '';
+
+    if (entry.emotions != null) {
+      for (var emotion in entry.emotions!.split(',')) {
+        final intId = int.tryParse(emotion.trim().split(' : ')[0]);
+        final emotionName = emotion.trim().split(' : ')[0];
+        // si intid est null trouver l'id correspondant au nom
+        if (intId == null) {
+          final List<Map<String, dynamic>> result = await db.query(
+            'emotions',
+            columns: ['id'],
+            where: 'nameEn = ? OR nameFr = ?',
+            whereArgs: [emotionName, emotionName],
+          );
+
+          if (result.isNotEmpty) {
+            emotionsString +=
+                '${result.first['id'] as int} : ${emotion.trim().split(' : ')[1]}';
+          }
+        }
+      }
+    }
+    if (emotionsString != '') {
+      Map<String, dynamic> values = {
+        'emotions': emotionsString,
+      };
+      await db.update(
+        'entries',
+        values,
+        where: 'id = ?',
+        whereArgs: [entry.id],
+      );
+    }
+  }
+
+  // convert old tag name to ids
+  Future<void> _convertTags(Entry entry) async {
+    final db = await database;
+    String tagsString = '';
+
+    if (entry.tags != null) {
+      for (var tag in entry.tags!.split(',')) {
+        final intId = int.tryParse(tag.trim().split(' : ')[0]);
+        final tagName = tag.trim().split(' : ')[0];
+        // si intid est null trouver l'id correspondant au nom
+        if (intId == null) {
+          final List<Map<String, dynamic>> result = await db.query(
+            'tags',
+            columns: ['id'],
+            where: 'name = ?',
+            whereArgs: [tagName],
+          );
+
+          if (result.isNotEmpty) {
+            tagsString +=
+                '${result.first['id'] as int} : ${tag.trim().split(' : ')[1]}';
+          }
+        }
+      }
+    }
+    if (tagsString != '') {
+      Map<String, dynamic> values = {
+        'tags': tagsString,
+      };
+      await db.update(
+        'entries',
+        values,
+        where: 'id = ?',
+        whereArgs: [entry.id],
+      );
+    }
+  }
+
   Future<void> checkIfColumnExists() async {
     final db = await database;
     List<Map<String, dynamic>> columns =
@@ -132,6 +208,11 @@ class DatabaseService {
       });
 
       _insertInitialEmotions(db);
+    }
+    final entries = await fetchEntries();
+    for (var entry in entries) {
+      await _convertEmotions(entry);
+      await _convertTags(entry);
     }
   }
 
@@ -263,13 +344,13 @@ class DatabaseService {
     final entry = await getEntry(entryId);
     final emotionMap = _convertStringToMap(entry.emotions!);
     final emotions = await fetchEmotions();
-    final emotionMapFromDb = {for (var e in emotions) e.nameEn: e};
+    final emotionMapFromDb = {for (var e in emotions) e.id: e};
 
     for (var entry in emotionMap.entries) {
-      final name = entry.key;
+      final id = entry.key;
       final count = entry.value;
-      if (emotionMapFromDb.containsKey(name)) {
-        final emotion = emotionMapFromDb[name]!;
+      if (emotionMapFromDb.containsKey(id)) {
+        final emotion = emotionMapFromDb[id]!;
         await updateEmotion(emotion.id!, selectedCount: count);
       }
     }
@@ -337,13 +418,13 @@ class DatabaseService {
     final entry = await getEntry(id);
     final tagMap = _convertStringToMap(entry.tags!);
     final tags = await fetchTags();
-    final tagMapFromDb = {for (var t in tags) t.name: t};
+    final tagMapFromDb = {for (var t in tags) t.id: t};
 
     for (var entry in tagMap.entries) {
-      final name = entry.key;
+      final id = entry.key;
       final count = entry.value;
-      if (tagMapFromDb.containsKey(name)) {
-        final tag = tagMapFromDb[name]!;
+      if (tagMapFromDb.containsKey(id)) {
+        final tag = tagMapFromDb[id]!;
         await updateTag(tag.id!, selectedCount: count);
       }
     }
@@ -351,13 +432,13 @@ class DatabaseService {
 
   // Helper method for converting String to Map
 
-  Map<String, int> _convertStringToMap(String data) {
+  Map<int, int> _convertStringToMap(String data) {
     final items = data.split(',');
-    final Map<String, int> map = {};
+    final Map<int, int> map = {};
     for (var item in items) {
       if (item.isEmpty) continue;
       final parts = item.split(':');
-      final key = parts[0].trim();
+      final key = int.parse(parts[0].trim());
       final value = int.tryParse(parts[1].trim()) ?? 0;
       map[key] = value;
     }

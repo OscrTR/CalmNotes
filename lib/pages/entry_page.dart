@@ -445,14 +445,14 @@ class _EntryCreateState extends State<EntryCreate> {
   String _convertEmotionsToString(List<Emotion> emotions) {
     return emotions
         .where((emotion) => emotion.selectedCount > 0)
-        .map((emotion) => '${emotion.nameEn} : ${emotion.selectedCount}')
+        .map((emotion) => '${emotion.id} : ${emotion.selectedCount}')
         .join(', ');
   }
 
   String _convertTagsToString(List<Tag> tags) {
     return tags
         .where((tag) => tag.selectedCount > 0)
-        .map((tag) => '${tag.name} : ${tag.selectedCount}')
+        .map((tag) => '${tag.id} : ${tag.selectedCount}')
         .join(', ');
   }
 
