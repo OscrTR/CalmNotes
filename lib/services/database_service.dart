@@ -99,7 +99,6 @@ class DatabaseService {
     return result.isNotEmpty ? result.first : null;
   }
 
-  // convert old emotion name to ids
   Future<void> _convertEmotions(Entry entry) async {
     final db = await database;
     String emotionsString = '';
@@ -108,7 +107,6 @@ class DatabaseService {
       for (var emotion in entry.emotions!.split(',')) {
         final intId = int.tryParse(emotion.trim().split(' : ')[0]);
         final emotionName = emotion.trim().split(' : ')[0];
-        // si intid est null trouver l'id correspondant au nom
         if (intId == null) {
           final List<Map<String, dynamic>> result = await db.query(
             'emotions',
@@ -137,7 +135,6 @@ class DatabaseService {
     }
   }
 
-  // convert old tag name to ids
   Future<void> _convertTags(Entry entry) async {
     final db = await database;
     String tagsString = '';
@@ -146,7 +143,6 @@ class DatabaseService {
       for (var tag in entry.tags!.split(',')) {
         final intId = int.tryParse(tag.trim().split(' : ')[0]);
         final tagName = tag.trim().split(' : ')[0];
-        // si intid est null trouver l'id correspondant au nom
         if (intId == null) {
           final List<Map<String, dynamic>> result = await db.query(
             'tags',
@@ -216,27 +212,9 @@ class DatabaseService {
     }
   }
 
-  Future<void> setOldTable() async {
-    final db = await database;
-    await db.transaction((txn) async {
-      await txn.execute('ALTER TABLE emotions RENAME TO old_emotions;');
-
-      await txn.execute('''
-        CREATE TABLE emotions (
-          id INTEGER PRIMARY KEY,
-          name TEXT NOT NULL,
-          lastUse INTEGER NOT NULL,
-          selectedCount INTEGER NOT NULL
-        )
-        ''');
-
-      await txn.execute('DROP TABLE old_emotions;');
-    });
-  }
-
   Future<void> _insertInitialEmotions(Database db) async {
     for (var emotion in emotions) {
-      // emotions come from emontions_list.dart
+      // emotions come from emotions_list.dart
       await db.insert('emotions', emotion);
     }
   }

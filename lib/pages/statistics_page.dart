@@ -23,8 +23,9 @@ class StatisticsPage extends StatefulWidget {
 
 class _StatisticsPageState extends State<StatisticsPage> {
   DateTime? _selectedStartDate;
-  ScrollController? _scrollControllerWeeks;
-  ScrollController? _scrollControllerMonths;
+  late ScrollController _scrollControllerWeeks;
+  late ScrollController _scrollControllerMonths;
+
   bool myInterceptor(bool stopDefaultButtonEvent, RouteInfo info) {
     GoRouter.of(context).go('/home');
     return true;
@@ -33,6 +34,8 @@ class _StatisticsPageState extends State<StatisticsPage> {
   @override
   void dispose() {
     BackButtonInterceptor.remove(myInterceptor);
+    _scrollControllerMonths.dispose();
+    _scrollControllerWeeks.dispose();
     super.dispose();
   }
 
@@ -40,6 +43,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
   void initState() {
     super.initState();
     BackButtonInterceptor.add(myInterceptor);
+
     final entryProvider = context.read<EntryProvider>();
     _scrollControllerWeeks = ScrollController(
         initialScrollOffset: entryProvider.initialWeeksListOffset);
@@ -136,7 +140,6 @@ class _StatisticsPageState extends State<StatisticsPage> {
 
   Widget _buildFactorSelectionContent(
       EntryProvider entryProvider, BuildContext context) {
-    final entries = entryProvider.filteredEntries;
     final emotionFactors = entryProvider.emotionFactors;
     final tagFactors = entryProvider.tagFactors;
 
@@ -151,17 +154,17 @@ class _StatisticsPageState extends State<StatisticsPage> {
         Wrap(
           spacing: 10,
           runSpacing: 10,
-          children: _buildFactorButtonList(
-              entries, context, emotionFactors, tagFactors),
+          children: _buildFactorButtonList(context, emotionFactors, tagFactors),
         ),
       ],
     );
   }
 
-  List<Widget> _buildFactorButtonList(List<Entry> entries, BuildContext context,
+  List<Widget> _buildFactorButtonList(BuildContext context,
       List<Emotion> emotionFactors, List<Tag> tagFactors) {
     List<Widget> factorButtons = [];
     String currentLocale = context.locale.toString();
+
     List<Widget> emotionButtons = emotionFactors.map((emotion) {
       final String btnText =
           currentLocale == 'en_US' ? emotion.nameEn : emotion.nameFr;
@@ -191,18 +194,15 @@ class _StatisticsPageState extends State<StatisticsPage> {
   }
 
   Widget _buildRangeTypeButtons(BuildContext context, EntryProvider provider) {
-    bool isWeekSelected = provider.isWeekSelected;
-
-    bool isMonthSelected = !provider.isWeekSelected;
-
     final double maxButtonWidth = MediaQuery.of(context).size.width / 2;
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Expanded(
           child: AnimBtn(
               btnText: context.tr('statistics_week'),
-              isSelected: isWeekSelected,
+              isSelected: provider.isWeekSelected,
               borderWidth: 1,
               borderRadius: 5,
               width: maxButtonWidth,
@@ -216,7 +216,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
         Expanded(
           child: AnimBtn(
               btnText: context.tr('statistics_month'),
-              isSelected: isMonthSelected,
+              isSelected: !provider.isWeekSelected,
               borderWidth: 1,
               borderRadius: 5,
               width: maxButtonWidth,
@@ -232,10 +232,9 @@ class _StatisticsPageState extends State<StatisticsPage> {
   }
 
   Widget _buildDateSelector(BuildContext context, EntryProvider provider) {
-    final weeks = provider.weeks;
-    final months = provider.months;
-    final List<DateTime> dateList = provider.isWeekSelected ? weeks : months;
-    final ScrollController? scrollController = provider.isWeekSelected
+    final List<DateTime> dateList =
+        provider.isWeekSelected ? provider.weeks : provider.months;
+    final ScrollController scrollController = provider.isWeekSelected
         ? _scrollControllerWeeks
         : _scrollControllerMonths;
 
@@ -308,10 +307,12 @@ class _StatisticsPageState extends State<StatisticsPage> {
   void _scrollToSelectedDate(EntryProvider entryProvider) {
     if (_selectedStartDate == null) return;
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final ScrollController? scrollController = entryProvider.isWeekSelected
+      final ScrollController scrollController = entryProvider.isWeekSelected
           ? _scrollControllerWeeks
           : _scrollControllerMonths;
-      scrollController!.jumpTo(scrollController.position.maxScrollExtent);
+      if (scrollController.hasClients) {
+        scrollController.jumpTo(scrollController.position.maxScrollExtent);
+      }
     });
   }
 

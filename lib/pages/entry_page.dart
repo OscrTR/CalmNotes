@@ -28,9 +28,13 @@ class EntryCreate extends StatefulWidget {
 class _EntryCreateState extends State<EntryCreate> {
   DateTime _selectedDate = DateTime.now();
   TimeOfDay _selectedTime = TimeOfDay.now();
-  int? _selectedMood;
+  int? _selectedMood = 5;
+
   final GlobalKey _emotionTooltipKey = GlobalKey();
   final GlobalKey _tagsTooltipKey = GlobalKey();
+
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
 
   void _showEmotionTooltip() {
     final dynamic tooltip = _emotionTooltipKey.currentState;
@@ -42,8 +46,6 @@ class _EntryCreateState extends State<EntryCreate> {
     tooltip.ensureTooltipVisible();
   }
 
-  final TextEditingController _titleController = TextEditingController();
-  final TextEditingController _descriptionController = TextEditingController();
   bool myInterceptor(bool stopDefaultButtonEvent, RouteInfo info) {
     GoRouter.of(context).go('/home');
     Provider.of<EmotionProvider>(context, listen: false).resetEmotions();
@@ -72,8 +74,6 @@ class _EntryCreateState extends State<EntryCreate> {
           .setEmotions(widget.entry!.id!);
       Provider.of<TagProvider>(context, listen: false)
           .setTags(widget.entry!.id!);
-    } else {
-      _selectedMood = 5;
     }
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await Future.delayed(const Duration(milliseconds: 100));
@@ -100,8 +100,6 @@ class _EntryCreateState extends State<EntryCreate> {
   TimeOfDay parseTimeOfDay(String dateTimeString) {
     // Split the string to separate date and time
     List<String> parts = dateTimeString.split('|');
-
-    // Extract the time part (assuming the format is correct)
     if (parts.length != 2) {
       throw const FormatException('Invalid date-time format');
     }

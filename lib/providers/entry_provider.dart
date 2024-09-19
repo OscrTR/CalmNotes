@@ -17,7 +17,7 @@ class EntryProvider extends ChangeNotifier {
   List<FlSpot> _entrySpots = [];
   Map<double, Color> _gradientColorsStopsMap = {};
   String _selectedFactorString = '';
-  Factor? _selectedFactor = null;
+  Factor? _selectedFactor;
   List<String> _factorsList = [];
   List<Emotion> _emotionFactors = [];
   List<Tag> _tagFactors = [];
