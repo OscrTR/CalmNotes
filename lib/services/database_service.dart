@@ -105,8 +105,8 @@ class DatabaseService {
 
     if (entry.emotions != null) {
       for (var emotion in entry.emotions!.split(',')) {
-        final intId = int.tryParse(emotion.trim().split(' : ')[0]);
-        final emotionName = emotion.trim().split(' : ')[0];
+        final intId = int.tryParse(emotion.trim().split(':')[0]);
+        final emotionName = emotion.trim().split(':')[0].trim();
         if (intId == null) {
           final List<Map<String, dynamic>> result = await db.query(
             'emotions',
@@ -117,7 +117,7 @@ class DatabaseService {
 
           if (result.isNotEmpty) {
             emotionsString +=
-                '${result.first['id'] as int} : ${emotion.trim().split(' : ')[1]}';
+                '${emotionsString.isNotEmpty ? ',' : ''}${result.first['id'] as int} : ${emotion.trim().split(':')[1].trim()}';
           }
         }
       }
@@ -142,7 +142,7 @@ class DatabaseService {
     if (entry.tags != null) {
       for (var tag in entry.tags!.split(',')) {
         final intId = int.tryParse(tag.trim().split(' : ')[0]);
-        final tagName = tag.trim().split(' : ')[0];
+        final tagName = tag.trim().split(':')[0].trim();
         if (intId == null) {
           final List<Map<String, dynamic>> result = await db.query(
             'tags',
@@ -153,7 +153,7 @@ class DatabaseService {
 
           if (result.isNotEmpty) {
             tagsString +=
-                '${result.first['id'] as int} : ${tag.trim().split(' : ')[1]}';
+                '${tagsString.isNotEmpty ? ',' : ''}${result.first['id'] as int} : ${tag.trim().split(':')[1].trim()}';
           }
         }
       }
@@ -205,10 +205,15 @@ class DatabaseService {
 
       _insertInitialEmotions(db);
     }
+  }
+
+  Future<void> convertOldEntries() async {
     final entries = await fetchEntries();
-    for (var entry in entries) {
-      await _convertEmotions(entry);
-      await _convertTags(entry);
+    if (int.parse(entries[0].date.substring(8, 10)) <= 22) {
+      for (var entry in entries) {
+        await _convertEmotions(entry);
+        await _convertTags(entry);
+      }
     }
   }
 
@@ -408,17 +413,17 @@ class DatabaseService {
     }
   }
 
-  // Helper method for converting String to Map
-
   Map<int, int> _convertStringToMap(String data) {
     final items = data.split(',');
     final Map<int, int> map = {};
     for (var item in items) {
       if (item.isEmpty) continue;
       final parts = item.split(':');
-      final key = int.parse(parts[0].trim());
+      final key = int.tryParse(parts[0].trim());
       final value = int.tryParse(parts[1].trim()) ?? 0;
-      map[key] = value;
+      if (key != null) {
+        map[key] = value;
+      }
     }
     return map;
   }

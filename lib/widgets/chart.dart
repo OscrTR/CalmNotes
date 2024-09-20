@@ -248,7 +248,6 @@ class _ChartState extends State<Chart> {
     );
   }
 
-// Check if all spots contain NaN values
   bool isOnlyNaN(List<FlSpot> spots) {
     return spots.every((spot) => spot.y.isNaN);
   }

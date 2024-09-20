@@ -18,7 +18,6 @@ class EntryProvider extends ChangeNotifier {
   Map<double, Color> _gradientColorsStopsMap = {};
   String _selectedFactorString = '';
   Factor? _selectedFactor;
-  List<String> _factorsList = [];
   List<Emotion> _emotionFactors = [];
   List<Tag> _tagFactors = [];
   List<FlSpot> _factorSpots = [];
@@ -45,7 +44,6 @@ class EntryProvider extends ChangeNotifier {
   Map<double, Color> get gradientColorsStopsMap => _gradientColorsStopsMap;
   String get selectedFactorString => _selectedFactorString;
   Factor? get selectedFactor => _selectedFactor;
-  List<String> get factorsList => _factorsList;
   List<Emotion> get emotionFactors => _emotionFactors;
   List<Tag> get tagFactors => _tagFactors;
   List<FlSpot> get factorSpots => _factorSpots;
@@ -139,11 +137,14 @@ class EntryProvider extends ChangeNotifier {
 
   Future<void> updateStatistics() async {
     _filteredEntries = await _filterEntriesBetweenDates(_startDate, _endDate);
-    _factorsList = await _extractFactors(_filteredEntries);
     _emotionFactors = await _extractEmotions(_filteredEntries);
     _tagFactors = await _extractTags(_filteredEntries);
     if (_selectedFactorString != '') {
-      if (!_factorsList.contains(_selectedFactorString)) {
+      bool isEmotionSelected = _emotionFactors
+          .any((emotion) => emotion.nameEn == _selectedFactorString);
+      bool isTagSelected =
+          _tagFactors.any((tag) => tag.name == _selectedFactorString);
+      if (!isEmotionSelected && !isTagSelected) {
         _factorSpots = [];
       } else {
         _factorSpots = await _convertFactorsToSpots(
@@ -161,7 +162,7 @@ class EntryProvider extends ChangeNotifier {
 
   void selectFactor(String factor) async {
     _selectedFactorString = factor;
-    final factorsList = await _createFactorsList(entries);
+    final factorsList = await _createFactorsList(_entries);
 
     for (var factor in factorsList) {
       if (factor.nameEn == _selectedFactorString) {
@@ -225,63 +226,75 @@ class EntryProvider extends ChangeNotifier {
       final DateTime date = DateTime.parse(entry.date.split('|')[0]);
       for (var emotion in entry.emotions!.split(',')) {
         if (emotion != '') {
-          final emotionId = emotion.trim().split(' : ')[0];
-          final emotionCount = double.parse(emotion.trim().split(' : ')[1]);
+          final emotionParts = emotion.trim().split(':');
 
-          final List<Map<String, dynamic>> result = await db.query(
-            'emotions',
-            where: 'id = ?',
-            whereArgs: [emotionId],
-          );
-          if (result.isNotEmpty) {
-            final bool isAlreadyInList = factorsList.any((factor) =>
-                factor.nameEn == result.first['nameEn'] && factor.date == date);
+          if (emotionParts.length == 2) {
+            final emotionId = emotionParts[0].trim();
+            final emotionCount = double.tryParse(emotionParts[1].trim()) ?? 0;
+            final List<Map<String, dynamic>> result = await db.query(
+              'emotions',
+              where: 'id = ?',
+              whereArgs: [emotionId],
+            );
+            if (result.isNotEmpty) {
+              final bool isAlreadyInList = factorsList.any((factor) =>
+                  factor.nameEn == result.first['nameEn'] &&
+                  factor.date == date);
 
-            if (isAlreadyInList) {
-              final Factor existingFactor = factorsList.firstWhere(
-                (factor) =>
-                    factor.nameEn == result.first['nameEn'] &&
-                    factor.date == date,
-              );
-              // If the factor exists, increase the selectedCount (value)
-              existingFactor.incrementValue(emotionCount);
-            } else {
-              factorsList.add(Factor(
-                  date: date,
-                  nameEn: result.first['nameEn'],
-                  nameFr: result.first['nameFr'],
-                  value: emotionCount));
+              if (isAlreadyInList) {
+                final Factor existingFactor = factorsList.firstWhere(
+                  (factor) =>
+                      factor.nameEn == result.first['nameEn'] &&
+                      factor.date == date,
+                );
+                existingFactor.incrementValue(emotionCount);
+              } else {
+                factorsList.add(Factor(
+                    date: date,
+                    nameEn: result.first['nameEn'],
+                    nameFr: result.first['nameFr'],
+                    value: emotionCount));
+              }
             }
+          } else {
+            continue;
           }
         }
       }
 
       for (var tag in entry.tags!.split(',')) {
-        final tagId = tag.trim().split(' : ')[0];
-        final tagCount = double.parse(tag.trim().split(' : ')[1]);
+        if (tag != '') {
+          final tagParts = tag.trim().split(':');
+          if (tagParts.length == 2) {
+            final tagId = tagParts[0].trim();
+            final tagCount = double.tryParse(tagParts[1].trim()) ?? 0;
 
-        final List<Map<String, dynamic>> result = await db.query(
-          'tags',
-          where: 'id = ?',
-          whereArgs: [tagId],
-        );
-        if (result.isNotEmpty) {
-          final bool isAlreadyInList = factorsList.any((factor) =>
-              factor.nameEn == result.first['name'] && factor.date == date);
-
-          if (isAlreadyInList) {
-            final Factor existingFactor = factorsList.firstWhere(
-              (factor) =>
-                  factor.nameEn == result.first['name'] && factor.date == date,
+            final List<Map<String, dynamic>> result = await db.query(
+              'tags',
+              where: 'id = ?',
+              whereArgs: [tagId],
             );
-            // If the factor exists, increase the selectedCount (value)
-            existingFactor.incrementValue(tagCount);
+            if (result.isNotEmpty) {
+              final bool isAlreadyInList = factorsList.any((factor) =>
+                  factor.nameEn == result.first['name'] && factor.date == date);
+
+              if (isAlreadyInList) {
+                final Factor existingFactor = factorsList.firstWhere(
+                  (factor) =>
+                      factor.nameEn == result.first['name'] &&
+                      factor.date == date,
+                );
+                existingFactor.incrementValue(tagCount);
+              } else {
+                factorsList.add(Factor(
+                    date: date,
+                    nameEn: result.first['name'],
+                    nameFr: result.first['name'],
+                    value: tagCount));
+              }
+            }
           } else {
-            factorsList.add(Factor(
-                date: date,
-                nameEn: result.first['name'],
-                nameFr: result.first['name'],
-                value: tagCount));
+            continue;
           }
         }
       }
@@ -290,7 +303,6 @@ class EntryProvider extends ChangeNotifier {
     return factorsList;
   }
 
-  // Method to filter entries between specified dates
   Future<List<Entry>> _filterEntriesBetweenDates(
       DateTime startDate, DateTime endDate) async {
     DateTime startOfDay =
@@ -299,8 +311,7 @@ class EntryProvider extends ChangeNotifier {
         endDate.year, endDate.month, endDate.day, 23, 59, 59, 999, 999);
 
     return _entries.where((entry) {
-      DateTime entryDate =
-          _convertStringToDateTime(entry.date); // Convert string to DateTime
+      DateTime entryDate = _convertStringToDateTime(entry.date);
       return entryDate
               .isAfter(startOfDay.subtract(const Duration(seconds: 1))) &&
           entryDate.isBefore(endOfDay.add(const Duration(seconds: 1)));
@@ -320,12 +331,10 @@ class EntryProvider extends ChangeNotifier {
     return moodSumMap;
   }
 
-  // Helper method to convert a date string to DateTime
   DateTime _convertStringToDateTime(String dateString) {
     return DateTime.parse(dateString.replaceFirst('|', 'T'));
   }
 
-  // Generate the full date range between startDate and endDate
   Future<List<String>> _generateFullDateRange(
       DateTime startDate, DateTime endDate) async {
     return List.generate(
@@ -412,15 +421,13 @@ class EntryProvider extends ChangeNotifier {
     return ranges;
   }
 
-  // retourner la liste d'émotions
   Future<List<Emotion>> _extractEmotions(List<Entry> entries) async {
-    // créer un set pour ne pas avoir de doublon avec l'id en key
     Map<int, Emotion> emotionsMap = {};
     for (var entry in entries) {
       if (entry.emotions != null) {
         for (var emotion in entry.emotions!.split(',')) {
-          if (emotion != '') {
-            final id = int.parse(emotion.trim().split(' : ')[0]);
+          final id = int.tryParse(emotion.trim().split(' : ')[0]);
+          if (id != null) {
             final matchingEmotion = await _databaseService.getEmotion(id);
             emotionsMap[id] = matchingEmotion;
           }
@@ -430,42 +437,20 @@ class EntryProvider extends ChangeNotifier {
     return emotionsMap.values.toList();
   }
 
-  // retourner la liste de tags
   Future<List<Tag>> _extractTags(List<Entry> entries) async {
-    // créer un set pour ne pas avoir de doublon avec l'id en key
     Map<int, Tag> tagMap = {};
     for (var entry in entries) {
       if (entry.tags != null) {
         for (var tag in entry.tags!.split(',')) {
-          final id = int.parse(tag.trim().split(' : ')[0]);
-          final matchingTag = await _databaseService.getTag(id);
-          tagMap[id] = matchingTag;
+          final id = int.tryParse(tag.trim().split(' : ')[0]);
+          if (id != null) {
+            final matchingTag = await _databaseService.getTag(id);
+            tagMap[id] = matchingTag;
+          }
         }
       }
     }
     return tagMap.values.toList();
-  }
-
-  Future<List<String>> _extractFactors(List<Entry> entries) async {
-    Set<String> factorsSet = {};
-
-    for (var entry in entries) {
-      _processEntry(entry.emotions, factorsSet);
-      _processEntry(entry.tags, factorsSet);
-    }
-
-    return factorsSet.toList();
-  }
-
-  void _processEntry(String? entryString, Set<String> factorsSet) {
-    if (entryString != null && entryString.isNotEmpty) {
-      for (var item in entryString.split(',')) {
-        var trimmedItem = item.trim().split(" : ")[0];
-        if (trimmedItem.isNotEmpty) {
-          factorsSet.add(trimmedItem);
-        }
-      }
-    }
   }
 
   int _getCalendarDays() {

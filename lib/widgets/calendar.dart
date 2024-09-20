@@ -97,8 +97,7 @@ class _CalendarState extends State<Calendar> {
     final Locale currentLocale = Localizations.localeOf(context);
     DateFormat dayFormat = DateFormat.E(currentLocale.toString());
 
-    // Start from a fixed Monday (e.g., Monday of any week)
-    DateTime baseMonday = DateTime(2023, 8, 14); // August 14, 2023 is a Monday
+    DateTime baseMonday = DateTime(2023, 8, 14);
 
     return List.generate(7, (i) {
       DateTime date = baseMonday.add(Duration(days: i));

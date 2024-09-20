@@ -98,7 +98,6 @@ class _EntryCreateState extends State<EntryCreate> {
   }
 
   TimeOfDay parseTimeOfDay(String dateTimeString) {
-    // Split the string to separate date and time
     List<String> parts = dateTimeString.split('|');
     if (parts.length != 2) {
       throw const FormatException('Invalid date-time format');
@@ -106,7 +105,6 @@ class _EntryCreateState extends State<EntryCreate> {
 
     String timePart = parts[1];
 
-    // Split the time part into hours and minutes
     List<String> timeParts = timePart.split(':');
     if (timeParts.length != 2) {
       throw const FormatException('Invalid time format');
@@ -115,7 +113,6 @@ class _EntryCreateState extends State<EntryCreate> {
     int hour = int.parse(timeParts[0]);
     int minute = int.parse(timeParts[1]);
 
-    // Create and return a TimeOfDay object
     return TimeOfDay(hour: hour, minute: minute);
   }
 

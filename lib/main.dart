@@ -17,7 +17,9 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
   await NotificationService.initializeNotifications();
-  _databaseService.checkIfColumnExists();
+  await _databaseService.checkIfColumnExists();
+  await _databaseService.convertOldEntries();
+
   runApp(
     EasyLocalization(
       supportedLocales: const [Locale('en', 'US'), Locale('fr', 'FR')],

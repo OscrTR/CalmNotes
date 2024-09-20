@@ -23,8 +23,7 @@ class StatisticsPage extends StatefulWidget {
 
 class _StatisticsPageState extends State<StatisticsPage> {
   DateTime? _selectedStartDate;
-  late ScrollController _scrollControllerWeeks;
-  late ScrollController _scrollControllerMonths;
+  late ScrollController _scrollController;
 
   bool myInterceptor(bool stopDefaultButtonEvent, RouteInfo info) {
     GoRouter.of(context).go('/home');
@@ -34,8 +33,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
   @override
   void dispose() {
     BackButtonInterceptor.remove(myInterceptor);
-    _scrollControllerMonths.dispose();
-    _scrollControllerWeeks.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -45,10 +43,8 @@ class _StatisticsPageState extends State<StatisticsPage> {
     BackButtonInterceptor.add(myInterceptor);
 
     final entryProvider = context.read<EntryProvider>();
-    _scrollControllerWeeks = ScrollController(
+    _scrollController = ScrollController(
         initialScrollOffset: entryProvider.initialWeeksListOffset);
-    _scrollControllerMonths = ScrollController(
-        initialScrollOffset: entryProvider.initialMonthsListOffset);
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await Future.delayed(const Duration(milliseconds: 100));
@@ -207,9 +203,9 @@ class _StatisticsPageState extends State<StatisticsPage> {
               borderRadius: 5,
               width: maxButtonWidth,
               borderColor: Colors.transparent,
-              onPress: () {
+              onPress: () async {
                 provider.changeRangeTypeSelection();
-                provider.setDefaultWeekDate();
+                await provider.setDefaultWeekDate();
                 _scrollToSelectedDate(provider);
               }),
         ),
@@ -221,9 +217,9 @@ class _StatisticsPageState extends State<StatisticsPage> {
               borderRadius: 5,
               width: maxButtonWidth,
               borderColor: Colors.transparent,
-              onPress: () {
+              onPress: () async {
                 provider.changeRangeTypeSelection();
-                provider.setDefaultMonthDate();
+                await provider.setDefaultMonthDate();
                 _scrollToSelectedDate(provider);
               }),
         ),
@@ -234,15 +230,12 @@ class _StatisticsPageState extends State<StatisticsPage> {
   Widget _buildDateSelector(BuildContext context, EntryProvider provider) {
     final List<DateTime> dateList =
         provider.isWeekSelected ? provider.weeks : provider.months;
-    final ScrollController scrollController = provider.isWeekSelected
-        ? _scrollControllerWeeks
-        : _scrollControllerMonths;
 
     return SizedBox(
       height: 40,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        controller: scrollController,
+        controller: _scrollController,
         itemCount: dateList.length,
         itemBuilder: (context, index) {
           final date = dateList[index];
@@ -307,11 +300,12 @@ class _StatisticsPageState extends State<StatisticsPage> {
   void _scrollToSelectedDate(EntryProvider entryProvider) {
     if (_selectedStartDate == null) return;
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final ScrollController scrollController = entryProvider.isWeekSelected
-          ? _scrollControllerWeeks
-          : _scrollControllerMonths;
-      if (scrollController.hasClients) {
-        scrollController.jumpTo(scrollController.position.maxScrollExtent);
+      if (_scrollController.hasClients) {
+        if (entryProvider.isWeekSelected) {
+          _scrollController.jumpTo(entryProvider.initialWeeksListOffset);
+        } else {
+          _scrollController.jumpTo(entryProvider.initialMonthsListOffset);
+        }
       }
     });
   }

@@ -12,7 +12,6 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 final DatabaseService _databaseService = DatabaseService.instance;
-// GoRouter configuration
 final router = GoRouter(
   initialLocation: '/',
   routes: [

@@ -15,36 +15,29 @@ class TagProvider extends ChangeNotifier {
   }
 
   List<Tag> _combineLists(List<Tag> list1, List<Tag> list2) {
-    // Create a map from list2 for quick lookup by id
     Map<int, Tag> map2 = {for (var e in list2) e.id!: e};
 
-    // Create a new list with updated values from list2
     List<Tag> updatedList = list1
         .map((tag) {
           if (map2.containsKey(tag.id)) {
-            // Update the Tag from list1 with values from list2
             return tag.updateFrom(map2[tag.id]!);
           }
-          // If not in list2, exclude this Tag
           return null;
         })
         .whereType<Tag>()
         .toList();
 
-    // Add new elements from list2 that were not in list1
     List<Tag> newElements = map2.entries
         .where((entry) => !list1.any((e) => e.id == entry.key))
         .map((entry) => entry.value)
         .toList();
 
-    // Combine the updated list1 with new elements from list2
     updatedList.addAll(newElements);
 
     return updatedList;
   }
 
   Future<void> fetchTags() async {
-    // Fetch tags and tagsToDisplay in parallel
     final results = await Future.wait(
         [_databaseService.fetchTags(), _databaseService.fetchTagsToDisplay()]);
 
