@@ -5,18 +5,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:calm_notes/services/database_service.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
-void sqfliteTestInit() {
-  // Initialize ffi implementation
-  sqfliteFfiInit();
-  // Set global factory
-  databaseFactory = databaseFactoryFfi;
-}
-
 void main() {
   late TagProvider tagProvider;
-
-  sqfliteTestInit();
   late DatabaseService dbService;
+
+  sqfliteFfiInit();
+  databaseFactory = databaseFactoryFfi;
 
   setUp(() async {
     dbService = DatabaseService.instance;
@@ -28,7 +22,6 @@ void main() {
     final tables = ['entries', 'reminders', 'emotions', 'tags'];
 
     for (var table in tables) {
-      // Delete all rows from the table
       await db.delete(table);
     }
   });
@@ -125,7 +118,7 @@ void main() {
       emotions: 'sad:1,happy:2',
       title: 'Cool title',
       description: 'My description.',
-      tags: 'work:1,friends:2',
+      tags: '1:1,2:2',
     );
 
     final entryId = await dbService.addEntry(entryToAdd);

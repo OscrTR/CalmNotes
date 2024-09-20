@@ -251,10 +251,10 @@ void main() {
       final entry = Entry(
         date: '2024-08-20',
         mood: 5,
-        emotions: 'happy:1,playful:2',
+        emotions: '1:1,2:2',
         title: 'Great Day',
         description: 'Had a wonderful day!',
-        tags: 'personal:1,work:3',
+        tags: '1:1,2:3',
       );
 
       final entryId = await dbService.addEntry(entry);
@@ -326,7 +326,7 @@ void main() {
         emotions: 'Happy:1,Excited:2',
         title: 'Great Day',
         description: 'Had a wonderful day!',
-        tags: 'personal:1,work:3',
+        tags: '1:1,2:3',
       );
 
       final entryId = await dbService.addEntry(entry);

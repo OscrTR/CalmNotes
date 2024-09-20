@@ -95,10 +95,10 @@ void main() {
     final entryToAdd = Entry(
       date: '2024-08-19|18:00',
       mood: 10,
-      emotions: 'happy:1,playful:2',
+      emotions: '1:1,2:2',
       title: 'Cool title',
       description: 'My description.',
-      tags: 'work:1,friends:2',
+      tags: '1:1,2:2',
     );
 
     await emotionProvider.fetchEmotions();

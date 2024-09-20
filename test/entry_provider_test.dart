@@ -5,18 +5,12 @@ import 'package:calm_notes/providers/entry_provider.dart';
 import 'package:calm_notes/services/database_service.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
-void sqfliteTestInit() {
-  // Initialize ffi implementation
-  sqfliteFfiInit();
-  // Set global factory
-  databaseFactory = databaseFactoryFfi;
-}
-
 void main() {
   late EntryProvider entryProvider;
-
-  sqfliteTestInit();
   late DatabaseService dbService;
+
+  sqfliteFfiInit();
+  databaseFactory = databaseFactoryFfi;
 
   setUp(() async {
     dbService = DatabaseService.instance;
@@ -179,6 +173,10 @@ void main() {
   test('Getting mood distribution', () async {
     final DateTime now = DateTime.now();
     final DateFormat formatter = DateFormat('yyyy-MM-dd|HH:mm:ss');
+
+    entryProvider.setStartEndDate(
+        DateTime.now().subtract(const Duration(days: 1)),
+        DateTime.now().add(const Duration(days: 4)));
 
     final entry1 = Entry(mood: 2, date: formatter.format(now));
     final entry2 = Entry(mood: 4, date: formatter.format(now));
