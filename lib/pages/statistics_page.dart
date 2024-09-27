@@ -63,28 +63,44 @@ class _StatisticsPageState extends State<StatisticsPage> {
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.only(top: 20, bottom: 0, left: 20, right: 20),
-        child: ListView(
+        child: Stack(
           children: [
-            Text(context.tr('statistics_page_title'),
-                style: Theme.of(context).textTheme.headlineMedium),
-            const SizedBox(height: 20),
-            _buildRangeTypeButtons(context, entryProvider),
-            const SizedBox(height: 10),
-            _buildDateSelector(context, entryProvider),
-            const SizedBox(height: 20),
-            _buildFactorSelection(entryProvider, entries, context),
-            const SizedBox(height: 10),
-            const Chart(),
-            const SizedBox(height: 30),
-            Text(context.tr('statistics_mood_calendar'),
-                style: Theme.of(context).textTheme.titleMedium),
-            const SizedBox(height: 20),
-            const Calendar(),
-            const SizedBox(height: 30),
-            Text(context.tr('statistics_mood_distribution'),
-                style: Theme.of(context).textTheme.titleMedium),
-            const SizedBox(height: 20),
-            const CustomPieChart(),
+            ListView(
+              children: [
+                const SizedBox(height: 166),
+                _buildFactorSelection(entryProvider, entries, context),
+                const SizedBox(height: 10),
+                const Chart(),
+                const SizedBox(height: 30),
+                Text(context.tr('statistics_mood_calendar'),
+                    style: Theme.of(context).textTheme.titleMedium),
+                const SizedBox(height: 20),
+                const Calendar(),
+                const SizedBox(height: 30),
+                Text(context.tr('statistics_mood_distribution'),
+                    style: Theme.of(context).textTheme.titleMedium),
+                const SizedBox(height: 20),
+                const CustomPieChart(),
+              ],
+            ),
+            Positioned(
+              child: Container(
+                color: CustomColors.backgroundColor,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(context.tr('statistics_page_title'),
+                        style: Theme.of(context).textTheme.headlineMedium),
+                    const SizedBox(height: 20),
+                    _buildRangeTypeButtons(context, entryProvider),
+                    const SizedBox(height: 10),
+                    _buildDateSelector(context, entryProvider),
+                    const SizedBox(height: 20),
+                  ],
+                ),
+              ),
+            )
           ],
         ),
       ),
